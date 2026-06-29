@@ -1,6 +1,6 @@
 (function () {
-  if (window.__RUNNING__) return;
-  window.__RUNNING__ = true;
+  if (window.__BOOTSTRAPPED__) return;
+  window.__BOOTSTRAPPED__ = true;
 
   const EXEC = "https://script.google.com/macros/s/AKfycbzz8VzmHGW2RijK0BdvwHAB3kt71YBKehCWcWC40dWlatVkCKqsLDMmJvSjayypXgyF/exec";
 
@@ -13,9 +13,22 @@
   }
 
   // =========================
-  // 🔥 EL CAMINO INLINE BUTTON
+  // 🔥 SINGLE SOURCE OF TRIGGER
   // =========================
-  function injectELCAMINO() {
+  window.EL_CAMINO_START = function () {
+    if (window.__RUNNING__) return;
+    window.__RUNNING__ = true;
+
+    console.log("EL CAMINO STARTED");
+
+    // start main engine
+    document.getElementById('btnSearch')?.click();
+  };
+
+  // =========================
+  // 🔥 INLINE BUTTON (EL CAMINO)
+  // =========================
+  function injectButton() {
     const searchBtn = document.getElementById('btnSearch');
     if (!searchBtn) return;
     if (document.getElementById('ELCAMINO_INLINE_BTN')) return;
@@ -25,7 +38,6 @@
     btn.type = 'button';
     btn.innerText = 'EL CAMINO';
 
-    // ===== ELITE STYLE =====
     btn.style.marginLeft = '10px';
     btn.style.padding = '6px 14px';
     btn.style.border = '1px solid rgba(184, 39, 252, 0.9)';
@@ -35,7 +47,6 @@
     btn.style.fontSize = '12px';
     btn.style.fontWeight = '600';
     btn.style.background = 'linear-gradient(135deg,#0f0f0f,#1a1a1a)';
-
     btn.style.boxShadow = `
       0 0 0 1px rgba(184,39,252,0.6),
       0 0 0 2px rgba(44,144,252,0.5),
@@ -53,36 +64,19 @@
       btn.style.filter = 'brightness(1)';
     };
 
+    // 🔥 SAME TRIGGER (bookmark & button)
     btn.onclick = function () {
-      if (window.__RUNNING__) return;
-
-      window.__RUNNING__ = true;
-
-      try {
-        runELCAMINO();
-      } catch (e) {
-        console.log(e);
-        unlock();
-      }
+      window.EL_CAMINO_START();
     };
 
     searchBtn.parentNode.insertBefore(btn, searchBtn.nextSibling);
   }
 
-  // expose trigger (optional clean hook)
-  window.__ELCAMINO_RUN__ = function () {
-    document.getElementById('btnSearch')?.click();
-  };
-
-  function runELCAMINO() {
-    window.__ELCAMINO_RUN__?.();
-  }
-
-  setInterval(injectELCAMINO, 1500);
-  injectELCAMINO();
+  setInterval(injectButton, 1500);
+  injectButton();
 
   // =========================
-  // 🔥 UI PANEL (UNCHANGED CORE)
+  // 🔥 UI PANEL (UNCHANGED)
   // =========================
   function ui() {
     if (document.getElementById('payHostUI')) return;
