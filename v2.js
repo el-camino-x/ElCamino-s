@@ -35,10 +35,15 @@
   const BLOCK = ['NEW REGISTRATION', 'SUSPICIOUS'];
 
   // =========================
-  // FLOATING UI (CONFIG PANEL)
+  // UI CONTROL PANEL
   // =========================
   function ui() {
     if (document.getElementById('payHostUI')) return;
+
+    if (!document.body) {
+      setTimeout(ui, 200);
+      return;
+    }
 
     let host = document.createElement('div');
     host.id = 'payHostUI';
@@ -120,28 +125,10 @@
 
     w.querySelector('#ca').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = true);
     w.querySelector('#uc').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = false);
-
-    // drag
-    let h = w.querySelector('.h');
-    let d = 0, ox = 0, oy = 0;
-
-    h.onmousedown = e => {
-      d = 1;
-      ox = e.clientX - host.offsetLeft;
-      oy = e.clientY - host.offsetTop;
-    };
-
-    document.onmouseup = () => d = 0;
-
-    document.onmousemove = e => {
-      if (!d) return;
-      host.style.left = (e.clientX - ox) + 'px';
-      host.style.top = (e.clientY - oy) + 'px';
-    };
   }
 
   // =========================
-  // INJECT BUTTON DI WEB PAGE
+  // INJECT BUTTON
   // =========================
   function injectCaminoButton() {
     const btn = document.getElementById('btnSearch');
@@ -149,21 +136,23 @@
 
     const cam = document.createElement('button');
     cam.id = 'btnElCamino';
-    cam.type = 'button';
+    cam.type = 'button'; // 🔥 FIX REFRESH
     cam.innerHTML = 'EL CAMINO';
     cam.className = btn.className;
-
     cam.style.marginLeft = '8px';
 
-    btn.insertAdjacentElement('afterend', cam);
+    cam.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
 
-    cam.onclick = () => {
       if (window.__ENGINE_RUNNING__) return;
       window.__ENGINE_RUNNING__ = true;
 
-      btn.click(); // trigger reload data
+      btn.click();
       startEngine();
-    };
+    });
+
+    btn.insertAdjacentElement('afterend', cam);
   }
 
   // =========================
@@ -186,7 +175,6 @@
       if (s < 3) return;
 
       clearInterval(iv);
-
       runFlow();
     }, 400);
   }
@@ -311,4 +299,5 @@
   // =========================
   ui();
   injectCaminoButton();
+
 })();
