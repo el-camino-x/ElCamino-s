@@ -38,94 +38,125 @@
   // UI CONTROL PANEL
   // =========================
   function ui() {
-    if (document.getElementById('payHostUI')) return;
+  if (document.getElementById('payHostUI')) return;
 
-    if (!document.body) {
-      setTimeout(ui, 200);
-      return;
-    }
-
-    let host = document.createElement('div');
-    host.id = 'payHostUI';
-    host.style = 'position:fixed;top:100px;left:100px;z-index:999999';
-
-    let sh = host.attachShadow({ mode: 'open' });
-
-    let style = document.createElement('style');
-    style.textContent = `
-      .p{background:#111;color:#fff;border-radius:12px;font-family:Arial;width:280px;height:320px;resize:both;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5);position:relative}
-      .h{cursor:move;background:#222;padding:8px;font-weight:bold}
-      .b{padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px}
-      .b label{display:flex;align-items:center;gap:6px}
-      .btns{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;margin-top:8px}
-      .row2{display:flex;gap:6px}
-      .row2 button{flex:1}
-      button{width:100%;padding:6px;font-size:11px;border:none;border-radius:8px;background:#2a5298;color:#fff;font-weight:500;cursor:pointer}
-      button:hover{filter:brightness(1.1)}
-      .ft{position:absolute;bottom:6px;left:10px;right:10px;overflow:hidden}
-      .marq{display:inline-block;white-space:nowrap;animation:mar 48s linear infinite;color:#8fbfff}
-      .marq span{padding-right:90px}
-      @keyframes mar{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-    `;
-
-    let w = document.createElement('div');
-    w.className = 'p';
-
-    w.innerHTML = `
-      <div class="h">ElCamino-爱 Operation V1</div>
-      <div class="b">
-        <label><input id="DANA" type="checkbox"> DANA</label>
-        <label><input id="OVO" type="checkbox"> OVO</label>
-        <label><input id="GOPAY" type="checkbox"> GOPAY</label>
-        <label><input id="BCA" type="checkbox"> BCA</label>
-        <label><input id="BNI" type="checkbox"> BNI</label>
-        <label><input id="BRI" type="checkbox"> BRI</label>
-        <label><input id="MANDIRI" type="checkbox"> MANDIRI</label>
-        <label><input id="BSI" type="checkbox"> BSI</label>
-        <label><input id="JAGO" type="checkbox"> JAGO</label>
-        <label><input id="PERMATA" type="checkbox"> PERMATA</label>
-        <label><input id="MAYBANK" type="checkbox"> MAYBANK</label>
-        <label><input id="SEABANK" type="checkbox"> SEABANK</label>
-
-        <div class="btns">
-          <button id="sv">SAVE</button>
-          <div class="row2">
-            <button id="ca">CHECK ALL</button>
-            <button id="uc">UNCHECK</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="ft">
-        <div class="marq">
-          <span>EL CAMINO’S SOLDATO • PRIVATE OPERATIONS NETWORK • DISCREET SYSTEM ACTIVE • GLOBAL TRANSACTIONS FLOWING •</span>
-          <span>EL CAMINO’S SOLDATO • PRIVATE OPERATIONS NETWORK • DISCREET SYSTEM ACTIVE • GLOBAL TRANSACTIONS FLOWING •</span>
-        </div>
-      </div>
-    `;
-
-    sh.appendChild(style);
-    sh.appendChild(w);
-    document.body.appendChild(host);
-
-    let keys = ['DANA','OVO','GOPAY','BCA','BNI','BRI','MANDIRI','BSI','JAGO','PERMATA','MAYBANK','SEABANK'];
-    let cfg = getCfg();
-
-    keys.forEach(k => {
-      let el = w.querySelector('#' + k);
-      if (el) el.checked = cfg[k] === true;
-    });
-
-    w.querySelector('#sv').onclick = () => {
-      let o = {};
-      keys.forEach(k => o[k] = w.querySelector('#' + k).checked);
-      localStorage.setItem('PAY_CFG', JSON.stringify(o));
-      alert('Saved');
-    };
-
-    w.querySelector('#ca').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = true);
-    w.querySelector('#uc').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = false);
+  if (!document.body) {
+    setTimeout(ui, 200);
+    return;
   }
+
+  let host = document.createElement('div');
+  host.id = 'payHostUI';
+  host.style = 'position:fixed;top:100px;left:100px;z-index:999999';
+
+  let sh = host.attachShadow({ mode: 'open' });
+
+  let style = document.createElement('style');
+  style.textContent = `
+    .p{background:#111;color:#fff;border-radius:12px;font-family:Arial;width:280px;height:320px;resize:both;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5);position:relative}
+    .h{cursor:move;background:#222;padding:8px;font-weight:bold;user-select:none}
+    .b{padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px}
+    .b label{display:flex;align-items:center;gap:6px}
+    .btns{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;margin-top:8px}
+    .row2{display:flex;gap:6px}
+    .row2 button{flex:1}
+    button{width:100%;padding:6px;font-size:11px;border:none;border-radius:8px;background:#2a5298;color:#fff;font-weight:500;cursor:pointer}
+    button:hover{filter:brightness(1.1)}
+    .ft{position:absolute;bottom:6px;left:10px;right:10px;overflow:hidden}
+    .marq{display:inline-block;white-space:nowrap;animation:mar 48s linear infinite;color:#8fbfff}
+    .marq span{padding-right:90px}
+    @keyframes mar{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  `;
+
+  let w = document.createElement('div');
+  w.className = 'p';
+
+  w.innerHTML = `
+    <div class="h">ElCamino-爱 Operation V1</div>
+    <div class="b">
+      <label><input id="DANA" type="checkbox"> DANA</label>
+      <label><input id="OVO" type="checkbox"> OVO</label>
+      <label><input id="GOPAY" type="checkbox"> GOPAY</label>
+      <label><input id="BCA" type="checkbox"> BCA</label>
+      <label><input id="BNI" type="checkbox"> BNI</label>
+      <label><input id="BRI" type="checkbox"> BRI</label>
+      <label><input id="MANDIRI" type="checkbox"> MANDIRI</label>
+      <label><input id="BSI" type="checkbox"> BSI</label>
+      <label><input id="JAGO" type="checkbox"> JAGO</label>
+      <label><input id="PERMATA" type="checkbox"> PERMATA</label>
+      <label><input id="MAYBANK" type="checkbox"> MAYBANK</label>
+      <label><input id="SEABANK" type="checkbox"> SEABANK</label>
+
+      <div class="btns">
+        <button id="sv">SAVE</button>
+        <div class="row2">
+          <button id="ca">CHECK ALL</button>
+          <button id="uc">UNCHECK</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ft">
+      <div class="marq">
+        <span>EL CAMINO’S SOLDATO • PRIVATE OPERATIONS NETWORK • DISCREET SYSTEM ACTIVE • GLOBAL TRANSACTIONS FLOWING •</span>
+        <span>EL CAMINO’S SOLDATO • PRIVATE OPERATIONS NETWORK • DISCREET SYSTEM ACTIVE • GLOBAL TRANSACTIONS FLOWING •</span>
+      </div>
+    </div>
+  `;
+
+  sh.appendChild(style);
+  sh.appendChild(w);
+  document.body.appendChild(host);
+
+  let keys = ['DANA','OVO','GOPAY','BCA','BNI','BRI','MANDIRI','BSI','JAGO','PERMATA','MAYBANK','SEABANK'];
+  let cfg = getCfg();
+
+  keys.forEach(k => {
+    let el = w.querySelector('#' + k);
+    if (el) el.checked = cfg[k] === true;
+  });
+
+  w.querySelector('#sv').onclick = () => {
+    let o = {};
+    keys.forEach(k => o[k] = w.querySelector('#' + k).checked);
+    localStorage.setItem('PAY_CFG', JSON.stringify(o));
+    alert('Saved');
+  };
+
+  w.querySelector('#ca').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = true);
+  w.querySelector('#uc').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = false);
+
+  // =========================
+  // DRAG FIX (ADDED)
+  // =========================
+  const header = w.querySelector('.h');
+
+  let dragging = false;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  header.addEventListener('mousedown', (e) => {
+    dragging = true;
+
+    const rect = host.getBoundingClientRect();
+
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+
+    host.style.position = 'fixed';
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+
+    host.style.left = (e.clientX - offsetX) + 'px';
+    host.style.top = (e.clientY - offsetY) + 'px';
+  });
+
+  document.addEventListener('mouseup', () => {
+    dragging = false;
+  });
+}
 
   // =========================
   // INJECT BUTTON
