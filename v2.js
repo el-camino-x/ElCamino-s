@@ -35,15 +35,11 @@
   const BLOCK = ['NEW REGISTRATION', 'SUSPICIOUS'];
 
   // =========================
-  // UI CONTROL PANEL
+  // UI
   // =========================
   function ui() {
     if (document.getElementById('payHostUI')) return;
-
-    if (!document.body) {
-      setTimeout(ui, 200);
-      return;
-    }
+    if (!document.body) return setTimeout(ui, 200);
 
     let host = document.createElement('div');
     host.id = 'payHostUI';
@@ -54,7 +50,7 @@
     let style = document.createElement('style');
     style.textContent = `
       .p{background:#111;color:#fff;border-radius:12px;font-family:Arial;width:280px;height:320px;resize:both;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5);position:relative}
-      .h{cursor:move;background:#222;padding:8px;font-weight:bold;user-select:none;touch-action:none}
+      .h{cursor:move;background:#222;padding:8px;font-weight:bold;user-select:none}
       .b{padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px}
       .b label{display:flex;align-items:center;gap:6px}
       .btns{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;margin-top:8px}
@@ -65,7 +61,17 @@
       .ft{position:absolute;bottom:6px;left:10px;right:10px;overflow:hidden}
       .marq{display:inline-block;white-space:nowrap;animation:mar 48s linear infinite;color:#8fbfff}
       .marq span{padding-right:90px}
-      @keyframes mar{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+      @keyframes mar {
+        0% {transform:translateX(0)}
+        100% {transform:translateX(-50%)}
+      }
+
+      @keyframes ecGradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
     `;
 
     let w = document.createElement('div');
@@ -126,47 +132,31 @@
     w.querySelector('#ca').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = true);
     w.querySelector('#uc').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = false);
 
-    // =========================
-    // DRAG FIX (FINAL POINTER EVENTS)
-    // =========================
-    const header = w.querySelector('.h');
-
+    // DRAG
+    let h = w.querySelector('.h');
     let dragging = false;
     let offsetX = 0;
     let offsetY = 0;
 
-    host.style.position = 'fixed';
-
-    header.addEventListener('pointerdown', (e) => {
+    h.addEventListener('mousedown', (e) => {
       dragging = true;
-
       const rect = host.getBoundingClientRect();
-
       offsetX = e.clientX - rect.left;
       offsetY = e.clientY - rect.top;
-
-      header.setPointerCapture(e.pointerId);
+      host.style.position = 'fixed';
     });
 
-    header.addEventListener('pointermove', (e) => {
+    document.addEventListener('mousemove', (e) => {
       if (!dragging) return;
-
       host.style.left = (e.clientX - offsetX) + 'px';
       host.style.top = (e.clientY - offsetY) + 'px';
     });
 
-    header.addEventListener('pointerup', (e) => {
-      dragging = false;
-      header.releasePointerCapture(e.pointerId);
-    });
-
-    header.addEventListener('pointercancel', () => {
-      dragging = false;
-    });
+    document.addEventListener('mouseup', () => dragging = false);
   }
 
   // =========================
-  // INJECT BUTTON
+  // BUTTON
   // =========================
   function injectCaminoButton() {
     const btn = document.getElementById('btnSearch');
@@ -177,7 +167,33 @@
     cam.type = 'button';
     cam.innerHTML = 'EL CAMINO';
     cam.className = btn.className;
+
     cam.style.marginLeft = '8px';
+    cam.style.padding = '7px 14px';
+    cam.style.border = 'none';
+    cam.style.borderRadius = '10px';
+    cam.style.cursor = 'pointer';
+    cam.style.color = '#fff';
+    cam.style.fontWeight = '600';
+    cam.style.fontSize = '12px';
+    cam.style.letterSpacing = '0.5px';
+
+    cam.style.background = 'linear-gradient(270deg, #071a33, #1a0b2e, #071a33)';
+    cam.style.backgroundSize = '400% 400%';
+    cam.style.animation = 'ecGradientMove 6s ease infinite';
+
+    cam.style.boxShadow = '0 6px 18px rgba(0,0,0,0.35)';
+    cam.style.transition = 'all 0.15s ease';
+
+    cam.addEventListener('mouseenter', () => {
+      cam.style.transform = 'scale(1.06)';
+      cam.style.boxShadow = '0 10px 25px rgba(0,0,0,0.55)';
+    });
+
+    cam.addEventListener('mouseleave', () => {
+      cam.style.transform = 'scale(1)';
+      cam.style.boxShadow = '0 6px 18px rgba(0,0,0,0.35)';
+    });
 
     cam.addEventListener('click', function (e) {
       e.preventDefault();
@@ -200,10 +216,7 @@
     let l = 0, s = 0;
 
     const iv = setInterval(() => {
-      if (!window.__ENGINE_RUNNING__) {
-        clearInterval(iv);
-        return;
-      }
+      if (!window.__ENGINE_RUNNING__) return clearInterval(iv);
 
       let rows = document.querySelectorAll('table tbody tr').length;
 
@@ -239,10 +252,9 @@
 
       let a = p(tds[6]?.innerText || '');
       let b = p(tds[8]?.innerText || '');
-      let total = a + b;
 
       if (a > 5000000) return;
-      if (total >= 50000000) return;
+      if ((a + b) >= 50000000) return;
 
       valid.push(tr);
     });
@@ -255,21 +267,14 @@
 
     valid.forEach(tr => {
       let cb = tr.querySelector('input[type=checkbox],td.select-checkbox,.select-checkbox,[type=checkbox]');
-      if (cb) {
-        cb.click();
-        cb.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+      if (cb) cb.click();
     });
 
-    let out = [];
-
-    valid.forEach(tr => {
+    let out = valid.map(tr => {
       let t = tr.querySelectorAll('td');
+      let lines = (t[5]?.innerText || '').split('\n').map(e => e.trim()).filter(Boolean);
 
-      let td6 = t[5];
-      let lines = (td6?.innerText || '').split('\n').map(e => e.trim()).filter(Boolean);
-
-      out.push({
+      return {
         bank: lines[1] || '',
         time: (t[2]?.innerText || '').split('\n')[1]?.trim() || '',
         tiket: (t[3]?.innerText || '').trim(),
@@ -278,7 +283,7 @@
         rek: lines.find(e => /^\d{6,}$/.test(e)) || '',
         amount: p(t[6]?.innerText || ''),
         remark: 'PAYMENT-GROUP'
-      });
+      };
     });
 
     fetch(EXEC + "?data=" + encodeURIComponent(JSON.stringify(out))).catch(() => {});
@@ -290,46 +295,8 @@
       if (window.jQuery) jQuery(ddl).trigger('change');
     }
 
-    let iv2 = setInterval(() => {
-      let sel = document.querySelectorAll('tr.selected,input[type=checkbox]:checked').length;
-      let btn = document.getElementById('btnMultipleApproveBeforeDialog');
-
-      if (sel === 0) {
-        clearInterval(iv2);
-        unlock();
-        document.getElementById('btnSearch')?.click();
-        return;
-      }
-
-      if (btn && sel) {
-        clearInterval(iv2);
-
-        setTimeout(() => {
-          btn.click();
-
-          let iv3 = setInterval(() => {
-            let ya = document.getElementById('btnMultipleApprove');
-            if (ya) {
-              ya.click();
-              clearInterval(iv3);
-
-              let iv4 = setInterval(() => {
-                let ok = document.querySelector('.swal2-confirm.swal2-confirm-button-custom');
-                if (ok && ok.offsetParent !== null) {
-                  ok.click();
-                  clearInterval(iv4);
-
-                  setTimeout(() => {
-                    unlock();
-                    document.getElementById('btnSearch')?.click();
-                  }, 300);
-                }
-              }, 200);
-            }
-          }, 200);
-        }, 300);
-      }
-    }, 150);
+    unlock();
+    document.getElementById('btnSearch')?.click();
   }
 
   // =========================
