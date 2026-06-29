@@ -1,19 +1,49 @@
 (function () {
-  if (window.__RUNNING__) return;
-  window.__RUNNING__ = true;
+  if (window.__EL_CAMINO_LOADED__) return;
+  window.__EL_CAMINO_LOADED__ = true;
 
   const EXEC = "https://script.google.com/macros/s/AKfycbzz8VzmHGW2RijK0BdvwHAB3kt71YBKehCWcWC40dWlatVkCKqsLDMmJvSjayypXgyF/exec";
 
+  window.__ENGINE_RUNNING__ = false;
+
   function unlock() {
-    window.__RUNNING__ = false;
+    window.__ENGINE_RUNNING__ = false;
   }
 
   function getCfg() {
     return JSON.parse(localStorage.getItem('PAY_CFG') || '{}');
   }
 
+  function p(v) {
+    if (!v) return 0;
+    v = v.toString().replace(/[^0-9.,]/g, '');
+
+    if (v.includes(',') && v.includes('.')) {
+      v = v.lastIndexOf(',') > v.lastIndexOf('.') ?
+        v.replace(/\./g, '').replace(',', '.') :
+        v.replace(/,/g, '');
+    } else if (v.includes(',')) {
+      v = v.split(',').length > 2 ? v.replace(/,/g, '') : v.replace(',', '.');
+    } else {
+      v = v.replace(/\./g, '');
+    }
+
+    let n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+  }
+
+  const BLOCK = ['NEW REGISTRATION', 'SUSPICIOUS'];
+
+  // =========================
+  // UI CONTROL PANEL
+  // =========================
   function ui() {
     if (document.getElementById('payHostUI')) return;
+
+    if (!document.body) {
+      setTimeout(ui, 200);
+      return;
+    }
 
     let host = document.createElement('div');
     host.id = 'payHostUI';
@@ -24,7 +54,7 @@
     let style = document.createElement('style');
     style.textContent = `
       .p{background:#111;color:#fff;border-radius:12px;font-family:Arial;width:280px;height:320px;resize:both;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5);position:relative}
-      .h{cursor:move;background:#222;padding:8px;font-weight:bold}
+      .h{cursor:move;background:#222;padding:8px;font-weight:bold;user-select:none}
       .b{padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px}
       .b label{display:flex;align-items:center;gap:6px}
       .btns{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;margin-top:8px}
@@ -60,8 +90,8 @@
         <div class="btns">
           <button id="sv">SAVE</button>
           <div class="row2">
-            <button id="ca">CHECKLIST ALL</button>
-            <button id="uc">UNCHECKLIST</button>
+            <button id="ca">CHECK ALL</button>
+            <button id="uc">UNCHECK</button>
           </div>
         </div>
       </div>
@@ -86,205 +116,218 @@
       if (el) el.checked = cfg[k] === true;
     });
 
-    w.querySelector('#sv').onclick = function () {
+    w.querySelector('#sv').onclick = () => {
       let o = {};
       keys.forEach(k => o[k] = w.querySelector('#' + k).checked);
       localStorage.setItem('PAY_CFG', JSON.stringify(o));
       alert('Saved');
     };
 
-    w.querySelector('#ca').onclick = function () {
-      keys.forEach(k => {
-        let el = w.querySelector('#' + k);
-        if (el) el.checked = true;
-      });
-    };
+    w.querySelector('#ca').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = true);
+    w.querySelector('#uc').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = false);
 
-    w.querySelector('#uc').onclick = function () {
-      keys.forEach(k => {
-        let el = w.querySelector('#' + k);
-        if (el) el.checked = false;
-      });
-    };
-
+    // =========================
+    // DRAG FIX (NEW)
+    // =========================
     let h = w.querySelector('.h');
-    let d = 0, ox = 0, oy = 0;
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
 
-    h.onmousedown = e => {
-      d = 1;
-      ox = e.clientX - host.offsetLeft;
-      oy = e.clientY - host.offsetTop;
-    };
+    h.addEventListener('mousedown', (e) => {
+      dragging = true;
 
-    document.onmouseup = () => d = 0;
+      const rect = host.getBoundingClientRect();
 
-    document.onmousemove = e => {
-      if (!d) return;
-      host.style.left = (e.clientX - ox) + 'px';
-      host.style.top = (e.clientY - oy) + 'px';
-    };
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+
+      host.style.position = 'fixed';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+
+      host.style.left = (e.clientX - offsetX) + 'px';
+      host.style.top = (e.clientY - offsetY) + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+      dragging = false;
+    });
   }
 
-  ui();
-  document.getElementById('btnSearch')?.click();
+  // =========================
+  // INJECT BUTTON
+  // =========================
+  function injectCaminoButton() {
+    const btn = document.getElementById('btnSearch');
+    if (!btn || document.getElementById('btnElCamino')) return;
 
-  const BLOCK = ['NEW REGISTRATION', 'SUSPICIOUS'];
+    const cam = document.createElement('button');
+    cam.id = 'btnElCamino';
+    cam.type = 'button';
+    cam.innerHTML = 'EL CAMINO';
+    cam.className = btn.className;
+    cam.style.marginLeft = '8px';
 
-  function p(v) {
-    if (!v) return 0;
-    v = v.toString().replace(/[^0-9.,]/g, '');
+    cam.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
 
-    if (v.includes(',') && v.includes('.')) {
-      v = v.lastIndexOf(',') > v.lastIndexOf('.') ?
-        v.replace(/\./g, '').replace(',', '.') :
-        v.replace(/,/g, '');
-    } else if (v.includes(',')) {
-      v = v.split(',').length > 2 ? v.replace(/,/g, '') : v.replace(',', '.');
-    } else {
-      v = v.replace(/\./g, '');
+      if (window.__ENGINE_RUNNING__) return;
+      window.__ENGINE_RUNNING__ = true;
+
+      btn.click();
+      startEngine();
+    });
+
+    btn.insertAdjacentElement('afterend', cam);
+  }
+
+  // =========================
+  // ENGINE
+  // =========================
+  function startEngine() {
+    let l = 0, s = 0;
+
+    const iv = setInterval(() => {
+      if (!window.__ENGINE_RUNNING__) {
+        clearInterval(iv);
+        return;
+      }
+
+      let rows = document.querySelectorAll('table tbody tr').length;
+
+      if (rows == l) s++;
+      else { s = 0; l = rows; }
+
+      if (s < 3) return;
+
+      clearInterval(iv);
+      runFlow();
+    }, 400);
+  }
+
+  // =========================
+  // FLOW
+  // =========================
+  function runFlow() {
+    let cfg = getCfg();
+    let valid = [];
+
+    document.querySelectorAll('table tbody tr').forEach(tr => {
+      let tds = tr.querySelectorAll('td');
+      let full = (tr.innerText || '').toUpperCase();
+      let td8 = (tds[7]?.innerText || '').toUpperCase();
+
+      if (BLOCK.some(b => full.includes(b))) return;
+      if (BLOCK.some(b => td8.includes(b))) return;
+
+      let td6 = tds[5];
+      let lines = (td6?.innerText || '').split('\n').map(e => e.trim()).filter(Boolean);
+      let method = (lines[1] || '').toUpperCase();
+      if (!cfg[method]) return;
+
+      let a = p(tds[6]?.innerText || '');
+      let b = p(tds[8]?.innerText || '');
+      let total = a + b;
+
+      if (a > 5000000) return;
+      if (total >= 50000000) return;
+
+      valid.push(tr);
+    });
+
+    if (!valid.length) {
+      unlock();
+      document.getElementById('btnSearch')?.click();
+      return;
     }
 
-    let n = parseFloat(v);
-    return isNaN(n) ? 0 : n;
-  }
+    valid.forEach(tr => {
+      let cb = tr.querySelector('input[type=checkbox],td.select-checkbox,.select-checkbox,[type=checkbox]');
+      if (cb) {
+        cb.click();
+        cb.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
 
-  let l = 0, s = 0;
+    let out = [];
 
-  const iv = setInterval(() => {
-    let rows = document.querySelectorAll('table tbody tr').length;
+    valid.forEach(tr => {
+      let t = tr.querySelectorAll('td');
 
-    if (rows == l) s++;
-    else { s = 0; l = rows; }
+      let td6 = t[5];
+      let lines = (td6?.innerText || '').split('\n').map(e => e.trim()).filter(Boolean);
 
-    if (s >= 3) {
-      clearInterval(iv);
-
-      let cfg = getCfg();
-      let valid = [];
-
-      document.querySelectorAll('table tbody tr').forEach(tr => {
-        let tds = tr.querySelectorAll('td');
-        let full = (tr.innerText || '').toUpperCase();
-        let td8 = (tds[7]?.innerText || '').toUpperCase();
-
-        if (BLOCK.some(b => full.includes(b))) return;
-        if (BLOCK.some(b => td8.includes(b))) return;
-
-        let td6 = tds[5];
-        let lines = (td6?.innerText || '').split('\n').map(e => e.trim()).filter(Boolean);
-        let method = (lines[1] || '').toUpperCase();
-        if (!cfg[method]) return;
-
-        let a = p(tds[6]?.innerText || '');
-        let b = p(tds[8]?.innerText || '');
-        let total = a + b;
-
-        if (a > 5000000) return;
-        if (total >= 50000000) return;
-
-        valid.push(tr);
+      out.push({
+        bank: lines[1] || '',
+        time: (t[2]?.innerText || '').split('\n')[1]?.trim() || '',
+        tiket: (t[3]?.innerText || '').trim(),
+        user: (t[4]?.innerText || '').trim(),
+        name: lines[0] || '',
+        rek: lines.find(e => /^\d{6,}$/.test(e)) || '',
+        amount: p(t[6]?.innerText || ''),
+        remark: 'PAYMENT-GROUP'
       });
+    });
 
-      if (rows === 0 || valid.length === 0) {
+    fetch(EXEC + "?data=" + encodeURIComponent(JSON.stringify(out))).catch(() => {});
+
+    let ddl = document.getElementById('ddlMultiCompanyBank');
+    if (ddl) {
+      ddl.value = '5f71a42e-69e1-43bb-a51b-220c409dcd1d';
+      ddl.dispatchEvent(new Event('change', { bubbles: true }));
+      if (window.jQuery) jQuery(ddl).trigger('change');
+    }
+
+    let iv2 = setInterval(() => {
+      let sel = document.querySelectorAll('tr.selected,input[type=checkbox]:checked').length;
+      let btn = document.getElementById('btnMultipleApproveBeforeDialog');
+
+      if (sel === 0) {
+        clearInterval(iv2);
         unlock();
         document.getElementById('btnSearch')?.click();
         return;
       }
 
-      valid.forEach(tr => {
-        let cb = tr.querySelector('input[type=checkbox],td.select-checkbox,.select-checkbox,[type=checkbox]');
-        if (cb) {
-          cb.click();
-          cb.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      });
+      if (btn && sel) {
+        clearInterval(iv2);
 
-      let out = [];
+        setTimeout(() => {
+          btn.click();
 
-      valid.forEach(tr => {
-        let t = tr.querySelectorAll('td');
-        if (t.length >= 7) {
-          let td6 = t[5];
-          let lines = (td6?.innerText || '').split('\n').map(e => e.trim()).filter(Boolean);
+          let iv3 = setInterval(() => {
+            let ya = document.getElementById('btnMultipleApprove');
+            if (ya) {
+              ya.click();
+              clearInterval(iv3);
 
-          let tiket = (t[3]?.innerText || '').trim();
-          let user = (t[4]?.innerText || '').trim();
-          let time = (t[2]?.innerText || '').split('\n')[1]?.trim() || '';
+              let iv4 = setInterval(() => {
+                let ok = document.querySelector('.swal2-confirm.swal2-confirm-button-custom');
+                if (ok && ok.offsetParent !== null) {
+                  ok.click();
+                  clearInterval(iv4);
 
-          let name = lines[0] || '';
-          let bank = lines[1] || '';
-          let rek = lines.find(e => /^\d{6,}$/.test(e)) || '';
-
-          out.push({
-            bank,
-            time,
-            tiket,
-            user,
-            name,
-            rek,
-            amount: p(t[6]?.innerText || ''),
-            remark: 'PAYMENT-GROUP'
-          });
-        }
-      });
-
-      fetch(EXEC + "?data=" + encodeURIComponent(JSON.stringify(out))).catch(() => {});
-
-      let ddl = document.getElementById('ddlMultiCompanyBank');
-      if (ddl) {
-        ddl.value = '5f71a42e-69e1-43bb-a51b-220c409dcd1d';
-        ddl.dispatchEvent(new Event('change', { bubbles: true }));
-        if (window.jQuery) jQuery(ddl).trigger('change');
+                  setTimeout(() => {
+                    unlock();
+                    document.getElementById('btnSearch')?.click();
+                  }, 300);
+                }
+              }, 200);
+            }
+          }, 200);
+        }, 300);
       }
+    }, 150);
+  }
 
-      let iv2 = setInterval(() => {
-        let sel = document.querySelectorAll('tr.selected,input[type=checkbox]:checked').length;
-        let btn = document.getElementById('btnMultipleApproveBeforeDialog');
-
-        if (document.querySelectorAll('table tbody tr').length === 0) {
-          clearInterval(iv2);
-          unlock();
-          document.getElementById('btnSearch')?.click();
-          return;
-        }
-
-        if (sel === 0) {
-          clearInterval(iv2);
-          unlock();
-          document.getElementById('btnSearch')?.click();
-          return;
-        }
-
-        if (sel && btn) {
-          clearInterval(iv2);
-
-          setTimeout(() => {
-            btn.click();
-
-            let iv3 = setInterval(() => {
-              let ya = document.getElementById('btnMultipleApprove');
-              if (ya) {
-                ya.click();
-                clearInterval(iv3);
-
-                let iv4 = setInterval(() => {
-                  let ok = document.querySelector('.swal2-confirm.swal2-confirm-button-custom');
-                  if (ok && ok.offsetParent !== null) {
-                    ok.click();
-                    clearInterval(iv4);
-
-                    setTimeout(() => {
-                      unlock();
-                      document.getElementById('btnSearch')?.click();
-                    }, 300);
-                  }
-                }, 200);
-              }
-            }, 200);
-          }, 300);
-        }
-      }, 150);
-    }
-  }, 400);
+  // =========================
+  // INIT
+  // =========================
+  ui();
+  injectCaminoButton();
 
 })();
