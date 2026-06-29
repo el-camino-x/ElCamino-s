@@ -1,20 +1,19 @@
 (function () {
-
-  if (!window.__ELCAMINO_BOOTSTRAPPED__) {
-    window.__ELCAMINO_BOOTSTRAPPED__ = true;
-  }
+  if (window.__ELCAMINO_BOOT__) return;
+  window.__ELCAMINO_BOOT__ = true;
 
   const EXEC = "https://script.google.com/macros/s/AKfycbzz8VzmHGW2RijK0BdvwHAB3kt71YBKehCWcWC40dWlatVkCKqsLDMmJvSjayypXgyF/exec";
 
   // =========================
-  // STATE CONTROL
+  // SAFE STATE CONTROL
   // =========================
   function unlock() {
     window.__RUNNING__ = false;
-    if (window.__IV__) {
-      clearInterval(window.__IV__);
-      window.__IV__ = null;
-    }
+
+    if (window.__IV__) clearInterval(window.__IV__);
+    if (window.__IV2__) clearInterval(window.__IV2__);
+    if (window.__IV3__) clearInterval(window.__IV3__);
+    if (window.__IV4__) clearInterval(window.__IV4__);
   }
 
   function getCfg() {
@@ -22,7 +21,7 @@
   }
 
   // =========================
-  // ENGINE CORE (YOUR LOGIC WRAPPED)
+  // MAIN ENGINE (YOUR ORIGINAL FLOW WRAPPED)
   // =========================
   function ENGINE() {
 
@@ -46,14 +45,18 @@
       return isNaN(n) ? 0 : n;
     }
 
-    let l = 0, s = 0;
-
     window.__IV__ = setInterval(() => {
 
       let rows = document.querySelectorAll('table tbody tr').length;
 
-      if (rows == l) s++;
+      let l = window.__LAST_ROWS__ || 0;
+      let s = window.__STABLE__ || 0;
+
+      if (rows === l) s++;
       else { s = 0; l = rows; }
+
+      window.__LAST_ROWS__ = l;
+      window.__STABLE__ = s;
 
       if (s < 3) return;
 
@@ -63,6 +66,7 @@
       let valid = [];
 
       document.querySelectorAll('table tbody tr').forEach(tr => {
+
         let tds = tr.querySelectorAll('td');
         let full = (tr.innerText || '').toUpperCase();
         let td8 = (tds[7]?.innerText || '').toUpperCase();
@@ -73,14 +77,14 @@
         let td6 = tds[5];
         let lines = (td6?.innerText || '').split('\n').map(e => e.trim()).filter(Boolean);
         let method = (lines[1] || '').toUpperCase();
+
         if (!cfg[method]) return;
 
         let a = p(tds[6]?.innerText || '');
         let b = p(tds[8]?.innerText || '');
-        let total = a + b;
 
         if (a > 5000000) return;
-        if (total >= 50000000) return;
+        if (a + b >= 50000000) return;
 
         valid.push(tr);
       });
@@ -103,18 +107,17 @@
 
       valid.forEach(tr => {
         let t = tr.querySelectorAll('td');
-        if (t.length >= 7) {
-          let td6 = t[5];
-          let lines = (td6?.innerText || '').split('\n').map(e => e.trim()).filter(Boolean);
 
-          out.push({
-            bank: lines[1] || '',
-            name: lines[0] || '',
-            rek: lines.find(e => /^\d{6,}$/.test(e)) || '',
-            amount: p(t[6]?.innerText || ''),
-            remark: 'PAYMENT-GROUP'
-          });
-        }
+        let td6 = t[5];
+        let lines = (td6?.innerText || '').split('\n').map(e => e.trim()).filter(Boolean);
+
+        out.push({
+          bank: lines[1] || '',
+          name: lines[0] || '',
+          rek: lines.find(e => /^\d{6,}$/.test(e)) || '',
+          amount: p(t[6]?.innerText || ''),
+          remark: 'PAYMENT-GROUP'
+        });
       });
 
       fetch(EXEC + "?data=" + encodeURIComponent(JSON.stringify(out))).catch(() => {});
@@ -126,40 +129,37 @@
         if (window.jQuery) jQuery(ddl).trigger('change');
       }
 
-      let iv2 = setInterval(() => {
+      window.__IV2__ = setInterval(() => {
 
         let sel = document.querySelectorAll('tr.selected,input[type=checkbox]:checked').length;
         let btn = document.getElementById('btnMultipleApproveBeforeDialog');
 
-        if (document.querySelectorAll('table tbody tr').length === 0) {
-          clearInterval(iv2);
+        if (rows === 0 || sel === 0) {
+          clearInterval(window.__IV2__);
           unlock();
-          return;
-        }
-
-        if (sel === 0) {
-          clearInterval(iv2);
-          unlock();
+          document.getElementById('btnSearch')?.click();
           return;
         }
 
         if (sel && btn) {
-          clearInterval(iv2);
+          clearInterval(window.__IV2__);
 
           setTimeout(() => {
             btn.click();
 
-            let iv3 = setInterval(() => {
+            window.__IV3__ = setInterval(() => {
+
               let ya = document.getElementById('btnMultipleApprove');
               if (ya) {
                 ya.click();
-                clearInterval(iv3);
+                clearInterval(window.__IV3__);
 
-                let iv4 = setInterval(() => {
+                window.__IV4__ = setInterval(() => {
+
                   let ok = document.querySelector('.swal2-confirm.swal2-confirm-button-custom');
                   if (ok && ok.offsetParent !== null) {
                     ok.click();
-                    clearInterval(iv4);
+                    clearInterval(window.__IV4__);
 
                     setTimeout(() => {
                       unlock();
@@ -171,73 +171,59 @@
             }, 200);
           }, 300);
         }
-
       }, 150);
-
     }, 400);
   }
 
   // =========================
-  // START / STOP API
+  // 🔥 SINGLE ENTRY POINT (IMPORTANT)
   // =========================
   window.EL_CAMINO_START = function () {
-    if (window.__RUNNING__) return;
 
+    if (window.__RUNNING__) return;
     window.__RUNNING__ = true;
 
-    console.log("EL CAMINO START");
+    // reset state biar bisa repeat clean
+    window.__LAST_ROWS__ = 0;
+    window.__STABLE__ = 0;
 
     document.getElementById('btnSearch')?.click();
 
-    // delay kecil biar table ready
     setTimeout(() => {
       ENGINE();
     }, 500);
   };
 
-  window.EL_CAMINO_STOP = function () {
-    unlock();
-    console.log("EL CAMINO STOP");
-  };
-
   // =========================
-  // INLINE BUTTON
+  // BUTTON INJECT (EL CAMINO)
   // =========================
-  function injectButton() {
-    const searchBtn = document.getElementById('btnSearch');
-    if (!searchBtn || document.getElementById('ELCAMINO_INLINE_BTN')) return;
+  function inject() {
+    let btnSearch = document.getElementById('btnSearch');
+    if (!btnSearch) return;
 
-    const btn = document.createElement('button');
-    btn.id = 'ELCAMINO_INLINE_BTN';
-    btn.type = 'button';
-    btn.innerText = 'EL CAMINO';
+    if (document.getElementById('ELCAMINO_BTN')) return;
 
-    btn.style.marginLeft = '10px';
-    btn.style.padding = '6px 14px';
-    btn.style.border = '1px solid rgba(184,39,252,0.9)';
-    btn.style.borderRadius = '8px';
-    btn.style.color = '#fff';
-    btn.style.cursor = 'pointer';
-    btn.style.fontSize = '12px';
-    btn.style.fontWeight = '600';
-    btn.style.background = 'linear-gradient(135deg,#0f0f0f,#1a1a1a)';
-    btn.style.boxShadow = `
-      0 0 0 1px rgba(184,39,252,0.6),
-      0 0 0 2px rgba(44,144,252,0.5),
-      0 0 12px rgba(184,253,51,0.25),
-      0 0 18px rgba(253,24,146,0.25)
-    `;
+    let b = document.createElement('button');
+    b.id = 'ELCAMINO_BTN';
+    b.innerText = 'EL CAMINO';
 
-    btn.onclick = () => window.EL_CAMINO_START();
+    b.style.marginLeft = '10px';
+    b.style.padding = '6px 12px';
+    b.style.borderRadius = '8px';
+    b.style.border = '1px solid #b827fc';
+    b.style.background = '#111';
+    b.style.color = '#fff';
+    b.style.cursor = 'pointer';
 
-    searchBtn.parentNode.insertBefore(btn, searchBtn.nextSibling);
+    b.onclick = () => window.EL_CAMINO_START();
+
+    btnSearch.parentNode.insertBefore(b, btnSearch.nextSibling);
   }
 
-  setInterval(injectButton, 1500);
+  setInterval(inject, 1000);
+  inject();
 
-  // =========================
-  // BOOT AUTO INIT
-  // =========================
+  // auto init optional
   document.getElementById('btnSearch')?.click();
 
 })();
