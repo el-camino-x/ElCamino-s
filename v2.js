@@ -32,19 +32,117 @@
 
     let style = document.createElement('style');
     style.textContent = `
-      .p{background:#111;color:#fff;border-radius:12px;font-family:Arial;width:280px;height:320px;resize:both;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5);position:relative}
-      .h{cursor:move;background:#222;padding:8px;font-weight:bold}
-      .b{padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px}
-      .b label{display:flex;align-items:center;gap:6px}
-      .btns{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;margin-top:8px}
-      .row2{display:flex;gap:6px}
-      .row2 button{flex:1}
-      button{width:100%;padding:6px;font-size:11px;border:none;border-radius:8px;background:#2a5298;color:#fff;font-weight:500;cursor:pointer}
-      button:hover{filter:brightness(1.1)}
-      .ft{position:absolute;bottom:6px;left:10px;right:10px;overflow:hidden}
-      .marq{display:inline-block;white-space:nowrap;animation:mar 48s linear infinite;color:#8fbfff}
-      .marq span{padding-right:90px}
-      @keyframes mar{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+      .p{
+        background:#111;
+        color:#fff;
+        border-radius:12px;
+        font-family:Arial;
+        width:280px;
+        height:320px;
+        resize:both;
+        overflow:hidden;
+        box-shadow:0 10px 30px rgba(0,0,0,.5);
+        position:relative;
+      }
+
+      .h{
+        cursor:move;
+        background:#222;
+        padding:8px;
+        font-weight:bold;
+      }
+
+      .b{
+        padding:10px;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:6px;
+        font-size:12px;
+      }
+
+      .b label{
+        display:flex;
+        align-items:center;
+        gap:6px;
+      }
+
+      .btns{
+        grid-column:1/-1;
+        display:flex;
+        flex-direction:column;
+        gap:6px;
+        margin-top:8px;
+      }
+
+      .row2{
+        display:flex;
+        gap:6px;
+      }
+
+      .row2 button{
+        flex:1;
+      }
+
+      button{
+        width:100%;
+        padding:6px;
+        font-size:11px;
+        border:none;
+        border-radius:8px;
+        background:#2a5298;
+        color:#fff;
+        font-weight:500;
+        cursor:pointer;
+        transition:all .15s ease;
+      }
+
+      button:hover{
+        filter:brightness(1.1);
+      }
+
+      /* 🔵 SAVE tetap biru default */
+
+      #runBtn{
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        color:#fff;
+        font-weight:600;
+        border:1px solid rgba(255,255,255,0.08);
+        box-shadow:0 6px 18px rgba(34,197,94,0.25);
+      }
+
+      #runBtn:hover{
+        transform:translateY(-1px);
+        box-shadow:0 10px 22px rgba(34,197,94,0.35);
+      }
+
+      #runBtn:active{
+        transform:translateY(0px);
+        box-shadow:0 4px 10px rgba(34,197,94,0.2);
+      }
+
+      .ft{
+        position:absolute;
+        bottom:6px;
+        left:10px;
+        right:10px;
+        overflow:hidden;
+      }
+
+      .marq{
+        display:inline-block;
+        white-space:nowrap;
+        animation:mar 48s linear infinite;
+        color:#8fbfff;
+      }
+
+      .marq span{
+        padding-right:90px;
+      }
+
+      @keyframes mar{
+        0%{transform:translateX(0)}
+        100%{transform:translateX(-50%)}
+      }
     `;
 
     let w = document.createElement('div');
@@ -52,6 +150,7 @@
 
     w.innerHTML = `
       <div class="h">ElCamino-爱 Operation V1</div>
+
       <div class="b">
         <label><input id="DANA" type="checkbox"> DANA</label>
         <label><input id="OVO" type="checkbox"> OVO</label>
@@ -67,7 +166,9 @@
         <label><input id="SEABANK" type="checkbox"> SEABANK</label>
 
         <div class="btns">
-          <button id="sv">SAVE & RUN</button>
+          <button id="saveBtn">SAVE CONFIG</button>
+          <button id="runBtn">RUN</button>
+
           <div class="row2">
             <button id="ca">CHECK ALL</button>
             <button id="uc">UNCHECK ALL</button>
@@ -88,44 +189,28 @@
     document.body.appendChild(host);
 
     let keys = ['DANA','OVO','GOPAY','BCA','BNI','BRI','MANDIRI','BSI','JAGO','PERMATA','MAYBANK','SEABANK'];
-    let cfg = getCfg();
 
+    let cfg = getCfg();
     keys.forEach(k => {
       let el = w.querySelector('#' + k);
       if (el) el.checked = cfg[k] === true;
     });
 
-    // SAVE = REFRESH + START FLOW
-    w.querySelector('#sv').onclick = function () {
+    // SAVE ONLY
+    w.querySelector('#saveBtn').onclick = function () {
       let o = {};
       keys.forEach(k => o[k] = w.querySelector('#' + k).checked);
       localStorage.setItem('PAY_CFG', JSON.stringify(o));
+      alert('Config Saved');
+    };
 
-      alert('Saved');
-
-      refreshData();   // ⬅ penting: update table dulu
-      startFlow();     // ⬅ execute tapi nunggu data ready
+    // RUN ONLY
+    w.querySelector('#runBtn').onclick = function () {
+      startFlow();
     };
 
     w.querySelector('#ca').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = true);
     w.querySelector('#uc').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = false);
-
-    let h = w.querySelector('.h');
-    let d = 0, ox = 0, oy = 0;
-
-    h.onmousedown = e => {
-      d = 1;
-      ox = e.clientX - host.offsetLeft;
-      oy = e.clientY - host.offsetTop;
-    };
-
-    document.onmouseup = () => d = 0;
-
-    document.onmousemove = e => {
-      if (!d) return;
-      host.style.left = (e.clientX - ox) + 'px';
-      host.style.top = (e.clientY - oy) + 'px';
-    };
 
     window.__UI_READY__ = true;
   }
@@ -133,16 +218,15 @@
   function startFlow() {
     if (!window.__UI_READY__) return;
 
-    let rows = document.querySelectorAll('table tbody tr').length;
+    refreshData();
 
-    if (rows === 0) {
-      setTimeout(startFlow, 500);
-      return;
-    }
+    setTimeout(() => {
+      executeFlow();
+    }, 1200);
+  }
 
+  function executeFlow() {
     if (MAIN_IV) clearInterval(MAIN_IV);
-
-    document.getElementById('btnSearch')?.click();
 
     const BLOCK = ['NEW REGISTRATION', 'SUSPICIOUS'];
 
@@ -222,19 +306,9 @@
             let td6 = t[5];
             let lines = (td6?.innerText || '').split('\n').map(e => e.trim()).filter(Boolean);
 
-            let tiket = (t[3]?.innerText || '').trim();
-            let user = (t[4]?.innerText || '').trim();
-
-            let name = lines[0] || '';
-            let bank = lines[1] || '';
-            let rek = lines.find(e => /^\d{6,}$/.test(e)) || '';
-
             out.push({
-              bank,
-              tiket,
-              user,
-              name,
-              rek,
+              bank: lines[1] || '',
+              name: lines[0] || '',
               amount: p(t[6]?.innerText || ''),
               remark: 'PAYMENT-GROUP'
             });
@@ -243,17 +317,10 @@
 
         fetch(EXEC + "?data=" + encodeURIComponent(JSON.stringify(out))).catch(() => {});
 
-        let ddl = document.getElementById('ddlMultiCompanyBank');
-        if (ddl) {
-          ddl.value = '5f71a42e-69e1-43bb-a51b-220c409dcd1d';
-          ddl.dispatchEvent(new Event('change', { bubbles: true }));
-          if (window.jQuery) jQuery(ddl).trigger('change');
-        }
-
         unlock();
       }
     }, 400);
   }
 
-  ui(); // ONLY UI LOAD, NO AUTO EXEC
+  ui();
 })();
