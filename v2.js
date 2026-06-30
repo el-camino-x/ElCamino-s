@@ -212,15 +212,22 @@
   // =========================
   // CUSTOM GIF
   // =========================
-  function customFilterBoxGIF() {
+  function customFilterBoxTheme() {
   const box = document.querySelector('.filter-box');
-  if (!box || box.dataset.caminoBg) return;
+  if (!box || box.dataset.caminoTheme) return;
 
-  box.dataset.caminoBg = "1";
+  box.dataset.caminoTheme = "1";
 
+  // =========================
+  // BASE BOX STYLE (NAVY MEWAH)
+  // =========================
   box.style.position = 'relative';
   box.style.overflow = 'hidden';
+  box.style.borderRadius = '10px';
 
+  // =========================
+  // BACKGROUND GIF LAYER
+  // =========================
   const bg = document.createElement('div');
   bg.style.cssText = `
     position:absolute;
@@ -228,27 +235,57 @@
     background:url('https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif');
     background-size:cover;
     background-position:center;
-    opacity:0.35;
+    opacity:0.25;
     z-index:0;
     pointer-events:none;
   `;
 
+  // dark navy overlay biar elegan
   const overlay = document.createElement('div');
   overlay.style.cssText = `
     position:absolute;
     inset:0;
-    background:rgba(0,0,0,0.4);
+    background:linear-gradient(135deg, #0a0f1c, #0d1b2a, #0a0f1c);
+    opacity:0.85;
     z-index:1;
     pointer-events:none;
   `;
 
-  Array.from(box.children).forEach(el => {
-    el.style.position = 'relative';
-    el.style.zIndex = '2';
-  });
-
   box.prepend(bg);
   box.appendChild(overlay);
+
+  // =========================
+  // MAKE CONTENT ABOVE LAYER
+  // =========================
+  Array.from(box.children).forEach(el => {
+    if (el !== bg && el !== overlay) {
+      el.style.position = 'relative';
+      el.style.zIndex = '2';
+    }
+  });
+
+  // =========================
+  // TEXT COLOR FIX (IMPORTANT)
+  // =========================
+  const fixText = (selector) => {
+    document.querySelectorAll(selector).forEach(el => {
+      el.style.color = '#ffffff';
+      el.style.fontWeight = '500';
+    });
+  };
+
+  fixText('.filter-toggle a');
+  fixText('.switch-slider div');
+  fixText('label[for="chkWithdrawPending"]');
+  fixText('label[for="chkWithdrawFloating"]');
+
+  // optional: placeholder input biar kebaca
+  document.querySelectorAll('.filter-container input, .filter-container select')
+    .forEach(el => {
+      el.style.color = '#ffffff';
+      el.style.background = 'rgba(10,15,28,0.6)';
+      el.style.border = '1px solid rgba(255,255,255,0.1)';
+    });
 }
   
   // =========================
