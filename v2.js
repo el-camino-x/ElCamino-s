@@ -216,7 +216,7 @@
   const box = document.querySelector('.filter-box');
   if (!box || box.dataset.caminoTheme) return;
 
-  box.dataset.caminoTheme = "v2-gif";
+  box.dataset.caminoTheme = "v2-final";
 
   // =========================
   // ROOT GLASS DARK STYLE
@@ -302,7 +302,7 @@
   });
 
   // =========================
-  // BUTTON POLISH (OPTIONAL UI BOOST)
+  // BUTTON POLISH (OPTIONAL)
   // =========================
   box.querySelectorAll("button").forEach(btn => {
     btn.style.background = "linear-gradient(135deg, #2a5298, #1e3c72)";
@@ -335,7 +335,7 @@
   });
 
   // =========================
-  // PLACEHOLDER STYLE (ONCE)
+  // PLACEHOLDER STYLE
   // =========================
   if (!document.getElementById("camino-placeholder-style-v2")) {
     const style = document.createElement("style");
@@ -344,6 +344,20 @@
       .filter-box input::placeholder,
       .filter-box textarea::placeholder {
         color: rgba(200, 220, 255, 0.45) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // =========================
+  // HIDE SWITCH CONTAINER (SAFE CSS ONLY)
+  // =========================
+  if (!document.getElementById("camino-hide-switch")) {
+    const style = document.createElement("style");
+    style.id = "camino-hide-switch";
+    style.textContent = `
+      .switch-container {
+        display: none !important;
       }
     `;
     document.head.appendChild(style);
