@@ -235,7 +235,7 @@
     inset:0;
     z-index:0;
     pointer-events:none;
-    background-image:url("https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif");
+    background-image:url("https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDEzMGk3MTYyeDlheWUycWRiMHY2Z3Y1bmFpMHN6d2ZxbG9sdDVpdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3NFzNsD3iRShTgkAAU/giphy.gif");
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
