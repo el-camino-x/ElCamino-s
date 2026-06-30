@@ -224,7 +224,7 @@ function customFilterBoxTheme() {
     inset:0;
     z-index:0;
     pointer-events:none;
-    background:url("https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif") center/cover no-repeat;
+    background:url("https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDEzMGk3MTYyeDlheWUycWRiMHY2Z3Y1bmFpMHN6d2ZxbG9sdDVpdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3NFzNsD3iRShTgkAAU/giphy.gif") center/cover no-repeat;
   `;
 
   const overlay = document.createElement("div");
