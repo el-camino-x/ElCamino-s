@@ -235,7 +235,7 @@
     background:url('https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif');
     background-size:cover;
     background-position:center;
-    opacity:0.25;
+    opacity:1;
     z-index:0;
     pointer-events:none;
   `;
