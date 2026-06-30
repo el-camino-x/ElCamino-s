@@ -218,74 +218,69 @@
 
   box.dataset.caminoTheme = "1";
 
-  // =========================
-  // BASE BOX STYLE (NAVY MEWAH)
-  // =========================
-  box.style.position = 'relative';
-  box.style.overflow = 'hidden';
-  box.style.borderRadius = '10px';
+  box.style.position = "relative";
+  box.style.overflow = "hidden";
+  box.style.borderRadius = "12px";
+  box.style.background = "transparent";
 
-  // =========================
-  // BACKGROUND GIF LAYER
-  // =========================
-  const bg = document.createElement('div');
-  bg.style.cssText = `
+  // GIF layer
+  const gif = document.createElement("div");
+  gif.style.cssText = `
     position:absolute;
     inset:0;
-    background:url('https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif');
-    background-size:cover;
-    background-position:center;
-    opacity:1;
     z-index:0;
     pointer-events:none;
+    background-image:url("https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
   `;
 
-  // dark navy overlay biar elegan
-  const overlay = document.createElement('div');
+  // Dark overlay
+  const overlay = document.createElement("div");
   overlay.style.cssText = `
     position:absolute;
     inset:0;
-    background:linear-gradient(135deg, #0a0f1c, #0d1b2a, #0a0f1c);
-    opacity:0.85;
     z-index:1;
     pointer-events:none;
+    background:rgba(5,10,20,.75);
+    backdrop-filter:blur(2px);
   `;
 
-  box.prepend(bg);
+  box.prepend(gif);
   box.appendChild(overlay);
 
-  // =========================
-  // MAKE CONTENT ABOVE LAYER
-  // =========================
-  Array.from(box.children).forEach(el => {
-    if (el !== bg && el !== overlay) {
-      el.style.position = 'relative';
-      el.style.zIndex = '2';
-    }
+  // semua elemen di atas GIF
+  Array.from(box.querySelectorAll("*")).forEach(el => {
+    if (el === gif || el === overlay) return;
+
+    el.style.position = "relative";
+    el.style.zIndex = "2";
   });
 
-  // =========================
-  // TEXT COLOR FIX (IMPORTANT)
-  // =========================
-  const fixText = (selector) => {
-    document.querySelectorAll(selector).forEach(el => {
-      el.style.color = '#ffffff';
-      el.style.fontWeight = '500';
-    });
-  };
+  // hilangkan background putih
+  box.querySelectorAll(`
+    .content-filter,
+    .treeSelector-container,
+    .treeSelector-wrapper,
+    .treeSelector-input-box,
+    .selector,
+    .switch-container,
+    .filter-container,
+    input,
+    select
+  `).forEach(el => {
+    el.style.background = "rgba(10,20,35,.45)";
+    el.style.color = "#fff";
+    el.style.borderColor = "rgba(255,255,255,.15)";
+  });
 
-  fixText('.filter-toggle a');
-  fixText('.switch-slider div');
-  fixText('label[for="chkWithdrawPending"]');
-  fixText('label[for="chkWithdrawFloating"]');
-
-  // optional: placeholder input biar kebaca
-  document.querySelectorAll('.filter-container input, .filter-container select')
-    .forEach(el => {
-      el.style.color = '#ffffff';
-      el.style.background = 'rgba(10,15,28,0.6)';
-      el.style.border = '1px solid rgba(255,255,255,0.1)';
-    });
+  // text putih
+  box.querySelectorAll(
+    "label, span, div, a, i"
+  ).forEach(el => {
+    el.style.color = "#fff";
+  });
 }
   
   // =========================
