@@ -210,16 +210,16 @@
   }
 
   // =========================
-  // ENGINE
+  // CUSTOM GIF
   // =========================
-  function wrapTopNavGIF() {
-  const nav = document.querySelector('.topNav');
-  if (!nav || nav.dataset.caminoGif) return;
+  function customFilterBoxGIF() {
+  const box = document.querySelector('.filter-box');
+  if (!box || box.dataset.caminoBg) return;
 
-  nav.dataset.caminoGif = "1";
+  box.dataset.caminoBg = "1";
 
-  nav.style.position = 'relative';
-  nav.style.overflow = 'hidden';
+  box.style.position = 'relative';
+  box.style.overflow = 'hidden';
 
   const bg = document.createElement('div');
   bg.style.cssText = `
@@ -228,27 +228,27 @@
     background:url('https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif');
     background-size:cover;
     background-position:center;
-    background-repeat:no-repeat;
-    opacity:0.55;
+    opacity:0.35;
     z-index:0;
+    pointer-events:none;
   `;
 
   const overlay = document.createElement('div');
   overlay.style.cssText = `
     position:absolute;
     inset:0;
-    background:rgba(0,0,0,0.45);
+    background:rgba(0,0,0,0.4);
     z-index:1;
     pointer-events:none;
   `;
 
-  Array.from(nav.children).forEach(el => {
+  Array.from(box.children).forEach(el => {
     el.style.position = 'relative';
     el.style.zIndex = '2';
   });
 
-  nav.prepend(bg);
-  nav.appendChild(overlay);
+  box.prepend(bg);
+  box.appendChild(overlay);
 }
   
   // =========================
@@ -371,6 +371,6 @@
   // =========================
   ui();
   injectCaminoButton();
-  wrapTopNavGIF();
+  customFilterBoxGIF();
 
 })();
