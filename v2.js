@@ -223,7 +223,9 @@
   box.style.borderRadius = "12px";
   box.style.background = "transparent";
 
-  // GIF layer
+  // =========================
+  // GIF LAYER
+  // =========================
   const gif = document.createElement("div");
   gif.style.cssText = `
     position:absolute;
@@ -236,7 +238,9 @@
     background-repeat:no-repeat;
   `;
 
-  // Dark overlay
+  // =========================
+  // DARK OVERLAY
+  // =========================
   const overlay = document.createElement("div");
   overlay.style.cssText = `
     position:absolute;
@@ -250,15 +254,18 @@
   box.prepend(gif);
   box.appendChild(overlay);
 
-  // semua elemen di atas GIF
-  Array.from(box.querySelectorAll("*")).forEach(el => {
+  // =========================
+  // FORCE ALL CONTENT ABOVE LAYER
+  // =========================
+  box.querySelectorAll("*").forEach(el => {
     if (el === gif || el === overlay) return;
-
     el.style.position = "relative";
     el.style.zIndex = "2";
   });
 
-  // hilangkan background putih
+  // =========================
+  // CLEAN BACKGROUND UI
+  // =========================
   box.querySelectorAll(`
     .content-filter,
     .treeSelector-container,
@@ -275,34 +282,49 @@
     el.style.borderColor = "rgba(255,255,255,.15)";
   });
 
-    // FIX SWITCH ALIGNMENT
-box.querySelectorAll('.switch-slider').forEach(el => {
-  el.style.display = 'flex';
-  el.style.alignItems = 'center';
-  el.style.justifyContent = 'space-between';
-  el.style.gap = '10px';
-});
+  // =========================
+  // FIX SWITCH - FORCE 1 LINE (IMPORTANT)
+  // =========================
+  box.querySelectorAll('.switch-slider').forEach(el => {
+    el.style.display = 'flex';
+    el.style.alignItems = 'center';
+    el.style.justifyContent = 'space-between';
+    el.style.flexWrap = 'nowrap';
+    el.style.whiteSpace = 'nowrap';
+    el.style.gap = '10px';
+  });
 
-box.querySelectorAll('.switch').forEach(el => {
-  el.style.display = 'inline-flex';
-  el.style.alignItems = 'center';
-  el.style.verticalAlign = 'middle';
-});
+  box.querySelectorAll('.switch').forEach(el => {
+    el.style.display = 'inline-flex';
+    el.style.alignItems = 'center';
+    el.style.flexWrap = 'nowrap';
+    el.style.whiteSpace = 'nowrap';
+    el.style.verticalAlign = 'middle';
+    el.style.margin = '0';
+    el.style.padding = '0';
+  });
 
-box.querySelectorAll('.switch-slider > div').forEach(el => {
-  el.style.display = 'flex';
-  el.style.alignItems = 'center';
-  el.style.lineHeight = '20px';
-});
+  box.querySelectorAll('.switch input').forEach(el => {
+    el.style.margin = '0';
+    el.style.position = 'relative';
+    el.style.top = '0';
+    el.style.verticalAlign = 'middle';
+  });
 
-  // text putih
-  box.querySelectorAll(
-    "label, span, div, a, i"
-  ).forEach(el => {
+  box.querySelectorAll('.switch-slider > div').forEach(el => {
+    el.style.display = 'flex';
+    el.style.alignItems = 'center';
+    el.style.whiteSpace = 'nowrap';
+    el.style.lineHeight = '20px';
+  });
+
+  // =========================
+  // TEXT COLOR (SAFE VERSION)
+  // =========================
+  box.querySelectorAll("label, span, a, i").forEach(el => {
     el.style.color = "#fff";
   });
 }
-
   
   
   // =========================
