@@ -202,6 +202,103 @@
   }
 
   // =========================
+  // CUSTOM THEME
+  // =========================
+  
+function customFilterBoxTheme() {
+  const box = document.querySelector('.filter-box');
+  if (!box || box.dataset.caminoTheme) return;
+
+  box.dataset.caminoTheme = "1";
+
+  box.style.position = "relative";
+  box.style.overflow = "hidden";
+  box.style.borderRadius = "12px";
+
+  // =========================
+  // GIF LAYER
+  // =========================
+  const gif = document.createElement("div");
+  gif.style.cssText = `
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:url("https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif") center/cover no-repeat;
+  `;
+
+  const overlay = document.createElement("div");
+  overlay.style.cssText = `
+    position:absolute;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background:rgba(5,10,20,.75);
+  `;
+
+  box.prepend(gif);
+  box.appendChild(overlay);
+
+  // =========================
+  // FORCE ABOVE LAYER
+  // =========================
+  box.querySelectorAll("*").forEach(el => {
+    if (el === gif || el === overlay) return;
+    el.style.position = "relative";
+    el.style.zIndex = "2";
+  });
+
+  // =========================
+  // IMPORTANT: FORCE SWITCH ROW 1 BARIS
+  // =========================
+  const switchContainer = box.querySelector('.switch-container');
+
+  if (switchContainer) {
+    switchContainer.style.display = "flex";
+    switchContainer.style.flexDirection = "row";
+    switchContainer.style.flexWrap = "nowrap";
+    switchContainer.style.alignItems = "center";
+    switchContainer.style.justifyContent = "space-between";
+    switchContainer.style.width = "100%";
+    switchContainer.style.gap = "40px";
+  }
+
+  box.querySelectorAll('.switch-slider').forEach(el => {
+    el.style.display = "flex";
+    el.style.flexDirection = "row";
+    el.style.alignItems = "center";
+    el.style.whiteSpace = "nowrap";
+    el.style.flex = "1";
+    el.style.minWidth = "0";
+  });
+
+  // label kiri (text)
+  box.querySelectorAll('.switch-slider > div').forEach(el => {
+    el.style.whiteSpace = "nowrap";
+    el.style.flexShrink = "0";
+    el.style.marginRight = "10px";
+  });
+
+  // toggle kanan
+  box.querySelectorAll('.switch').forEach(el => {
+    el.style.marginLeft = "auto";
+    el.style.flexShrink = "0";
+  });
+
+  // =========================
+  // REMOVE WRAP KARENA INPUT BLOCKING
+  // =========================
+  box.querySelectorAll('.switch-slider').forEach(el => {
+    el.style.minWidth = "220px"; // penting biar gak turun
+  });
+
+  // text putih
+  box.querySelectorAll("label, span, a, i").forEach(el => {
+    el.style.color = "#fff";
+  });
+}
+  
+  // =========================
   // FLOW
   // =========================
   function runFlow() {
@@ -324,4 +421,5 @@
   // =========================
   ui();
   injectCaminoButton();
+  customFilterBoxTheme();
 })();
