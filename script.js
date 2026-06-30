@@ -158,6 +158,124 @@
   }
 
   // =========================
+  // ENGINE
+  // =========================
+
+  function applyDarkFilterTheme() {
+  if (document.getElementById('camino-dark-theme')) return;
+
+  const style = document.createElement('style');
+  style.id = 'camino-dark-theme';
+
+  style.textContent = `
+    .filter-box {
+      background: #0f1115 !important;
+      border: 1px solid #1f2937 !important;
+      border-radius: 12px;
+      padding: 12px;
+      color: #e5e7eb !important;
+    }
+
+    .filter-box * {
+      color: #e5e7eb !important;
+    }
+
+    /* INPUT STYLE */
+    .filter-box input,
+    .filter-box select {
+      background: #111827 !important;
+      border: 1px solid #374151 !important;
+      color: #e5e7eb !important;
+      border-radius: 8px;
+      padding: 6px 8px;
+    }
+
+    .filter-box input::placeholder {
+      color: #9ca3af !important;
+    }
+
+    /* TREE SELECTOR (BANK + GROUP DROPDOWN) */
+    .treeSelector-container,
+    .treeSelector-wrapper {
+      background: #0b1220 !important;
+      border: 1px solid #1f2937 !important;
+      border-radius: 10px;
+    }
+
+    .treeSelector-li-box {
+      background: transparent !important;
+    }
+
+    .treeSelector-label {
+      color: #e5e7eb !important;
+    }
+
+    .treeSelector-li:hover {
+      background: #1f2937 !important;
+    }
+
+    /* CHECKBOX */
+    input[type="checkbox"] {
+      accent-color: #3b82f6;
+    }
+
+    /* ADVANCED FILTER SECTION */
+    #advancedFiltersSection {
+      background: #0b1220 !important;
+      border-top: 1px solid #1f2937 !important;
+    }
+
+    hr {
+      border-color: #1f2937 !important;
+    }
+
+    /* BUTTONS */
+    .submit-button-new {
+      background: #2563eb !important;
+      color: white !important;
+      border-radius: 8px;
+      border: none;
+    }
+
+    .submit-button-new:hover {
+      background: #1d4ed8 !important;
+    }
+
+    .reset-link {
+      color: #f87171 !important;
+    }
+
+    .reset-link:hover {
+      color: #ef4444 !important;
+    }
+
+    .filter-toggle a {
+      color: #60a5fa !important;
+      cursor: pointer;
+    }
+
+    .switch .slider {
+      background-color: #374151 !important;
+    }
+
+    input:checked + .slider {
+      background-color: #3b82f6 !important;
+    }
+
+    .filter-dropdown-content {
+      background: #0b1220 !important;
+      border: 1px solid #1f2937 !important;
+    }
+
+    .filter-item:hover {
+      background: #1f2937 !important;
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+  
+  // =========================
   // INJECT BUTTON
   // =========================
   function injectCaminoButton() {
@@ -329,5 +447,6 @@
   // =========================
   ui();
   injectCaminoButton();
+  applyDarkFilterTheme();
 
 })();
