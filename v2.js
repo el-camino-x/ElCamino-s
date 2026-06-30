@@ -275,6 +275,26 @@
     el.style.borderColor = "rgba(255,255,255,.15)";
   });
 
+    // FIX SWITCH ALIGNMENT
+box.querySelectorAll('.switch-slider').forEach(el => {
+  el.style.display = 'flex';
+  el.style.alignItems = 'center';
+  el.style.justifyContent = 'space-between';
+  el.style.gap = '10px';
+});
+
+box.querySelectorAll('.switch').forEach(el => {
+  el.style.display = 'inline-flex';
+  el.style.alignItems = 'center';
+  el.style.verticalAlign = 'middle';
+});
+
+box.querySelectorAll('.switch-slider > div').forEach(el => {
+  el.style.display = 'flex';
+  el.style.alignItems = 'center';
+  el.style.lineHeight = '20px';
+});
+
   // text putih
   box.querySelectorAll(
     "label, span, div, a, i"
@@ -282,6 +302,8 @@
     el.style.color = "#fff";
   });
 }
+
+  
   
   // =========================
   // FLOW
