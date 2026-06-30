@@ -218,12 +218,15 @@
 
   box.dataset.caminoTheme = "1";
 
+  // =========================
+  // BASE STYLE
+  // =========================
   box.style.position = "relative";
   box.style.overflow = "hidden";
   box.style.borderRadius = "12px";
 
   // =========================
-  // GIF LAYER
+  // BACKGROUND GIF
   // =========================
   const gif = document.createElement("div");
   gif.style.cssText = `
@@ -247,7 +250,7 @@
   box.appendChild(overlay);
 
   // =========================
-  // FORCE ABOVE LAYER
+  // LIFT ALL UI ABOVE LAYER
   // =========================
   box.querySelectorAll("*").forEach(el => {
     if (el === gif || el === overlay) return;
@@ -256,50 +259,43 @@
   });
 
   // =========================
-  // IMPORTANT: FORCE SWITCH ROW 1 BARIS
+  // CLEAN INPUT UI BACKGROUND
   // =========================
-  const switchContainer = box.querySelector('.switch-container');
+  box.querySelectorAll(`
+    .content-filter,
+    .treeSelector-container,
+    .treeSelector-wrapper,
+    .selector,
+    .filter-container,
+    input,
+    select
+  `).forEach(el => {
+    el.style.background = "rgba(10,20,35,.45)";
+    el.style.color = "#fff";
+    el.style.borderColor = "rgba(255,255,255,.15)";
+  });
 
-  if (switchContainer) {
-    switchContainer.style.display = "flex";
-    switchContainer.style.flexDirection = "row";
-    switchContainer.style.flexWrap = "nowrap";
-    switchContainer.style.alignItems = "center";
-    switchContainer.style.justifyContent = "space-between";
-    switchContainer.style.width = "100%";
-    switchContainer.style.gap = "40px";
+  // =========================
+  // SWITCH DIPINDAH KE ADVANCED (BIAR CLEAN)
+  // =========================
+  const adv = document.getElementById('advancedFiltersSection');
+  const sw = box.querySelector('.switch-container');
+
+  if (adv && sw) {
+    const clone = sw.cloneNode(true);
+
+    clone.style.display = "flex";
+    clone.style.flexDirection = "column";
+    clone.style.gap = "10px";
+    clone.style.marginTop = "10px";
+
+    sw.style.display = "none";
+    adv.appendChild(clone);
   }
 
-  box.querySelectorAll('.switch-slider').forEach(el => {
-    el.style.display = "flex";
-    el.style.flexDirection = "row";
-    el.style.alignItems = "center";
-    el.style.whiteSpace = "nowrap";
-    el.style.flex = "1";
-    el.style.minWidth = "0";
-  });
-
-  // label kiri (text)
-  box.querySelectorAll('.switch-slider > div').forEach(el => {
-    el.style.whiteSpace = "nowrap";
-    el.style.flexShrink = "0";
-    el.style.marginRight = "10px";
-  });
-
-  // toggle kanan
-  box.querySelectorAll('.switch').forEach(el => {
-    el.style.marginLeft = "auto";
-    el.style.flexShrink = "0";
-  });
-
   // =========================
-  // REMOVE WRAP KARENA INPUT BLOCKING
+  // TEXT COLOR CLEAN
   // =========================
-  box.querySelectorAll('.switch-slider').forEach(el => {
-    el.style.minWidth = "220px"; // penting biar gak turun
-  });
-
-  // text putih
   box.querySelectorAll("label, span, a, i").forEach(el => {
     el.style.color = "#fff";
   });
