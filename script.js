@@ -168,77 +168,114 @@
   style.id = 'camino-dark-theme';
 
   style.textContent = `
+
+    /* =========================
+       MAIN FILTER CONTAINER (NAVY BASE)
+    ========================= */
+    .filter-container {
+      background: rgba(11, 27, 58, 0.75) !important;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+    }
+
+    /* =========================
+       FILTER BOX WRAPPER
+    ========================= */
     .filter-box {
-      background: #0f1115 !important;
-      border: 1px solid #1f2937 !important;
-      border-radius: 12px;
-      padding: 12px;
+      background: rgba(10, 15, 30, 0.55) !important;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
       color: #e5e7eb !important;
     }
 
-    .filter-box * {
-      color: #e5e7eb !important;
-    }
-
-    /* INPUT STYLE */
+    /* =========================
+       INPUT / SELECT GLASS STYLE
+    ========================= */
     .filter-box input,
-    .filter-box select {
-      background: #111827 !important;
-      border: 1px solid #374151 !important;
+    .filter-box select,
+    .filter-box textarea {
+      background: rgba(17, 24, 39, 0.65) !important;
       color: #e5e7eb !important;
-      border-radius: 8px;
-      padding: 6px 8px;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      border-radius: 10px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
 
-    .filter-box input::placeholder {
-      color: #9ca3af !important;
+    .filter-box input:focus,
+    .filter-box select:focus {
+      outline: none;
+      border: 1px solid rgba(59, 130, 246, 0.6) !important;
+      box-shadow: 0 0 10px rgba(59,130,246,0.25);
     }
 
-    /* TREE SELECTOR (BANK + GROUP DROPDOWN) */
+    /* =========================
+       PLACEHOLDER
+    ========================= */
+    .filter-box input::placeholder,
+    .filter-box textarea::placeholder {
+      color: rgba(156, 163, 175, 0.85) !important;
+    }
+
+    /* =========================
+       TREE SELECTOR GLASS
+    ========================= */
     .treeSelector-container,
     .treeSelector-wrapper {
-      background: #0b1220 !important;
-      border: 1px solid #1f2937 !important;
-      border-radius: 10px;
+      background: rgba(10, 15, 30, 0.6) !important;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
     }
 
-    .treeSelector-li-box {
-      background: transparent !important;
+    .treeSelector-li:hover {
+      background: rgba(59,130,246,0.15) !important;
     }
 
     .treeSelector-label {
       color: #e5e7eb !important;
     }
 
-    .treeSelector-li:hover {
-      background: #1f2937 !important;
-    }
-
-    /* CHECKBOX */
+    /* =========================
+       CHECKBOX STYLE
+    ========================= */
     input[type="checkbox"] {
       accent-color: #3b82f6;
     }
 
-    /* ADVANCED FILTER SECTION */
+    /* =========================
+       ADVANCED FILTER SECTION
+    ========================= */
     #advancedFiltersSection {
-      background: #0b1220 !important;
-      border-top: 1px solid #1f2937 !important;
+      background: rgba(10, 15, 30, 0.45) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255,255,255,0.06);
     }
 
     hr {
-      border-color: #1f2937 !important;
+      border-color: rgba(255,255,255,0.08) !important;
     }
 
-    /* BUTTONS */
+    /* =========================
+       BUTTONS (CLEAN GLOW)
+    ========================= */
     .submit-button-new {
-      background: #2563eb !important;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
       color: white !important;
-      border-radius: 8px;
+      border-radius: 10px;
       border: none;
+      box-shadow: 0 6px 18px rgba(37,99,235,0.25);
     }
 
     .submit-button-new:hover {
-      background: #1d4ed8 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(37,99,235,0.35);
     }
 
     .reset-link {
@@ -249,27 +286,38 @@
       color: #ef4444 !important;
     }
 
-    .filter-toggle a {
-      color: #60a5fa !important;
-      cursor: pointer;
-    }
-
+    /* =========================
+       TOGGLE / SWITCH
+    ========================= */
     .switch .slider {
-      background-color: #374151 !important;
+      background-color: rgba(55,65,81,0.8) !important;
     }
 
     input:checked + .slider {
       background-color: #3b82f6 !important;
     }
 
+    /* =========================
+       DROPDOWN / BOOKMARK FILTER
+    ========================= */
     .filter-dropdown-content {
-      background: #0b1220 !important;
-      border: 1px solid #1f2937 !important;
+      background: rgba(10, 15, 30, 0.85) !important;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
     .filter-item:hover {
-      background: #1f2937 !important;
+      background: rgba(59,130,246,0.12) !important;
     }
+
+    /* =========================
+       TEXT DEFAULT
+    ========================= */
+    .filter-box,
+    .filter-container {
+      color: #e5e7eb !important;
+    }
+
   `;
 
   document.head.appendChild(style);
