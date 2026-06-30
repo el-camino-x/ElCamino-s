@@ -218,12 +218,17 @@
 
   box.dataset.caminoTheme = "1";
 
+  // =========================
+  // BASE STYLE BOX ONLY
+  // =========================
   box.style.position = "relative";
   box.style.overflow = "hidden";
   box.style.borderRadius = "12px";
   box.style.background = "transparent";
 
-  // GIF layer
+  // =========================
+  // GIF LAYER
+  // =========================
   const gif = document.createElement("div");
   gif.style.cssText = `
     position:absolute;
@@ -236,7 +241,9 @@
     background-repeat:no-repeat;
   `;
 
-  // Dark overlay
+  // =========================
+  // DARK OVERLAY
+  // =========================
   const overlay = document.createElement("div");
   overlay.style.cssText = `
     position:absolute;
@@ -250,15 +257,18 @@
   box.prepend(gif);
   box.appendChild(overlay);
 
-  // semua elemen di atas GIF
-  Array.from(box.querySelectorAll("*")).forEach(el => {
+  // =========================
+  // KEEP ALL CONTENT ABOVE LAYER
+  // =========================
+  box.querySelectorAll("*").forEach(el => {
     if (el === gif || el === overlay) return;
-
     el.style.position = "relative";
     el.style.zIndex = "2";
   });
 
-  // hilangkan background putih
+  // =========================
+  // UI BACKGROUND CLEAN ONLY
+  // =========================
   box.querySelectorAll(`
     .content-filter,
     .treeSelector-container,
@@ -271,15 +281,26 @@
     select
   `).forEach(el => {
     el.style.background = "rgba(10,20,35,.45)";
-    el.style.color = "#fff";
     el.style.borderColor = "rgba(255,255,255,.15)";
   });
 
-  // text putih
-  box.querySelectorAll(
-    "label, span, div, a, i"
-  ).forEach(el => {
+  // =========================
+  // TEXT COLOR ONLY (SAFE)
+  // =========================
+  box.querySelectorAll("label, span, a, i, div").forEach(el => {
     el.style.color = "#fff";
+  });
+
+  // =========================
+  // SWITCH FIX (SAFE MODE - NO LAYOUT TOUCH)
+  // =========================
+  box.querySelectorAll('.switch').forEach(el => {
+    el.style.display = "inline-flex";
+    el.style.alignItems = "center";
+  });
+
+  box.querySelectorAll('.slider').forEach(el => {
+    el.style.flexShrink = "0";
   });
 }
   
