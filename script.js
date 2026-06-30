@@ -158,172 +158,6 @@
   }
 
   // =========================
-  // ENGINE
-  // =========================
-
-  function applyDarkFilterTheme() {
-  if (document.getElementById('camino-dark-theme')) return;
-
-  const style = document.createElement('style');
-  style.id = 'camino-dark-theme';
-
-  style.textContent = `
-
-    /* =========================
-       MAIN FILTER CONTAINER (NAVY BASE)
-    ========================= */
-    .filter-container {
-      background: rgba(11, 27, 58, 0.75) !important;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
-    }
-
-    /* =========================
-       FILTER BOX WRAPPER
-    ========================= */
-    .filter-box {
-      background: rgba(10, 15, 30, 0.55) !important;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 14px;
-      color: #e5e7eb !important;
-    }
-
-    /* =========================
-       INPUT / SELECT GLASS STYLE
-    ========================= */
-    .filter-box input,
-    .filter-box select,
-    .filter-box textarea {
-      background: rgba(17, 24, 39, 0.65) !important;
-      color: #e5e7eb !important;
-      border: 1px solid rgba(255,255,255,0.08) !important;
-      border-radius: 10px;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
-
-    .filter-box input:focus,
-    .filter-box select:focus {
-      outline: none;
-      border: 1px solid rgba(59, 130, 246, 0.6) !important;
-      box-shadow: 0 0 10px rgba(59,130,246,0.25);
-    }
-
-    /* =========================
-       PLACEHOLDER
-    ========================= */
-    .filter-box input::placeholder,
-    .filter-box textarea::placeholder {
-      color: rgba(156, 163, 175, 0.85) !important;
-    }
-
-    /* =========================
-       TREE SELECTOR GLASS
-    ========================= */
-    .treeSelector-container,
-    .treeSelector-wrapper {
-      background: rgba(10, 15, 30, 0.6) !important;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 12px;
-    }
-
-    .treeSelector-li:hover {
-      background: rgba(59,130,246,0.15) !important;
-    }
-
-    .treeSelector-label {
-      color: #e5e7eb !important;
-    }
-
-    /* =========================
-       CHECKBOX STYLE
-    ========================= */
-    input[type="checkbox"] {
-      accent-color: #3b82f6;
-    }
-
-    /* =========================
-       ADVANCED FILTER SECTION
-    ========================= */
-    #advancedFiltersSection {
-      background: rgba(10, 15, 30, 0.45) !important;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-
-    hr {
-      border-color: rgba(255,255,255,0.08) !important;
-    }
-
-    /* =========================
-       BUTTONS (CLEAN GLOW)
-    ========================= */
-    .submit-button-new {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-      color: white !important;
-      border-radius: 10px;
-      border: none;
-      box-shadow: 0 6px 18px rgba(37,99,235,0.25);
-    }
-
-    .submit-button-new:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 22px rgba(37,99,235,0.35);
-    }
-
-    .reset-link {
-      color: #f87171 !important;
-    }
-
-    .reset-link:hover {
-      color: #ef4444 !important;
-    }
-
-    /* =========================
-       TOGGLE / SWITCH
-    ========================= */
-    .switch .slider {
-      background-color: rgba(55,65,81,0.8) !important;
-    }
-
-    input:checked + .slider {
-      background-color: #3b82f6 !important;
-    }
-
-    /* =========================
-       DROPDOWN / BOOKMARK FILTER
-    ========================= */
-    .filter-dropdown-content {
-      background: rgba(10, 15, 30, 0.85) !important;
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .filter-item:hover {
-      background: rgba(59,130,246,0.12) !important;
-    }
-
-    /* =========================
-       TEXT DEFAULT
-    ========================= */
-    .filter-box,
-    .filter-container {
-      color: #e5e7eb !important;
-    }
-
-  `;
-
-  document.head.appendChild(style);
-}
-  
-  // =========================
   // INJECT BUTTON
   // =========================
   function injectCaminoButton() {
@@ -375,6 +209,102 @@
     }, 400);
   }
 
+  // =========================
+  // CUSTOM GIF
+  // =========================
+  function customFilterBoxTheme() {
+  const box = document.querySelector('.filter-box');
+  if (!box || box.dataset.caminoTheme) return;
+
+  box.dataset.caminoTheme = "1";
+
+  // =========================
+  // BASE STYLE BOX ONLY
+  // =========================
+  box.style.position = "relative";
+  box.style.overflow = "hidden";
+  box.style.borderRadius = "12px";
+  box.style.background = "transparent";
+
+  // =========================
+  // GIF LAYER
+  // =========================
+  const gif = document.createElement("div");
+  gif.style.cssText = `
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background-image:url("https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+  `;
+
+  // =========================
+  // DARK OVERLAY
+  // =========================
+  const overlay = document.createElement("div");
+  overlay.style.cssText = `
+    position:absolute;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background:rgba(5,10,20,.75);
+    backdrop-filter:blur(2px);
+  `;
+
+  box.prepend(gif);
+  box.appendChild(overlay);
+
+  // =========================
+  // KEEP ALL CONTENT ABOVE LAYER
+  // =========================
+  box.querySelectorAll("*").forEach(el => {
+    if (el === gif || el === overlay) return;
+    el.style.position = "relative";
+    el.style.zIndex = "2";
+  });
+
+  // =========================
+  // UI BACKGROUND CLEAN ONLY
+  // =========================
+  box.querySelectorAll(`
+    .content-filter,
+    .treeSelector-container,
+    .treeSelector-wrapper,
+    .treeSelector-input-box,
+    .selector,
+    .switch-container,
+    .filter-container,
+    input,
+    select
+  `).forEach(el => {
+    el.style.background = "rgba(10,20,35,.45)";
+    el.style.borderColor = "rgba(255,255,255,.15)";
+  });
+
+  // =========================
+  // TEXT COLOR ONLY (SAFE)
+  // =========================
+  box.querySelectorAll("label, span, a, i, div").forEach(el => {
+    el.style.color = "#fff";
+  });
+
+  // =========================
+  // SWITCH FIX (SAFE MODE - NO LAYOUT TOUCH)
+  // =========================
+  box.querySelectorAll('.switch').forEach(el => {
+    el.style.display = "inline-flex";
+    el.style.alignItems = "center";
+  });
+
+  box.querySelectorAll('.slider').forEach(el => {
+    el.style.flexShrink = "0";
+  });
+}
+  
+  
   // =========================
   // FLOW
   // =========================
@@ -495,6 +425,6 @@
   // =========================
   ui();
   injectCaminoButton();
-  applyDarkFilterTheme();
+  customFilterBoxTheme();
 
 })();
