@@ -221,7 +221,6 @@
   box.style.position = "relative";
   box.style.overflow = "hidden";
   box.style.borderRadius = "12px";
-  box.style.background = "transparent";
 
   // =========================
   // GIF LAYER
@@ -232,15 +231,9 @@
     inset:0;
     z-index:0;
     pointer-events:none;
-    background-image:url("https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif");
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
+    background:url("https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif") center/cover no-repeat;
   `;
 
-  // =========================
-  // DARK OVERLAY
-  // =========================
   const overlay = document.createElement("div");
   overlay.style.cssText = `
     position:absolute;
@@ -248,14 +241,13 @@
     z-index:1;
     pointer-events:none;
     background:rgba(5,10,20,.75);
-    backdrop-filter:blur(2px);
   `;
 
   box.prepend(gif);
   box.appendChild(overlay);
 
   // =========================
-  // FORCE ALL CONTENT ABOVE LAYER
+  // FORCE ABOVE LAYER
   // =========================
   box.querySelectorAll("*").forEach(el => {
     if (el === gif || el === overlay) return;
@@ -264,63 +256,50 @@
   });
 
   // =========================
-  // CLEAN BACKGROUND UI
+  // IMPORTANT: FORCE SWITCH ROW 1 BARIS
   // =========================
-  box.querySelectorAll(`
-    .content-filter,
-    .treeSelector-container,
-    .treeSelector-wrapper,
-    .treeSelector-input-box,
-    .selector,
-    .switch-container,
-    .filter-container,
-    input,
-    select
-  `).forEach(el => {
-    el.style.background = "rgba(10,20,35,.45)";
-    el.style.color = "#fff";
-    el.style.borderColor = "rgba(255,255,255,.15)";
+  const switchContainer = box.querySelector('.switch-container');
+
+  if (switchContainer) {
+    switchContainer.style.display = "flex";
+    switchContainer.style.flexDirection = "row";
+    switchContainer.style.flexWrap = "nowrap";
+    switchContainer.style.alignItems = "center";
+    switchContainer.style.justifyContent = "space-between";
+    switchContainer.style.width = "100%";
+    switchContainer.style.gap = "40px";
+  }
+
+  box.querySelectorAll('.switch-slider').forEach(el => {
+    el.style.display = "flex";
+    el.style.flexDirection = "row";
+    el.style.alignItems = "center";
+    el.style.whiteSpace = "nowrap";
+    el.style.flex = "1";
+    el.style.minWidth = "0";
+  });
+
+  // label kiri (text)
+  box.querySelectorAll('.switch-slider > div').forEach(el => {
+    el.style.whiteSpace = "nowrap";
+    el.style.flexShrink = "0";
+    el.style.marginRight = "10px";
+  });
+
+  // toggle kanan
+  box.querySelectorAll('.switch').forEach(el => {
+    el.style.marginLeft = "auto";
+    el.style.flexShrink = "0";
   });
 
   // =========================
-  // FIX SWITCH - FORCE 1 LINE (IMPORTANT)
+  // REMOVE WRAP KARENA INPUT BLOCKING
   // =========================
   box.querySelectorAll('.switch-slider').forEach(el => {
-    el.style.display = 'flex';
-    el.style.alignItems = 'center';
-    el.style.justifyContent = 'space-between';
-    el.style.flexWrap = 'nowrap';
-    el.style.whiteSpace = 'nowrap';
-    el.style.gap = '10px';
+    el.style.minWidth = "220px"; // penting biar gak turun
   });
 
-  box.querySelectorAll('.switch').forEach(el => {
-    el.style.display = 'inline-flex';
-    el.style.alignItems = 'center';
-    el.style.flexWrap = 'nowrap';
-    el.style.whiteSpace = 'nowrap';
-    el.style.verticalAlign = 'middle';
-    el.style.margin = '0';
-    el.style.padding = '0';
-  });
-
-  box.querySelectorAll('.switch input').forEach(el => {
-    el.style.margin = '0';
-    el.style.position = 'relative';
-    el.style.top = '0';
-    el.style.verticalAlign = 'middle';
-  });
-
-  box.querySelectorAll('.switch-slider > div').forEach(el => {
-    el.style.display = 'flex';
-    el.style.alignItems = 'center';
-    el.style.whiteSpace = 'nowrap';
-    el.style.lineHeight = '20px';
-  });
-
-  // =========================
-  // TEXT COLOR (SAFE VERSION)
-  // =========================
+  // text putih
   box.querySelectorAll("label, span, a, i").forEach(el => {
     el.style.color = "#fff";
   });
