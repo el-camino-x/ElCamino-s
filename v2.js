@@ -216,92 +216,138 @@
   const box = document.querySelector('.filter-box');
   if (!box || box.dataset.caminoTheme) return;
 
-  box.dataset.caminoTheme = "1";
+  box.dataset.caminoTheme = "v2-gif";
 
   // =========================
-  // BASE STYLE BOX ONLY
+  // ROOT GLASS DARK STYLE
   // =========================
-  box.style.position = "relative";
+  box.style.background = "rgba(10, 18, 32, 0.75)";
+  box.style.backdropFilter = "blur(10px)";
+  box.style.webkitBackdropFilter = "blur(10px)";
+  box.style.border = "1px solid rgba(255,255,255,0.08)";
+  box.style.borderRadius = "14px";
+  box.style.boxShadow = "0 10px 30px rgba(0,0,0,0.4)";
+  box.style.color = "#e6f0ff";
+  box.style.position = box.style.position || "relative";
   box.style.overflow = "hidden";
-  box.style.borderRadius = "12px";
-  box.style.background = "transparent";
 
   // =========================
-  // GIF LAYER
+  // GIF BACKGROUND LAYER
   // =========================
-  const gif = document.createElement("div");
-  gif.style.cssText = `
-    position:absolute;
-    inset:0;
-    z-index:0;
-    pointer-events:none;
-    background-image:url("https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif");
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
-  `;
+  if (!box.querySelector(".camino-gif-layer")) {
+    const gif = document.createElement("div");
+    gif.className = "camino-gif-layer";
+
+    gif.style.cssText = `
+      position:absolute;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      background-image:url("https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDEzMGk3MTYyeDlheWUycWRiMHY2Z3Y1bmFpMHN6d2ZxbG9sdDVpdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3NFzNsD3iRShTgkAAU/giphy.gif");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      opacity:0.28;
+    `;
+
+    box.prepend(gif);
+  }
 
   // =========================
-  // DARK OVERLAY
+  // DARK OVERLAY (READABILITY)
   // =========================
-  const overlay = document.createElement("div");
-  overlay.style.cssText = `
-    position:absolute;
-    inset:0;
-    z-index:1;
-    pointer-events:none;
-    background:rgba(5,10,20,.75);
-    backdrop-filter:blur(2px);
-  `;
+  if (!box.querySelector(".camino-overlay")) {
+    const overlay = document.createElement("div");
+    overlay.className = "camino-overlay";
 
-  box.prepend(gif);
-  box.appendChild(overlay);
+    overlay.style.cssText = `
+      position:absolute;
+      inset:0;
+      z-index:1;
+      pointer-events:none;
+      background:rgba(5,10,20,0.70);
+      backdrop-filter:blur(3px);
+    `;
+
+    box.appendChild(overlay);
+  }
 
   // =========================
-  // KEEP ALL CONTENT ABOVE LAYER
+  // INPUT / FORM CONTROLS
   // =========================
-  box.querySelectorAll("*").forEach(el => {
-    if (el === gif || el === overlay) return;
+  box.querySelectorAll("input, select, textarea").forEach(el => {
+    el.style.background = "rgba(17, 26, 46, 0.75)";
+    el.style.color = "#ffffff";
+    el.style.border = "1px solid rgba(255,255,255,0.12)";
+    el.style.borderRadius = "8px";
+    el.style.outline = "none";
+    el.style.transition = "all 0.2s ease";
+
+    el.addEventListener("focus", () => {
+      el.style.border = "1px solid rgba(120,180,255,0.8)";
+      el.style.boxShadow = "0 0 0 3px rgba(80,140,255,0.15)";
+    });
+
+    el.addEventListener("blur", () => {
+      el.style.border = "1px solid rgba(255,255,255,0.12)";
+      el.style.boxShadow = "none";
+    });
+  });
+
+  // =========================
+  // TEXT COLOR (SAFE ONLY)
+  // =========================
+  box.querySelectorAll("label, span, a, i").forEach(el => {
+    el.style.color = "#d7e6ff";
+  });
+
+  // =========================
+  // BUTTON POLISH (OPTIONAL UI BOOST)
+  // =========================
+  box.querySelectorAll("button").forEach(btn => {
+    btn.style.background = "linear-gradient(135deg, #2a5298, #1e3c72)";
+    btn.style.border = "none";
+    btn.style.borderRadius = "8px";
+    btn.style.color = "#fff";
+    btn.style.cursor = "pointer";
+    btn.style.transition = "0.2s";
+
+    btn.addEventListener("mouseenter", () => {
+      btn.style.filter = "brightness(1.15)";
+      btn.style.transform = "translateY(-1px)";
+    });
+
+    btn.addEventListener("mouseleave", () => {
+      btn.style.filter = "brightness(1)";
+      btn.style.transform = "translateY(0)";
+    });
+  });
+
+  // =========================
+  // ENSURE CONTENT ABOVE LAYERS
+  // =========================
+  box.querySelectorAll(":scope > *").forEach(el => {
+    if (el.classList?.contains("camino-gif-layer")) return;
+    if (el.classList?.contains("camino-overlay")) return;
+
     el.style.position = "relative";
     el.style.zIndex = "2";
   });
 
   // =========================
-  // UI BACKGROUND CLEAN ONLY
+  // PLACEHOLDER STYLE (ONCE)
   // =========================
-  box.querySelectorAll(`
-    .content-filter,
-    .treeSelector-container,
-    .treeSelector-wrapper,
-    .treeSelector-input-box,
-    .selector,
-    .switch-container,
-    .filter-container,
-    input,
-    select
-  `).forEach(el => {
-    el.style.background = "rgba(10,20,35,.45)";
-    el.style.borderColor = "rgba(255,255,255,.15)";
-  });
-
-  // =========================
-  // TEXT COLOR ONLY (SAFE)
-  // =========================
-  box.querySelectorAll("label, span, a, i, div").forEach(el => {
-    el.style.color = "#fff";
-  });
-
-  // =========================
-  // SWITCH FIX (SAFE MODE - NO LAYOUT TOUCH)
-  // =========================
-  box.querySelectorAll('.switch').forEach(el => {
-    el.style.display = "inline-flex";
-    el.style.alignItems = "center";
-  });
-
-  box.querySelectorAll('.slider').forEach(el => {
-    el.style.flexShrink = "0";
-  });
+  if (!document.getElementById("camino-placeholder-style-v2")) {
+    const style = document.createElement("style");
+    style.id = "camino-placeholder-style-v2";
+    style.textContent = `
+      .filter-box input::placeholder,
+      .filter-box textarea::placeholder {
+        color: rgba(200, 220, 255, 0.45) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
 }
   
   
