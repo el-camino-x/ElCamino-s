@@ -218,25 +218,25 @@
 
   box.dataset.caminoTheme = "1";
 
-  // =========================
-  // BASE STYLE
-  // =========================
   box.style.position = "relative";
   box.style.overflow = "hidden";
   box.style.borderRadius = "12px";
+  box.style.background = "transparent";
 
-  // =========================
-  // BACKGROUND GIF
-  // =========================
+  // GIF layer
   const gif = document.createElement("div");
   gif.style.cssText = `
     position:absolute;
     inset:0;
     z-index:0;
     pointer-events:none;
-    background:url("https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif") center/cover no-repeat;
+    background-image:url("https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
   `;
 
+  // Dark overlay
   const overlay = document.createElement("div");
   overlay.style.cssText = `
     position:absolute;
@@ -244,28 +244,28 @@
     z-index:1;
     pointer-events:none;
     background:rgba(5,10,20,.75);
+    backdrop-filter:blur(2px);
   `;
 
   box.prepend(gif);
   box.appendChild(overlay);
 
-  // =========================
-  // LIFT ALL UI ABOVE LAYER
-  // =========================
-  box.querySelectorAll("*").forEach(el => {
+  // semua elemen di atas GIF
+  Array.from(box.querySelectorAll("*")).forEach(el => {
     if (el === gif || el === overlay) return;
+
     el.style.position = "relative";
     el.style.zIndex = "2";
   });
 
-  // =========================
-  // CLEAN INPUT UI BACKGROUND
-  // =========================
+  // hilangkan background putih
   box.querySelectorAll(`
     .content-filter,
     .treeSelector-container,
     .treeSelector-wrapper,
+    .treeSelector-input-box,
     .selector,
+    .switch-container,
     .filter-container,
     input,
     select
@@ -275,28 +275,10 @@
     el.style.borderColor = "rgba(255,255,255,.15)";
   });
 
-  // =========================
-  // SWITCH DIPINDAH KE ADVANCED (BIAR CLEAN)
-  // =========================
-  const adv = document.getElementById('advancedFiltersSection');
-  const sw = box.querySelector('.switch-container');
-
-  if (adv && sw) {
-    const clone = sw.cloneNode(true);
-
-    clone.style.display = "flex";
-    clone.style.flexDirection = "column";
-    clone.style.gap = "10px";
-    clone.style.marginTop = "10px";
-
-    sw.style.display = "none";
-    adv.appendChild(clone);
-  }
-
-  // =========================
-  // TEXT COLOR CLEAN
-  // =========================
-  box.querySelectorAll("label, span, a, i").forEach(el => {
+  // text putih
+  box.querySelectorAll(
+    "label, span, div, a, i"
+  ).forEach(el => {
     el.style.color = "#fff";
   });
 }
