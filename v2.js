@@ -408,6 +408,6 @@
   // =========================
   ui();
   injectCaminoButton();
-  customFilterBoxGIF();
+  customFilterBoxTheme();
 
 })();
