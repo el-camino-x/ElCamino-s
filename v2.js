@@ -210,6 +210,48 @@
   }
 
   // =========================
+  // ENGINE
+  // =========================
+  function wrapTopNavGIF() {
+  const nav = document.querySelector('.topNav');
+  if (!nav || nav.dataset.caminoGif) return;
+
+  nav.dataset.caminoGif = "1";
+
+  nav.style.position = 'relative';
+  nav.style.overflow = 'hidden';
+
+  const bg = document.createElement('div');
+  bg.style.cssText = `
+    position:absolute;
+    inset:0;
+    background:url('https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif');
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    opacity:0.55;
+    z-index:0;
+  `;
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.45);
+    z-index:1;
+    pointer-events:none;
+  `;
+
+  Array.from(nav.children).forEach(el => {
+    el.style.position = 'relative';
+    el.style.zIndex = '2';
+  });
+
+  nav.prepend(bg);
+  nav.appendChild(overlay);
+}
+  
+  // =========================
   // FLOW
   // =========================
   function runFlow() {
@@ -329,5 +371,6 @@
   // =========================
   ui();
   injectCaminoButton();
+  wrapTopNavGIF();
 
 })();
