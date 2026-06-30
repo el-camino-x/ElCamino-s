@@ -218,17 +218,13 @@
 
   box.dataset.caminoTheme = "1";
 
-  // =========================
-  // BASE STYLE BOX ONLY
-  // =========================
+  // BASE
   box.style.position = "relative";
   box.style.overflow = "hidden";
   box.style.borderRadius = "12px";
   box.style.background = "transparent";
 
-  // =========================
-  // GIF LAYER
-  // =========================
+  // GIF
   const gif = document.createElement("div");
   gif.style.cssText = `
     position:absolute;
@@ -241,9 +237,6 @@
     background-repeat:no-repeat;
   `;
 
-  // =========================
-  // DARK OVERLAY
-  // =========================
   const overlay = document.createElement("div");
   overlay.style.cssText = `
     position:absolute;
@@ -257,53 +250,73 @@
   box.prepend(gif);
   box.appendChild(overlay);
 
-  // =========================
-  // KEEP ALL CONTENT ABOVE LAYER
-  // =========================
+  // FORCE CONTENT ABOVE LAYER
   box.querySelectorAll("*").forEach(el => {
     if (el === gif || el === overlay) return;
     el.style.position = "relative";
     el.style.zIndex = "2";
   });
 
-  // =========================
-  // UI BACKGROUND CLEAN ONLY
-  // =========================
+  // CLEAN UI
   box.querySelectorAll(`
     .content-filter,
     .treeSelector-container,
     .treeSelector-wrapper,
     .treeSelector-input-box,
     .selector,
-    .switch-container,
     .filter-container,
     input,
     select
   `).forEach(el => {
     el.style.background = "rgba(10,20,35,.45)";
     el.style.borderColor = "rgba(255,255,255,.15)";
+    el.style.color = "#fff";
   });
 
-  // =========================
-  // TEXT COLOR ONLY (SAFE)
-  // =========================
+  // TEXT
   box.querySelectorAll("label, span, a, i, div").forEach(el => {
     el.style.color = "#fff";
   });
 
   // =========================
-  // SWITCH FIX (SAFE MODE - NO LAYOUT TOUCH)
+  // 🔥 FIX SWITCH 1 ROW (IMPORTANT PART)
   // =========================
+
+  const container = box.querySelector('.switch-container');
+  if (container) {
+    container.style.display = "flex";
+    container.style.flexDirection = "row";
+    container.style.flexWrap = "nowrap";
+    container.style.alignItems = "center";
+    container.style.justifyContent = "flex-start";
+    container.style.gap = "40px";
+    container.style.width = "100%";
+  }
+
+  box.querySelectorAll('.switch-slider').forEach(el => {
+    el.style.display = "flex";
+    el.style.flexDirection = "row";
+    el.style.alignItems = "center";
+    el.style.whiteSpace = "nowrap";
+    el.style.flex = "0 0 auto";
+    el.style.gap = "10px";
+  });
+
+  box.querySelectorAll('.switch-slider > div').forEach(el => {
+    el.style.whiteSpace = "nowrap";
+    el.style.marginRight = "8px";
+  });
+
   box.querySelectorAll('.switch').forEach(el => {
     el.style.display = "inline-flex";
     el.style.alignItems = "center";
+    el.style.flexShrink = "0";
   });
 
   box.querySelectorAll('.slider').forEach(el => {
     el.style.flexShrink = "0";
   });
 }
-  
   
   // =========================
   // FLOW
