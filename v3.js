@@ -214,86 +214,61 @@ function customFilterBoxTheme() {
   box.style.position = "relative";
   box.style.overflow = "hidden";
   box.style.borderRadius = "12px";
+  box.style.background = "transparent";
 
-  // =========================
-  // GIF LAYER
-  // =========================
+  // GIF layer
   const gif = document.createElement("div");
   gif.style.cssText = `
-    position:absolute;
-    inset:0;
-    z-index:0;
-    pointer-events:none;
-    background:url("https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDEzMGk3MTYyeDlheWUycWRiMHY2Z3Y1bmFpMHN6d2ZxbG9sdDVpdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3NFzNsD3iRShTgkAAU/giphy.gif") center/cover no-repeat;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url("https://media1.tenor.com/m/R21z5ykb3cIAAAAC/boa-tarde.gif");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   `;
 
+  // Dark overlay
   const overlay = document.createElement("div");
   overlay.style.cssText = `
-    position:absolute;
-    inset:0;
-    z-index:1;
-    pointer-events:none;
-    background:rgba(5,10,20,.75);
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: rgba(5,10,20,.75);
+    backdrop-filter: blur(2px);
   `;
 
   box.prepend(gif);
   box.appendChild(overlay);
 
-  // =========================
-  // FORCE ABOVE LAYER
-  // =========================
-  box.querySelectorAll("*").forEach(el => {
+  // semua elemen di atas GIF
+  Array.from(box.querySelectorAll("*")).forEach(el => {
     if (el === gif || el === overlay) return;
     el.style.position = "relative";
     el.style.zIndex = "2";
   });
 
-  // =========================
-  // IMPORTANT: FORCE SWITCH ROW 1 BARIS
-  // =========================
-  const switchContainer = box.querySelector('.switch-container');
-
-  if (switchContainer) {
-    switchContainer.style.display = "flex";
-    switchContainer.style.flexDirection = "row";
-    switchContainer.style.flexWrap = "nowrap";
-    switchContainer.style.alignItems = "center";
-    switchContainer.style.justifyContent = "space-between";
-    switchContainer.style.width = "100%";
-    switchContainer.style.gap = "40px";
-  }
-
-  box.querySelectorAll('.switch-slider').forEach(el => {
-    el.style.display = "flex";
-    el.style.flexDirection = "row";
-    el.style.alignItems = "center";
-    el.style.whiteSpace = "nowrap";
-    el.style.flex = "1";
-    el.style.minWidth = "0";
-  });
-
-  // label kiri (text)
-  box.querySelectorAll('.switch-slider > div').forEach(el => {
-    el.style.whiteSpace = "nowrap";
-    el.style.flexShrink = "0";
-    el.style.marginRight = "10px";
-  });
-
-  // toggle kanan
-  box.querySelectorAll('.switch').forEach(el => {
-    el.style.marginLeft = "auto";
-    el.style.flexShrink = "0";
-  });
-
-  // =========================
-  // REMOVE WRAP KARENA INPUT BLOCKING
-  // =========================
-  box.querySelectorAll('.switch-slider').forEach(el => {
-    el.style.minWidth = "220px"; // penting biar gak turun
+  // styling elemen UI
+  box.querySelectorAll(`
+    .content-filter,
+    .treeSelector-container,
+    .treeSelector-wrapper,
+    .treeSelector-input-box,
+    .selector,
+    .switch-container,
+    .filter-container,
+    input,
+    select
+  `).forEach(el => {
+    el.style.background = "rgba(10,20,35,.45)";
+    el.style.color = "#fff";
+    el.style.borderColor = "rgba(255,255,255,.15)";
   });
 
   // text putih
-  box.querySelectorAll("label, span, a, i").forEach(el => {
+  box.querySelectorAll("label, span, div, a, i").forEach(el => {
     el.style.color = "#fff";
   });
 }
