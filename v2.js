@@ -217,7 +217,7 @@
     w.className = 'p';
 
     w.innerHTML = `
-      <div class="h">ElCamino-爱 Operation V1</div>
+      <div class="h">ElCamino-爱 Operation V1.2</div>
 
       <div class="b">
 
