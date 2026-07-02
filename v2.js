@@ -35,192 +35,64 @@
   const BLOCK = ['NEW REGISTRATION', 'SUSPICIOUS'];
 
   // =========================
-  // INFORMATION TEXT
-  // =========================
-  const INFORMATION = `
-📌 BANK CUT OFF INFORMATION
-
-💳 E-WALLET
-• DANA   : 00.00 - 00.03
-• OVO    : 00.00 - 00.03
-
-🏦 BANK ONLINE
-• BCA     : 00.00 - 00.05
-• SEABANK : 00.00 - 00.15
-• BSI     : 00.00 - 00.15
-• JAGO    : 00.00 - 00.15
-• MAYBANK : 00.00 - 00.15
-• PERMATA : 00.00 - 00.15
-
-⛔ MAINTENANCE
-• BNI     : 23.00 - 03.00
-• MANDIRI : 23.00 - 02.00
-• BRI     : 23.50 - 02.30
-• GOPAY   : 23.30 - 00.30
-`;
-
-  // =========================
-  // UI PANEL
+  // UI CONTROL PANEL
   // =========================
   function ui() {
     if (document.getElementById('payHostUI')) return;
-    if (!document.body) return setTimeout(ui, 200);
 
-    const host = document.createElement('div');
+    if (!document.body) {
+      setTimeout(ui, 200);
+      return;
+    }
+
+    let host = document.createElement('div');
     host.id = 'payHostUI';
     host.style = 'position:fixed;top:100px;left:100px;z-index:999999';
 
-    const sh = host.attachShadow({ mode: 'open' });
+    let sh = host.attachShadow({ mode: 'open' });
 
-    const style = document.createElement('style');
+    let style = document.createElement('style');
     style.textContent = `
-      .p{
-        background:#111;
-        color:#fff;
-        border-radius:12px;
-        font-family:Arial;
-        width:280px;
-        height:460px;
-        resize:both;
-        overflow:hidden;
-        box-shadow:0 10px 30px rgba(0,0,0,.5);
-        position:relative;
-        padding-bottom:28px;
-      }
+      .p{background:#111;color:#fff;border-radius:12px;font-family:Inter, Arial, sans-serif;width:275px;height:501px;resize:both;overflow-y:auto;overflow-x:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5);position:relative;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:rgba(143,191,255,.35) transparent}
+      
+      .p::-webkit-scrollbar{width:3px}
+      .p::-webkit-scrollbar-track{background:transparent}
+      .p::-webkit-scrollbar-thumb{background:rgba(143,191,255,.45);border-radius:10px}
+      .p::-webkit-scrollbar-thumb:hover{background:rgba(143,191,255,.75)}
+      
+      .h{cursor:move;background:#222;padding:8px;font-weight:bold;user-select:none;position:sticky;top:0;z-index:10}
+      
+      .b{padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px}
+      .b label{display:flex;align-items:center;gap:6px}
+      
+      .btns{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;margin-top:8px}
+      
+      .info{grid-column:1/-1;margin-top:10px;padding:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:8px;font-size:12px;line-height:1.6;color:#e6e6e6;max-height:160px;overflow-y:auto}
+      
+      .logo{width:14px;height:14px;vertical-align:middle;margin-right:6px;border-radius:3px}
 
-      .h{
-        cursor:move;
-        background:#222;
-        padding:8px;
-        font-weight:bold;
-        user-select:none;
-      }
+      .row2{display:flex;gap:6px}
+      .row2 button{flex:1}
+      
+      button{width:100%;padding:7px;font-size:11px;border:none;border-radius:10px;background:rgba(42,82,152,.75);color:#fff;font-weight:500;cursor:pointer;transition:all .2s ease;backdrop-filter:blur(6px);box-shadow:0 4px 12px rgba(0,0,0,.25);position:relative;overflow:hidden}
+      
+      button:hover{transform:translateY(-1px) scale(1.02);background:rgba(58,110,200,.85);box-shadow:0 6px 18px rgba(0,0,0,.35),0 0 10px rgba(143,191,255,.25);}
 
-      .b{
-        padding:10px;
-        display:grid;
-        grid-template-columns:1fr 1fr;
-        gap:6px;
-        font-size:12px;
-      }
+      button:active{transform:translateY(0px) scale(.98);box-shadow:0 2px 8px rgba(0,0,0,.25);}
 
-      .b label{
-        display:flex;
-        align-items:center;
-        gap:6px;
-      }
+      .ft{margin-top:auto;padding:6px 10px;overflow:hidden;mask-image:linear-gradient(to right, transparent, black 10%, black 90%, transparent)}
+      .marq{display:inline-block;white-space:nowrap;will-change:transform;animation:mar 48s linear infinite;color:#8fbfff}
+      .marq span{padding-right:90px}
+      
+      @keyframes mar{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+`;
 
-      .btns{
-        grid-column:1/-1;
-        display:flex;
-        flex-direction:column;
-        gap:6px;
-        margin-top:8px;
-      }
-
-      .row2{
-        display:flex;
-        gap:6px;
-      }
-
-      .row2 button{
-        flex:1;
-      }
-
-      button{
-        width:100%;
-        padding:6px;
-        font-size:11px;
-        border:none;
-        border-radius:8px;
-        background:#2a5298;
-        color:#fff;
-        font-weight:500;
-        cursor:pointer;
-      }
-
-      button:hover{
-        filter:brightness(1.1);
-      }
-
-      /* INFO BOX */
-      .infoBox{
-        grid-column:1/-1;
-        background:rgba(20,30,50,.65);
-        border:1px solid rgba(255,255,255,.08);
-        border-radius:10px;
-        padding:10px;
-        font-size:10px;
-        white-space:pre-line;
-        line-height:1.35;
-        max-height:150px;
-        overflow:auto;
-        margin-top:8px;
-      }
-
-      /* ===== PREMIUM SCROLLBAR ===== */
-.infoBox::-webkit-scrollbar {
-  width: 6px;
-}
-
-.infoBox::-webkit-scrollbar-track {
-  background: rgba(255,255,255,0.05);
-  border-radius: 10px;
-}
-
-.infoBox::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #2a5298, #1b3b6f);
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-.infoBox::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #3b6fd6, #2a5298);
-}
-
-/* Firefox */
-.infoBox {
-  scrollbar-width: thin;
-  scrollbar-color: #2a5298 rgba(255,255,255,0.05);
-}
-
-      /* FOOTER FIX (NO OVERLAP) */
-      .ft{
-        position:absolute;
-        bottom:0;
-        left:0;
-        right:0;
-        padding:6px 10px;
-        overflow:hidden;
-        background:rgba(10,15,25,.7);
-        backdrop-filter:blur(2px);
-      }
-
-      .marq{
-        display:inline-block;
-        white-space:nowrap;
-        animation:mar 48s linear infinite;
-        color:#8fbfff;
-      }
-
-      .marq span{
-        padding-right:90px;
-      }
-
-      @keyframes mar{
-        0%{transform:translateX(0)}
-        100%{transform:translateX(-50%)}
-      }
-    `;
-
-    const w = document.createElement('div');
+    let w = document.createElement('div');
     w.className = 'p';
 
     w.innerHTML = `
       <div class="h">ElCamino-爱 Operation V1.2</div>
-
       <div class="b">
-
         <label><input id="DANA" type="checkbox"> DANA</label>
         <label><input id="OVO" type="checkbox"> OVO</label>
         <label><input id="GOPAY" type="checkbox"> GOPAY</label>
@@ -236,16 +108,30 @@
 
         <div class="btns">
           <button id="sv">SAVE</button>
-
           <div class="row2">
             <button id="ca">CHECK ALL</button>
             <button id="uc">UNCHECK</button>
           </div>
         </div>
 
-        <!-- INFORMATION -->
-        <div class="infoBox" id="infoBox"></div>
+        <div class="info">
+  <b><img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/021/616/845/small/banking-3d-render-icon-illustration-png.png"> BANK CUT OFF INFORMATION</b>
+  
+  <br><br><img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/065/645/small_2x/dana-logo-square-rounded-dana-logo-free-download-dana-logo-free-png.png"> DANA : 00.00 - 00.03<br>
+  <img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/065/651/small_2x/ovo-logo-square-rounded-ovo-logo-free-download-ovo-logo-free-png.png"> OVO : 00.00 - 00.03<br>
+  <img class="logo" src="https://static.vecteezy.com/system/resources/previews/067/065/676/non_2x/gopay-logo-square-rounded-gopay-logo-free-download-gopay-logo-free-png.png"> GOPAY : 23.30 - 00.30<br><br>
 
+  <img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/518/small_2x/bank-bca-square-rounded-logo-free-png.png"> BCA : 00.00 - 00.05<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/previews/067/565/519/non_2x/seabank-square-rounded-logo-transparent-without-background-free-png.png"> SEABANK : 00.00 - 00.15<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/previews/067/565/455/non_2x/bank-syariah-indonesia-square-rounded-logo-transparent-without-background-free-png.png"> BSI : 00.00 - 00.15<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/previews/067/565/533/non_2x/bank-jago-square-rounded-logo-transparent-without-background-free-png.png"> JAGO : 00.00 - 00.15<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/previews/067/565/453/non_2x/maybank-indonesia-square-rounded-logo-transparent-without-background-free-png.png"> MAYBANK : 00.00 - 00.15<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/464/small_2x/permata-bank-square-rounded-logo-transparent-without-background-free-png.png"> PERMATA : 00.00 - 00.15<br><br>
+
+<img class="logo" src="https://static.vecteezy.com/system/resources/previews/055/553/741/non_2x/mandri-mobile-phone-app-logo-free-png.png"> MANDIRI : 23.00 - 02.00<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/461/small_2x/bank-bri-official-square-rounded-logo-free-png.png"> BRI : 23.50 - 02.30<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/468/small_2x/bank-bni-square-rounded-logo-free-png.png"> BNI : 23.00 - 03.00
+</div>
       </div>
 
       <div class="ft">
@@ -260,14 +146,11 @@
     sh.appendChild(w);
     document.body.appendChild(host);
 
-    // inject info
-    w.querySelector('#infoBox').textContent = INFORMATION;
-
-    const keys = ['DANA','OVO','GOPAY','BCA','BNI','BRI','MANDIRI','BSI','JAGO','PERMATA','MAYBANK','SEABANK'];
-    const cfg = getCfg();
+    let keys = ['DANA','OVO','GOPAY','BCA','BNI','BRI','MANDIRI','BSI','JAGO','PERMATA','MAYBANK','SEABANK'];
+    let cfg = getCfg();
 
     keys.forEach(k => {
-      const el = w.querySelector('#' + k);
+      let el = w.querySelector('#' + k);
       if (el) el.checked = cfg[k] === true;
     });
 
@@ -281,7 +164,9 @@
     w.querySelector('#ca').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = true);
     w.querySelector('#uc').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = false);
 
-    // DRAG
+    // =========================
+    // DRAG FIX (NEW)
+    // =========================
     let h = w.querySelector('.h');
     let dragging = false;
     let offsetX = 0;
@@ -289,14 +174,18 @@
 
     h.addEventListener('mousedown', (e) => {
       dragging = true;
-      const r = host.getBoundingClientRect();
-      offsetX = e.clientX - r.left;
-      offsetY = e.clientY - r.top;
+
+      const rect = host.getBoundingClientRect();
+
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+
       host.style.position = 'fixed';
     });
 
     document.addEventListener('mousemove', (e) => {
       if (!dragging) return;
+
       host.style.left = (e.clientX - offsetX) + 'px';
       host.style.top = (e.clientY - offsetY) + 'px';
     });
@@ -306,15 +195,21 @@
     });
   }
 
+  // =========================
+  // INJECT BUTTON
+  // =========================
   function injectCaminoButton() {
     const btn = document.getElementById('btnSearch');
     if (!btn || document.getElementById('btnElCamino')) return;
 
     const cam = document.createElement('button');
     cam.id = 'btnElCamino';
+    cam.type = 'button';
     cam.innerHTML = 'EL CAMINO';
+    cam.className = btn.className;
+    cam.style.marginLeft = '8px';
 
-    cam.onclick = (e) => {
+    cam.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
 
@@ -323,20 +218,26 @@
 
       btn.click();
       startEngine();
-    };
+    });
 
     btn.insertAdjacentElement('afterend', cam);
   }
 
+  // =========================
+  // ENGINE
+  // =========================
   function startEngine() {
     let l = 0, s = 0;
 
     const iv = setInterval(() => {
-      if (!window.__ENGINE_RUNNING__) return clearInterval(iv);
+      if (!window.__ENGINE_RUNNING__) {
+        clearInterval(iv);
+        return;
+      }
 
-      const rows = document.querySelectorAll('table tbody tr').length;
+      let rows = document.querySelectorAll('table tbody tr').length;
 
-      if (rows === l) s++;
+      if (rows == l) s++;
       else { s = 0; l = rows; }
 
       if (s < 3) return;
@@ -346,6 +247,119 @@
     }, 400);
   }
 
+  // =========================
+  // CUSTOM GIF
+  // =========================
+  function customFilterBoxTheme() {
+  const box = document.querySelector('.filter-box');
+  if (!box || box.dataset.caminoTheme) return;
+
+  box.dataset.caminoTheme = "1";
+
+  // =========================
+  // BASE STYLE BOX ONLY
+  // =========================
+  box.style.position = "relative";
+  box.style.overflow = "hidden";
+  box.style.borderRadius = "12px";
+  box.style.background = "transparent";
+
+  // =========================
+  // GIF LAYER
+  // =========================
+  const gif = document.createElement("div");
+  gif.style.cssText = `
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background-image:url("https://media1.tenor.com/m/3y_DrAG1pBoAAAAd/el-camino-a-breaking-bad-movie.gif");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+  `;
+
+  // =========================
+  // DARK OVERLAY
+  // =========================
+  const overlay = document.createElement("div");
+  overlay.style.cssText = `
+    position:absolute;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background:rgba(5,10,20,.75);
+    backdrop-filter:blur(2px);
+  `;
+
+  box.prepend(gif);
+  box.appendChild(overlay);
+
+  // =========================
+  // KEEP ALL CONTENT ABOVE LAYER
+  // =========================
+  box.querySelectorAll("*").forEach(el => {
+    if (el === gif || el === overlay) return;
+    el.style.position = "relative";
+    el.style.zIndex = "2";
+  });
+
+  // =========================
+  // UI BACKGROUND CLEAN ONLY
+  // =========================
+  box.querySelectorAll(`
+    .content-filter,
+    .treeSelector-container,
+    .treeSelector-wrapper,
+    .treeSelector-input-box,
+    .selector,
+    .switch-container,
+    .filter-container,
+    input,
+    select
+  `).forEach(el => {
+    el.style.background = "rgba(10,20,35,.45)";
+    el.style.borderColor = "rgba(255,255,255,.15)";
+  });
+
+  // =========================
+  // TEXT COLOR ONLY (SAFE)
+  // =========================
+  box.querySelectorAll("label, span, a, i, div").forEach(el => {
+    el.style.color = "#fff";
+  });
+
+  // =========================
+  // SWITCH FIX (SAFE MODE - NO LAYOUT TOUCH)
+  // =========================
+  box.querySelectorAll('.switch').forEach(el => {
+    el.style.display = "inline-flex";
+    el.style.alignItems = "center";
+  });
+
+  box.querySelectorAll('.slider').forEach(el => {
+    el.style.flexShrink = "0";
+  });
+    
+  // =========================
+  // HIDE SWITCH CONTAINER (SAFE CSS ONLY)
+  // =========================
+  if (!document.getElementById("camino-hide-switch")) {
+    const style = document.createElement("style");
+    style.id = "camino-hide-switch";
+    style.textContent = `
+      .switch-container {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+  
+  
+  // =========================
+  // FLOW
+  // =========================
   function runFlow() {
     let cfg = getCfg();
     let valid = [];
@@ -381,31 +395,86 @@
 
     valid.forEach(tr => {
       let cb = tr.querySelector('input[type=checkbox],td.select-checkbox,.select-checkbox,[type=checkbox]');
-      if (cb) cb.click();
+      if (cb) {
+        cb.click();
+        cb.dispatchEvent(new Event('change', { bubbles: true }));
+      }
     });
 
-    unlock();
-    document.getElementById('btnSearch')?.click();
+    let out = [];
+
+    valid.forEach(tr => {
+      let t = tr.querySelectorAll('td');
+
+      let td6 = t[5];
+      let lines = (td6?.innerText || '').split('\n').map(e => e.trim()).filter(Boolean);
+
+      out.push({
+        bank: lines[1] || '',
+        time: (t[2]?.innerText || '').split('\n')[1]?.trim() || '',
+        tiket: (t[3]?.innerText || '').trim(),
+        user: (t[4]?.innerText || '').trim(),
+        name: lines[0] || '',
+        rek: lines.find(e => /^\d{6,}$/.test(e)) || '',
+        amount: p(t[6]?.innerText || ''),
+        remark: 'PAYMENT-GROUP'
+      });
+    });
+
+    fetch(EXEC + "?data=" + encodeURIComponent(JSON.stringify(out))).catch(() => {});
+
+    let ddl = document.getElementById('ddlMultiCompanyBank');
+    if (ddl) {
+      ddl.value = '5f71a42e-69e1-43bb-a51b-220c409dcd1d';
+      ddl.dispatchEvent(new Event('change', { bubbles: true }));
+      if (window.jQuery) jQuery(ddl).trigger('change');
+    }
+
+    let iv2 = setInterval(() => {
+      let sel = document.querySelectorAll('tr.selected,input[type=checkbox]:checked').length;
+      let btn = document.getElementById('btnMultipleApproveBeforeDialog');
+
+      if (sel === 0) {
+        clearInterval(iv2);
+        unlock();
+        document.getElementById('btnSearch')?.click();
+        return;
+      }
+
+      if (btn && sel) {
+        clearInterval(iv2);
+
+        setTimeout(() => {
+          btn.click();
+
+          let iv3 = setInterval(() => {
+            let ya = document.getElementById('btnMultipleApprove');
+            if (ya) {
+              ya.click();
+              clearInterval(iv3);
+
+              let iv4 = setInterval(() => {
+                let ok = document.querySelector('.swal2-confirm.swal2-confirm-button-custom');
+                if (ok && ok.offsetParent !== null) {
+                  ok.click();
+                  clearInterval(iv4);
+
+                  setTimeout(() => {
+                    unlock();
+                    document.getElementById('btnSearch')?.click();
+                  }, 300);
+                }
+              }, 200);
+            }
+          }, 200);
+        }, 300);
+      }
+    }, 150);
   }
 
-  function customFilterBoxTheme() {
-    const box = document.querySelector('.filter-box');
-    if (!box || box.dataset.caminoTheme) return;
-
-    box.dataset.caminoTheme = "1";
-    box.style.position = "relative";
-    box.style.overflow = "hidden";
-
-    const gif = document.createElement("div");
-    gif.style.cssText = `
-      position:absolute;inset:0;z-index:0;
-      background:url("https://media1.tenor.com/m/3y_DrAG1pBoAAAAd/el-camino-a-breaking-bad-movie.gif");
-      background-size:cover;
-    `;
-
-    box.prepend(gif);
-  }
-
+  // =========================
+  // INIT
+  // =========================
   ui();
   injectCaminoButton();
   customFilterBoxTheme();
