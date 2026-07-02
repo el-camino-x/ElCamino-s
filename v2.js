@@ -226,13 +226,15 @@
   `;
 
   document.body.appendChild(el);
-}
 
-    setTimeout(() => {
-  el.style.transition = "0.5s";
-  el.style.opacity = "0";
-  setTimeout(() => el.remove(), 500);
-}, 3000);
+  // ✅ AUTO FADE + REMOVE (INI YANG BENAR)
+  setTimeout(() => {
+    el.style.transition = "0.5s";
+    el.style.opacity = "0";
+
+    setTimeout(() => el.remove(), 500);
+  }, 3000);
+}
     
     // =========================
     // DRAG FIX (NEW)
