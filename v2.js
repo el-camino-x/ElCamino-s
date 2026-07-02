@@ -11,8 +11,8 @@
   // =========================
   const WHITELIST = [
   "phpradanicky",
-  "admin1",
   "admin2",
+  "phpradatiaamanda",
   "admin3",
   "admin4"
 ];
@@ -191,6 +191,50 @@
     w.querySelector('#uc').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = false);
 
     // =========================
+    // ALERT
+    // =========================
+    function showUnauthorizedGif() {
+  if (document.getElementById("unauth-gif")) return;
+
+  const el = document.createElement("div");
+  el.id = "unauth-gif";
+  el.style.cssText = `
+    position: fixed;
+    inset: 0;
+    z-index: 9999999;
+    background: rgba(0,0,0,.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+  `;
+
+  el.innerHTML = `
+    <img src="https://media1.tenor.com/m/MY6Oiygedx0AAAAd/aghi-pascol.gif"
+         style="width:220px;height:auto;border-radius:12px;margin-bottom:15px;">
+    
+    <div style="font-size:18px;font-weight:bold;">
+      ACCESS DENIED
+    </div>
+
+    <div style="font-size:12px;opacity:.7;margin-top:6px;">
+      User tidak ada di whitelist
+    </div>
+  `;
+
+  document.body.appendChild(el);
+}
+
+    setTimeout(() => {
+  el.style.transition = "0.5s";
+  el.style.opacity = "0";
+  setTimeout(() => el.remove(), 500);
+}, 3000);
+    
+    // =========================
     // DRAG FIX (NEW)
     // =========================
     let h = w.querySelector('.h');
@@ -241,8 +285,8 @@
 
   // 🔐 AUTH CHECK (INI INTINYA)
   if (!isAuthorized()) {
-    alert("Unauthorized user");
-    return;
+  showUnauthorizedGif();
+  return;
   }
 
   if (window.__ENGINE_RUNNING__) return;
