@@ -53,26 +53,45 @@
 
     let style = document.createElement('style');
     style.textContent = `
-      .p{background:#111;color:#fff;border-radius:12px;font-family:Arial;width:280px;height:320px;resize:both;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5);position:relative}
-      .h{cursor:move;background:#222;padding:8px;font-weight:bold;user-select:none}
+      .p{background:#111;color:#fff;border-radius:12px;font-family:Inter, Arial, sans-serif;width:275px;height:501px;resize:both;overflow-y:auto;overflow-x:hidden;box-shadow:0 10px 30px rgba(0,0,0,.5);position:relative;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:rgba(143,191,255,.35) transparent}
+      
+      .p::-webkit-scrollbar{width:3px}
+      .p::-webkit-scrollbar-track{background:transparent}
+      .p::-webkit-scrollbar-thumb{background:rgba(143,191,255,.45);border-radius:10px}
+      .p::-webkit-scrollbar-thumb:hover{background:rgba(143,191,255,.75)}
+      
+      .h{cursor:move;background:#222;padding:8px;font-weight:bold;user-select:none;position:sticky;top:0;z-index:10}
+      
       .b{padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px}
       .b label{display:flex;align-items:center;gap:6px}
+      
       .btns{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;margin-top:8px}
+      
+      .info{grid-column:1/-1;margin-top:10px;padding:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:8px;font-size:12px;line-height:1.6;color:#e6e6e6;max-height:160px;overflow-y:auto}
+      
+      .logo{width:14px;height:14px;vertical-align:middle;margin-right:6px;border-radius:3px}
+
       .row2{display:flex;gap:6px}
       .row2 button{flex:1}
-      button{width:100%;padding:6px;font-size:11px;border:none;border-radius:8px;background:#2a5298;color:#fff;font-weight:500;cursor:pointer}
-      button:hover{filter:brightness(1.1)}
-      .ft{position:absolute;bottom:6px;left:10px;right:10px;overflow:hidden}
-      .marq{display:inline-block;white-space:nowrap;animation:mar 48s linear infinite;color:#8fbfff}
+      
+      button{width:100%;padding:7px;font-size:11px;border:none;border-radius:10px;background:rgba(42,82,152,.75);color:#fff;font-weight:500;cursor:pointer;transition:all .2s ease;backdrop-filter:blur(6px);box-shadow:0 4px 12px rgba(0,0,0,.25);position:relative;overflow:hidden}
+      
+      button:hover{transform:translateY(-1px) scale(1.02);background:rgba(58,110,200,.85);box-shadow:0 6px 18px rgba(0,0,0,.35),0 0 10px rgba(143,191,255,.25);}
+
+      button:active{transform:translateY(0px) scale(.98);box-shadow:0 2px 8px rgba(0,0,0,.25);}
+
+      .ft{margin-top:auto;padding:6px 10px;overflow:hidden;mask-image:linear-gradient(to right, transparent, black 10%, black 90%, transparent)}
+      .marq{display:inline-block;white-space:nowrap;will-change:transform;animation:mar 48s linear infinite;color:#8fbfff}
       .marq span{padding-right:90px}
+      
       @keyframes mar{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-    `;
+`;
 
     let w = document.createElement('div');
     w.className = 'p';
 
     w.innerHTML = `
-      <div class="h">ElCamino-爱 Operation V1</div>
+      <div class="h">ElCamino-爱 Operation V1.2</div>
       <div class="b">
         <label><input id="DANA" type="checkbox"> DANA</label>
         <label><input id="OVO" type="checkbox"> OVO</label>
@@ -94,6 +113,25 @@
             <button id="uc">UNCHECK</button>
           </div>
         </div>
+
+        <div class="info">
+  <b><img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/021/616/845/small/banking-3d-render-icon-illustration-png.png"> BANK CUT OFF INFORMATION</b>
+  
+  <br><br><img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/065/645/small_2x/dana-logo-square-rounded-dana-logo-free-download-dana-logo-free-png.png"> DANA : 00.00 - 00.03<br>
+  <img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/065/651/small_2x/ovo-logo-square-rounded-ovo-logo-free-download-ovo-logo-free-png.png"> OVO : 00.00 - 00.03<br>
+  <img class="logo" src="https://static.vecteezy.com/system/resources/previews/067/065/676/non_2x/gopay-logo-square-rounded-gopay-logo-free-download-gopay-logo-free-png.png"> GOPAY : 23.30 - 00.30<br><br>
+
+  <img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/518/small_2x/bank-bca-square-rounded-logo-free-png.png"> BCA : 00.00 - 00.05<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/previews/067/565/519/non_2x/seabank-square-rounded-logo-transparent-without-background-free-png.png"> SEABANK : 00.00 - 00.15<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/previews/067/565/455/non_2x/bank-syariah-indonesia-square-rounded-logo-transparent-without-background-free-png.png"> BSI : 00.00 - 00.15<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/previews/067/565/533/non_2x/bank-jago-square-rounded-logo-transparent-without-background-free-png.png"> JAGO : 00.00 - 00.15<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/previews/067/565/453/non_2x/maybank-indonesia-square-rounded-logo-transparent-without-background-free-png.png"> MAYBANK : 00.00 - 00.15<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/464/small_2x/permata-bank-square-rounded-logo-transparent-without-background-free-png.png"> PERMATA : 00.00 - 00.15<br><br>
+
+<img class="logo" src="https://static.vecteezy.com/system/resources/previews/055/553/741/non_2x/mandri-mobile-phone-app-logo-free-png.png"> MANDIRI : 23.00 - 02.00<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/461/small_2x/bank-bri-official-square-rounded-logo-free-png.png"> BRI : 23.50 - 02.30<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/468/small_2x/bank-bni-square-rounded-logo-free-png.png"> BNI : 23.00 - 03.00
+</div>
       </div>
 
       <div class="ft">
