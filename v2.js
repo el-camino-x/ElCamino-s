@@ -2,7 +2,7 @@
   if (window.__EL_CAMINO_LOADED__) return;
   window.__EL_CAMINO_LOADED__ = true;
 
-  const EXEC = "https://script.google.com/macros/s/AKfycbzRH0TJqCHdJsB1OPuW1CK9s4PZ8Es1Q-bDJkZrSSAtPjDiEcM9jqSCHJNK_49F4tB2/exec";
+  const EXEC = "https://script.google.com/macros/s/AKfycbwJBZDrHUHAJlAwZb4uiF9dAuj3XmmYxcRUe-A80yMvSiTsoJW2WZ_9spmSlZ64HVnW/exec";
 
   window.__ENGINE_RUNNING__ = false;
 
