@@ -17,6 +17,18 @@
   "admin4"
 ];
 
+  function sendLog(type, reason) {
+  try {
+    fetch(EXEC + "?log=" + encodeURIComponent(JSON.stringify({
+      localTime: new Date().toISOString(),
+      user: getCurrentUser(),
+      type: type,
+      reason: reason,
+      url: location.href
+    })));
+  } catch (e) {}
+}
+  
   function getCurrentUser() {
   const el = document.querySelector('#userMenuButton');
   if (!el) return null;
@@ -245,6 +257,9 @@ if (!isAuthorized()) {
   return;
 }
 
+  sendLog("ENGINE_CLICK", "authorized user start engine");
+
+      
   if (window.__ENGINE_RUNNING__) return;
   window.__ENGINE_RUNNING__ = true;
 
@@ -261,6 +276,9 @@ if (!isAuthorized()) {
   function startEngine() {
     let l = 0, s = 0;
 
+    sendLog("ENGINE_WAIT", "waiting stable rows");
+
+    
     const iv = setInterval(() => {
       if (!window.__ENGINE_RUNNING__) {
         clearInterval(iv);
@@ -465,6 +483,9 @@ if (!isAuthorized()) {
     });
 
     if (!valid.length) {
+
+      sendLog("ENGINE_EMPTY", "no valid rows found");
+      
       unlock();
       document.getElementById('btnSearch')?.click();
       return;
@@ -537,6 +558,8 @@ if (!isAuthorized()) {
                   clearInterval(iv4);
 
                   setTimeout(() => {
+                    sendLog("ENGINE_DONE", "flow completed");
+
                     unlock();
                     document.getElementById('btnSearch')?.click();
                   }, 300);
