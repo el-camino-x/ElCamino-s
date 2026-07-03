@@ -155,7 +155,7 @@
 <img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/464/small_2x/permata-bank-square-rounded-logo-transparent-without-background-free-png.png"> PERMATA : 00.00 - 00.15<br><br>
 
 <img class="logo" src="https://static.vecteezy.com/system/resources/previews/055/553/741/non_2x/mandri-mobile-phone-app-logo-free-png.png"> MANDIRI : 23.00 - 02.00<br>
-<img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/461/small_2x/bank-bri-official-square-rounded-logo-free-png.png"> BRI : 23.50 - 02.30<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/461/small_2x/bank-bri-official-square-rounded-logo-free-png.png"> BRI : 23.50 - 02.45<br>
 <img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/468/small_2x/bank-bni-square-rounded-logo-free-png.png"> BNI : 23.00 - 03.00
 </div>
       </div>
@@ -305,7 +305,7 @@ if (!isAuthorized()) {
     inset:0;
     z-index:0;
     pointer-events:none;
-    background-image:url("https://media1.tenor.com/m/3y_DrAG1pBoAAAAd/el-camino-a-breaking-bad-movie.gif");
+    background-image:url("https://i.postimg.cc/L6fQNJP9/image.png");
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
@@ -355,14 +355,14 @@ if (!isAuthorized()) {
   });
 
   // =========================
-  // TEXT COLOR ONLY (SAFE)
+  // TEXT COLOR ONLY 
   // =========================
   box.querySelectorAll("label, span, a, i, div").forEach(el => {
     el.style.color = "#fff";
   });
 
   // =========================
-  // SWITCH FIX (SAFE MODE - NO LAYOUT TOUCH)
+  // SWITCH FIX 
   // =========================
   box.querySelectorAll('.switch').forEach(el => {
     el.style.display = "inline-flex";
@@ -374,7 +374,7 @@ if (!isAuthorized()) {
   });
     
   // =========================
-  // HIDE SWITCH CONTAINER (SAFE CSS ONLY)
+  // HIDE SWITCH CONTAINER 
   // =========================
   if (!document.getElementById("camino-hide-switch")) {
     const style = document.createElement("style");
@@ -387,7 +387,47 @@ if (!isAuthorized()) {
     document.head.appendChild(style);
   }
 }
+
+  // =========================
+  // BLOCK ID
+  // =========================
   
+  const BLOCK_ID = [
+  "fpso1",
+  "fpso2",
+  "fpso3",
+  "fpjek1",
+  "fpjek2",
+  "rudyy888",
+  "pradajuanda",
+  "cobacoba1233",
+  "forumwijaya",
+  "pradachan",
+  "pradapatrick",
+  "userzoom",
+  "jokerbanting",
+  "ziroru99",
+  "legendas123",
+  "ASSEN",
+  "je90",
+  "pradataa",
+  "asgardd",
+  "barbara188xx",
+  "dbjastin",
+  "SPAMSMS",
+  "Exquisiteboy",
+  "spamwa188",
+  "egolbca",
+  "Idmaxwin",
+  "torpedobasi",
+  "ifanbca",
+  "Cabegiling",
+  "mandakafir",
+  "Rendy9906",
+  "kafirun05129",
+  "Arifjp77",
+  "icha19"
+];
   
   // =========================
   // FLOW
@@ -398,6 +438,11 @@ if (!isAuthorized()) {
 
     document.querySelectorAll('table tbody tr').forEach(tr => {
       let tds = tr.querySelectorAll('td');
+
+      let idUser = (tds[4]?.innerText || '').trim();
+
+      if (BLOCK_ID.includes(idUser)) return;
+      
       let full = (tr.innerText || '').toUpperCase();
       let td8 = (tds[7]?.innerText || '').toUpperCase();
 
