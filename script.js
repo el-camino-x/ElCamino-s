@@ -155,7 +155,7 @@
 <img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/464/small_2x/permata-bank-square-rounded-logo-transparent-without-background-free-png.png"> PERMATA : 00.00 - 00.15<br><br>
 
 <img class="logo" src="https://static.vecteezy.com/system/resources/previews/055/553/741/non_2x/mandri-mobile-phone-app-logo-free-png.png"> MANDIRI : 23.00 - 02.00<br>
-<img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/461/small_2x/bank-bri-official-square-rounded-logo-free-png.png"> BRI : 23.50 - 02.30<br>
+<img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/461/small_2x/bank-bri-official-square-rounded-logo-free-png.png"> BRI : 23.50 - 02.45<br>
 <img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/468/small_2x/bank-bni-square-rounded-logo-free-png.png"> BNI : 23.00 - 03.00
 </div>
       </div>
@@ -305,7 +305,7 @@ if (!isAuthorized()) {
     inset:0;
     z-index:0;
     pointer-events:none;
-    background-image:url("https://media1.tenor.com/m/3y_DrAG1pBoAAAAd/el-camino-a-breaking-bad-movie.gif");
+    background-image:url("https://i.postimg.cc/d137WKkp/image.png");
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
