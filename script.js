@@ -6,6 +6,32 @@
 
   window.__ENGINE_RUNNING__ = false;
 
+  // =========================
+  // WHITELIST AUTH SYSTEM
+  // =========================
+  const WHITELIST = [
+  "phpradanicky",
+  "pradarega",
+  "phpradatiaamanda",
+  "admin3",
+  "admin4"
+];
+
+  function getCurrentUser() {
+  const el = document.querySelector('#userMenuButton');
+  if (!el) return null;
+
+  const text = el.innerText || '';
+
+  const match = text.match(/\(([^)]+)\)/);
+  return match ? match[1].trim() : null;
+}
+
+  function isAuthorized() {
+    const user = getCurrentUser();
+    return user && WHITELIST.includes(user);
+  }
+  
   function unlock() {
     window.__ENGINE_RUNNING__ = false;
   }
@@ -163,7 +189,7 @@
 
     w.querySelector('#ca').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = true);
     w.querySelector('#uc').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = false);
-
+    
     // =========================
     // DRAG FIX (NEW)
     // =========================
@@ -210,15 +236,21 @@
     cam.style.marginLeft = '8px';
 
     cam.addEventListener('click', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
+  e.preventDefault();
+  e.stopPropagation();
 
-      if (window.__ENGINE_RUNNING__) return;
-      window.__ENGINE_RUNNING__ = true;
+  // 🔐 AUTH CHECK (INI INTINYA)
+if (!isAuthorized()) {
+  alert("Unauthorized user");
+  return;
+}
 
-      btn.click();
-      startEngine();
-    });
+  if (window.__ENGINE_RUNNING__) return;
+  window.__ENGINE_RUNNING__ = true;
+
+  btn.click();
+  startEngine();
+});
 
     btn.insertAdjacentElement('afterend', cam);
   }
@@ -475,8 +507,20 @@
   // =========================
   // INIT
   // =========================
+  function waitForUser(cb) {
+  const iv = setInterval(() => {
+    const user = getCurrentUser();
+    if (user) {
+      clearInterval(iv);
+      cb(user);
+    }
+  }, 300);
+  }
+  
   ui();
+  waitForUser(() => {
   injectCaminoButton();
+});
   customFilterBoxTheme();
 
 })();
