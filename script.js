@@ -305,7 +305,7 @@ if (!isAuthorized()) {
     inset:0;
     z-index:0;
     pointer-events:none;
-    background-image:url("https://i.postimg.cc/d137WKkp/image.png");
+    background-image:url("https://i.postimg.cc/L6fQNJP9/image.png");
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
