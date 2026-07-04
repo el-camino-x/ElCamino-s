@@ -253,11 +253,10 @@
 
   // 🔐 AUTH CHECK (INI INTINYA)
 if (!isAuthorized()) {
+  sendLog("UNAUTHORIZED", "user not in whitelist");
   alert("Unauthorized user");
   return;
 }
-
-  sendLog("ENGINE_CLICK", "authorized user start engine");
 
       
   if (window.__ENGINE_RUNNING__) return;
@@ -275,8 +274,6 @@ if (!isAuthorized()) {
   // =========================
   function startEngine() {
     let l = 0, s = 0;
-
-    sendLog("ENGINE_WAIT", "waiting stable rows");
 
     
     const iv = setInterval(() => {
@@ -483,8 +480,6 @@ if (!isAuthorized()) {
     });
 
     if (!valid.length) {
-
-      sendLog("ENGINE_EMPTY", "no valid rows found");
       
       unlock();
       document.getElementById('btnSearch')?.click();
