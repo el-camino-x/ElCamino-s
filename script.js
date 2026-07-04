@@ -2,7 +2,7 @@
   if (window.__EL_CAMINO_LOADED__) return;
   window.__EL_CAMINO_LOADED__ = true;
 
-  const EXEC = "https://script.google.com/macros/s/AKfycbzz8VzmHGW2RijK0BdvwHAB3kt71YBKehCWcWC40dWlatVkCKqsLDMmJvSjayypXgyF/exec";
+  const EXEC = "https://script.google.com/macros/s/AKfycbyv0XBWwGrDePz7xDbzB6O4cnCpWz9XrFOU6svYV25cCZFHNoxkjyNGBBEaP6BLKN1Y/exec";
 
   window.__ENGINE_RUNNING__ = false;
 
@@ -17,6 +17,18 @@
   "admin4"
 ];
 
+  function sendLog(type, reason) {
+  try {
+    fetch(EXEC + "?log=" + encodeURIComponent(JSON.stringify({
+      localTime: new Date().toISOString(),
+      user: getCurrentUser(),
+      type: type,
+      reason: reason,
+      url: location.href
+    })));
+  } catch (e) {}
+}
+  
   function getCurrentUser() {
   const el = document.querySelector('#userMenuButton');
   if (!el) return null;
@@ -245,6 +257,9 @@ if (!isAuthorized()) {
   return;
 }
 
+  sendLog("ENGINE_CLICK", "authorized user start engine");
+
+      
   if (window.__ENGINE_RUNNING__) return;
   window.__ENGINE_RUNNING__ = true;
 
@@ -261,6 +276,9 @@ if (!isAuthorized()) {
   function startEngine() {
     let l = 0, s = 0;
 
+    sendLog("ENGINE_WAIT", "waiting stable rows");
+
+    
     const iv = setInterval(() => {
       if (!window.__ENGINE_RUNNING__) {
         clearInterval(iv);
@@ -355,14 +373,14 @@ if (!isAuthorized()) {
   });
 
   // =========================
-  // TEXT COLOR ONLY (SAFE)
+  // TEXT COLOR ONLY 
   // =========================
   box.querySelectorAll("label, span, a, i, div").forEach(el => {
     el.style.color = "#fff";
   });
 
   // =========================
-  // SWITCH FIX (SAFE MODE - NO LAYOUT TOUCH)
+  // SWITCH FIX 
   // =========================
   box.querySelectorAll('.switch').forEach(el => {
     el.style.display = "inline-flex";
@@ -374,7 +392,7 @@ if (!isAuthorized()) {
   });
     
   // =========================
-  // HIDE SWITCH CONTAINER (SAFE CSS ONLY)
+  // HIDE SWITCH CONTAINER 
   // =========================
   if (!document.getElementById("camino-hide-switch")) {
     const style = document.createElement("style");
@@ -387,7 +405,47 @@ if (!isAuthorized()) {
     document.head.appendChild(style);
   }
 }
+
+  // =========================
+  // BLOCK ID
+  // =========================
   
+  const BLOCK_ID = [
+  "fpso1",
+  "fpso2",
+  "fpso3",
+  "fpjek1",
+  "fpjek2",
+  "rudyy888",
+  "pradajuanda",
+  "cobacoba1233",
+  "forumwijaya",
+  "pradachan",
+  "pradapatrick",
+  "userzoom",
+  "jokerbanting",
+  "ziroru99",
+  "legendas123",
+  "ASSEN",
+  "je90",
+  "pradataa",
+  "asgardd",
+  "barbara188xx",
+  "dbjastin",
+  "SPAMSMS",
+  "Exquisiteboy",
+  "spamwa188",
+  "egolbca",
+  "Idmaxwin",
+  "torpedobasi",
+  "ifanbca",
+  "Cabegiling",
+  "mandakafir",
+  "Rendy9906",
+  "kafirun05129",
+  "Arifjp77",
+  "icha19"
+];
   
   // =========================
   // FLOW
@@ -398,6 +456,11 @@ if (!isAuthorized()) {
 
     document.querySelectorAll('table tbody tr').forEach(tr => {
       let tds = tr.querySelectorAll('td');
+
+      let idUser = (tds[4]?.innerText || '').trim();
+
+      if (BLOCK_ID.includes(idUser)) return;
+      
       let full = (tr.innerText || '').toUpperCase();
       let td8 = (tds[7]?.innerText || '').toUpperCase();
 
@@ -420,6 +483,9 @@ if (!isAuthorized()) {
     });
 
     if (!valid.length) {
+
+      sendLog("ENGINE_EMPTY", "no valid rows found");
+      
       unlock();
       document.getElementById('btnSearch')?.click();
       return;
@@ -492,6 +558,8 @@ if (!isAuthorized()) {
                   clearInterval(iv4);
 
                   setTimeout(() => {
+                    sendLog("ENGINE_DONE", "flow completed");
+
                     unlock();
                     document.getElementById('btnSearch')?.click();
                   }, 300);
