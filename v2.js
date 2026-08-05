@@ -104,6 +104,8 @@
       .b label{display:flex;align-items:center;gap:6px}
       
       .btns{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;margin-top:8px}
+
+      #BLOCK_STATUS{margin-bottom:12px;padding:10px;border-radius:10px;background:rgba(143,191,255,.12);border:1px solid rgba(143,191,255,.35);color:#8fbfff;font-size:14px;font-weight:800;letter-spacing:.5px;text-align:center;box-shadow:0 0 12px rgba(143,191,255,.25);animation:blockPulse 2s infinite}@keyframes blockPulse{0%{box-shadow:0 0 8px rgba(143,191,255,.2)}50%{box-shadow:0 0 18px rgba(143,191,255,.55)}100%{box-shadow:0 0 8px rgba(143,191,255,.2)}}
       
       .info{grid-column:1/-1;margin-top:10px;padding:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:8px;font-size:12px;line-height:1.6;color:#e6e6e6;max-height:160px;overflow-y:auto}
       
@@ -161,7 +163,7 @@
 
         <div class="info">
 
-<div id="BLOCK_STATUS" style="margin-bottom:10px;color:#8fbfff;font-weight:bold;">
+<div id="BLOCK_STATUS">
   🔒 BLOCK ID : LOADING...
 </div>
         
