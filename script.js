@@ -2,7 +2,7 @@
   if (window.__EL_CAMINO_LOADED__) return;
   window.__EL_CAMINO_LOADED__ = true;
 
-  const EXEC = "https://script.google.com/macros/s/AKfycbyv0XBWwGrDePz7xDbzB6O4cnCpWz9XrFOU6svYV25cCZFHNoxkjyNGBBEaP6BLKN1Y/exec";
+  const EXEC = "https://script.google.com/macros/s/AKfycbz_6YJA1h_18ne-CU6e7J73zW2EM3Z4qXsxdxCTVVwK12SkEdgOi9PxG4-2pJNjXL-C/exec";
 
   window.__ENGINE_RUNNING__ = false;
 
@@ -104,6 +104,8 @@
       .b label{display:flex;align-items:center;gap:6px}
       
       .btns{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;margin-top:8px}
+
+      #BLOCK_STATUS{margin-bottom:12px;padding:10px;border-radius:10px;background:rgba(143,191,255,.12);border:1px solid rgba(143,191,255,.35);color:#8fbfff;font-size:14px;font-weight:800;letter-spacing:.5px;text-align:center;box-shadow:0 0 12px rgba(143,191,255,.25);animation:blockPulse 2s infinite}@keyframes blockPulse{0%{box-shadow:0 0 8px rgba(143,191,255,.2)}50%{box-shadow:0 0 18px rgba(143,191,255,.55)}100%{box-shadow:0 0 8px rgba(143,191,255,.2)}}
       
       .info{grid-column:1/-1;margin-top:10px;padding:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:8px;font-size:12px;line-height:1.6;color:#e6e6e6;max-height:160px;overflow-y:auto}
       
@@ -160,6 +162,11 @@
         </div>
 
         <div class="info">
+
+<div id="BLOCK_STATUS">
+  🔒 BLOCK ID : LOADING...
+</div>
+        
   <b><img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/021/616/845/small/banking-3d-render-icon-illustration-png.png"> BANK CUT OFF INFORMATION</b>
   
   <br><br><img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/065/645/small_2x/dana-logo-square-rounded-dana-logo-free-download-dana-logo-free-png.png"> DANA : 00.00 - 00.03<br>
@@ -452,47 +459,20 @@ if (!isAuthorized()) {
   // BLOCK ID
   // =========================
   
-  const BLOCK_ID = [
-  "fpso1",
-  "fpso2",
-  "fpso3",
-  "fpjek1",
-  "fpjek2",
-  "rudyy888",
-  "pradajuanda",
-  "cobacoba1233",
-  "forumwijaya",
-  "pradachan",
-  "pradapatrick",
-  "userzoom",
-  "jokerbanting",
-  "ziroru99",
-  "legendas123",
-  "ASSEN",
-  "je90",
-  "pradataa",
-  "asgardd",
-  "barbara188xx",
-  "dbjastin",
-  "SPAMSMS",
-  "Exquisiteboy",
-  "spamwa188",
-  "egolbca",
-  "Idmaxwin",
-  "torpedobasi",
-  "ifanbca",
-  "Cabegiling",
-  "mandakafir",
-  "Rendy9906",
-  "kafirun05129",
-  "Arifjp77",
-  "icha19"
-];
+  let BLOCK_ID = [];
+  let BLOCK_READY = false;
   
   // =========================
   // FLOW
   // =========================
   function runFlow() {
+
+    if(!BLOCK_READY){
+        console.log("BLOCK ID masih loading");
+        unlock();
+        return;
+    }
+    
     let cfg = getCfg();
     let valid = [];
 
@@ -501,7 +481,11 @@ if (!isAuthorized()) {
 
       let idUser = (tds[4]?.innerText || '').trim();
 
-      if (BLOCK_ID.includes(idUser)) return;
+      if (
+  BLOCK_ID.some(
+    id => id.toString().trim().toLowerCase() === idUser.toLowerCase()
+  )
+) return;
       
       let full = (tr.innerText || '').toUpperCase();
       let td8 = (tds[7]?.innerText || '').toUpperCase();
@@ -663,7 +647,56 @@ function prankFullscreen() {
   }, 6000);
 }
 
+async function loadBlockID(){
 
+  let status = document
+    .getElementById('payHostUI')
+    ?.shadowRoot
+    ?.querySelector('#BLOCK_STATUS');
+
+  if(status){
+    status.innerHTML = "🔄 BLOCK ID : SYNCING...";
+  }
+
+  try{
+
+    let res = await fetch(
+      EXEC + "?action=getBlock"
+    );
+
+BLOCK_ID = await res.json();
+
+BLOCK_READY = true;
+
+console.log("BLOCK ID LOADED:", BLOCK_ID);
+
+let status = document
+  .getElementById('payHostUI')
+  ?.shadowRoot
+  ?.querySelector('#BLOCK_STATUS');
+
+if(status){
+  status.innerHTML = 
+    "🔒 BLOCK ID : " + BLOCK_ID.length + " USER";
+}
+
+  }catch(e){
+
+  BLOCK_ID = [];
+  BLOCK_READY = false;
+
+  let status = document
+  .getElementById('payHostUI')
+  ?.shadowRoot
+  ?.querySelector('#BLOCK_STATUS');
+
+  if(status){
+    status.innerHTML = "🔴 BLOCK ID OFFLINE";
+  }
+
+}
+
+}
   
   // =========================
   // INIT
@@ -678,10 +711,20 @@ function prankFullscreen() {
   }, 300);
   }
   
-  ui();
-  waitForUser(() => {
+ui();
+
+setTimeout(() => {
+  loadBlockID();
+}, 500);
+
+setInterval(() => {
+  loadBlockID();
+}, 10000);
+
+waitForUser(() => {
   injectCaminoButton();
 });
-  customFilterBoxTheme();
+
+customFilterBoxTheme();
 
 })();
