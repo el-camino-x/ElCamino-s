@@ -10,8 +10,8 @@
   // WHITELIST AUTH SYSTEM
   // =========================
   const WHITELIST = [
-  "phpradanickyyyy",
-  "pradaregaa",
+  "phpradanicky",
+  "pradarega",
   "phpradatiaamanda",
   "admin3",
   "admin4"
