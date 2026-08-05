@@ -13,7 +13,7 @@
   "phpradanicky",
   "pradarega",
   "phpradatiaamanda",
-  "admin3",
+  "pradasiddik",
   "admin4"
 ];
 
