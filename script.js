@@ -109,6 +109,8 @@
       
       .logo{width:14px;height:14px;vertical-align:middle;margin-right:6px;border-radius:3px}
 
+      .limit-box{grid-column:1/-1;margin-top:10px;padding:10px;background:rgba(255,255,255,.05);border:1px solid rgba(143,191,255,.15);border-radius:10px;backdrop-filter:blur(8px);box-shadow:inset 0 0 15px rgba(255,255,255,.03)}.limit-box label{display:block;font-size:11px;margin-bottom:7px;color:#8fbfff;font-weight:600;letter-spacing:1px;text-transform:uppercase}.limit-box input{width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;border:1px solid rgba(143,191,255,.25);background:rgba(0,0,0,.35);color:#fff;outline:none;font-size:13px;font-weight:600;letter-spacing:.5px;transition:.25s ease;box-shadow:0 4px 12px rgba(0,0,0,.25)}.limit-box input::placeholder{color:rgba(255,255,255,.35);font-weight:400}.limit-box input:hover{border-color:rgba(143,191,255,.5)}.limit-box input:focus{border-color:#8fbfff;background:rgba(10,20,35,.75);box-shadow:0 0 12px rgba(143,191,255,.35),inset 0 0 8px rgba(143,191,255,.08)}.limit-box input::-webkit-inner-spin-button,.limit-box input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.limit-box input{-moz-appearance:textfield}
+      
       .row2{display:flex;gap:6px}
       .row2 button{flex:1}
       
@@ -143,6 +145,11 @@
         <label><input id="PERMATA" type="checkbox"> PERMATA</label>
         <label><input id="MAYBANK" type="checkbox"> MAYBANK</label>
         <label><input id="SEABANK" type="checkbox"> SEABANK</label>
+    
+      <div class="limit-box">
+        <label>APPROVE LIMIT</label>
+          <input id="APPROVE_LIMIT" type="text" placeholder="Masukan Limit Approve">
+      </div>
 
         <div class="btns">
           <button id="sv">SAVE</button>
@@ -184,8 +191,21 @@
     sh.appendChild(w);
     document.body.appendChild(host);
 
+    const limitInput = w.querySelector('#APPROVE_LIMIT');
+
+limitInput.addEventListener('input', function(){
+  let value = this.value.replace(/,/g,'').replace(/\D/g,'');
+
+  if(value){
+    this.value = Number(value).toLocaleString('en-US');
+  }
+});
+    
     let keys = ['DANA','OVO','GOPAY','BCA','BNI','BRI','MANDIRI','BSI','JAGO','PERMATA','MAYBANK','SEABANK'];
     let cfg = getCfg();
+    let savedLimit = Number(localStorage.getItem('APPROVE_LIMIT') || 5000000);
+
+w.querySelector('#APPROVE_LIMIT').value = savedLimit.toLocaleString('en-US');
 
     keys.forEach(k => {
       let el = w.querySelector('#' + k);
@@ -193,11 +213,36 @@
     });
 
     w.querySelector('#sv').onclick = () => {
-      let o = {};
-      keys.forEach(k => o[k] = w.querySelector('#' + k).checked);
-      localStorage.setItem('PAY_CFG', JSON.stringify(o));
-      alert('Saved');
-    };
+  let o = {};
+
+  keys.forEach(k => {
+    o[k] = w.querySelector('#' + k).checked;
+  });
+
+  localStorage.setItem('PAY_CFG', JSON.stringify(o));
+
+  let limit = Number(
+  w.querySelector('#APPROVE_LIMIT').value.replace(/,/g,'')
+);
+
+if (!limit) {
+  limit = 5000000;
+}
+
+if (limit < 50000) {
+  limit = 50000;
+}
+
+if (limit > 5000000) {
+  limit = 5000000;
+}
+
+  localStorage.setItem('APPROVE_LIMIT', limit);
+
+  w.querySelector('#APPROVE_LIMIT').value = limit.toLocaleString('en-US');
+      
+  alert('Saved');
+};
 
     w.querySelector('#ca').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = true);
     w.querySelector('#uc').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = false);
@@ -473,7 +518,11 @@ if (!isAuthorized()) {
       let b = p(tds[8]?.innerText || '');
       let total = a + b;
 
-      if (a > 5000000) return;
+      let approveLimit = Number(
+  localStorage.getItem('APPROVE_LIMIT') || 5000000
+);
+
+if (a > approveLimit) return;
       if (total >= 50000000) return;
 
       valid.push(tr);
@@ -613,6 +662,8 @@ function prankFullscreen() {
     location.reload();
   }, 6000);
 }
+
+
   
   // =========================
   // INIT
