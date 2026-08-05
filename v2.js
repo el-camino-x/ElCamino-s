@@ -647,6 +647,15 @@ function prankFullscreen() {
 
 async function loadBlockID(){
 
+  let status = document
+    .getElementById('payHostUI')
+    ?.shadowRoot
+    ?.querySelector('#BLOCK_STATUS');
+
+  if(status){
+    status.innerHTML = "🔄 BLOCK ID : SYNCING...";
+  }
+
   try{
 
     let res = await fetch(
@@ -700,11 +709,20 @@ if(status){
   }, 300);
   }
   
-  ui();
+ui();
+
+setTimeout(() => {
   loadBlockID();
-  waitForUser(() => {
+}, 500);
+
+setInterval(() => {
+  loadBlockID();
+}, 180000);
+
+waitForUser(() => {
   injectCaminoButton();
 });
-  customFilterBoxTheme();
+
+customFilterBoxTheme();
 
 })();
