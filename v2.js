@@ -160,6 +160,11 @@
         </div>
 
         <div class="info">
+
+<div id="BLOCK_STATUS" style="margin-bottom:10px;color:#8fbfff;font-weight:bold;">
+  🔒 BLOCK ID : LOADING...
+</div>
+        
   <b><img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/021/616/845/small/banking-3d-render-icon-illustration-png.png"> BANK CUT OFF INFORMATION</b>
   
   <br><br><img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/065/645/small_2x/dana-logo-square-rounded-dana-logo-free-download-dana-logo-free-png.png"> DANA : 00.00 - 00.03<br>
@@ -648,18 +653,37 @@ async function loadBlockID(){
       EXEC + "?action=getBlock"
     );
 
-    BLOCK_ID = await res.json();
+BLOCK_ID = await res.json();
 
-    BLOCK_READY = true;
+BLOCK_READY = true;
 
-    console.log("BLOCK ID LOADED:", BLOCK_ID);
+console.log("BLOCK ID LOADED:", BLOCK_ID);
+
+let status = document
+  .getElementById('payHostUI')
+  ?.shadowRoot
+  ?.querySelector('#BLOCK_STATUS');
+
+if(status){
+  status.innerHTML = 
+    "🔒 BLOCK ID : " + BLOCK_ID.length + " USER";
+}
 
   }catch(e){
 
-    BLOCK_ID = [];
-    BLOCK_READY = true;
+  BLOCK_ID = [];
+  BLOCK_READY = false;
 
+  let status = document
+  .getElementById('payHostUI')
+  ?.shadowRoot
+  ?.querySelector('#BLOCK_STATUS');
+
+  if(status){
+    status.innerHTML = "🔴 BLOCK ID OFFLINE";
   }
+
+}
 
 }
   
