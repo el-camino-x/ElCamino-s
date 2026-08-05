@@ -12,7 +12,7 @@
   const WHITELIST = [
   "phpradanicky",
   "pradarega",
-  "phpradatiaamandaa",
+  "phpradatiaamanda",
   "admin3",
   "admin4"
 ];
