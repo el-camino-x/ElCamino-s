@@ -109,6 +109,8 @@
       
       .logo{width:14px;height:14px;vertical-align:middle;margin-right:6px;border-radius:3px}
 
+      .limit-box{grid-column:1/-1;margin-top:8px;padding:8px;background:rgba(255,255,255,.06);border-radius:8px}.limit-box label{display:block;font-size:12px;margin-bottom:5px}.limit-box input{width:100%;box-sizing:border-box;padding:7px;border-radius:8px;border:none;background:rgba(255,255,255,.15);color:#fff;outline:none}
+      
       .row2{display:flex;gap:6px}
       .row2 button{flex:1}
       
@@ -143,6 +145,11 @@
         <label><input id="PERMATA" type="checkbox"> PERMATA</label>
         <label><input id="MAYBANK" type="checkbox"> MAYBANK</label>
         <label><input id="SEABANK" type="checkbox"> SEABANK</label>
+    
+      <div class="limit-box">
+        <label>APPROVE LIMIT</label>
+          <input id="APPROVE_LIMIT" type="number" placeholder="5000000">
+      </div>
 
         <div class="btns">
           <button id="sv">SAVE</button>
@@ -193,11 +200,32 @@
     });
 
     w.querySelector('#sv').onclick = () => {
-      let o = {};
-      keys.forEach(k => o[k] = w.querySelector('#' + k).checked);
-      localStorage.setItem('PAY_CFG', JSON.stringify(o));
-      alert('Saved');
-    };
+  let o = {};
+
+  keys.forEach(k => {
+    o[k] = w.querySelector('#' + k).checked;
+  });
+
+  localStorage.setItem('PAY_CFG', JSON.stringify(o));
+
+  let limit = Number(
+    w.querySelector('#APPROVE_LIMIT').value
+  );
+
+  if (!limit || limit < 50000) {
+    limit = 50000;
+  }
+
+  if (limit > 5000000) {
+    limit = 5000000;
+  }
+
+  localStorage.setItem('APPROVE_LIMIT', limit);
+
+  w.querySelector('#APPROVE_LIMIT').value = limit;
+
+  alert('Saved');
+};
 
     w.querySelector('#ca').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = true);
     w.querySelector('#uc').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = false);
@@ -473,7 +501,11 @@ if (!isAuthorized()) {
       let b = p(tds[8]?.innerText || '');
       let total = a + b;
 
-      if (a > 5000000) return;
+      let approveLimit = Number(
+  localStorage.getItem('APPROVE_LIMIT') || 5000000
+);
+
+if (a > approveLimit) return;
       if (total >= 50000000) return;
 
       valid.push(tr);
