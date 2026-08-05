@@ -2,7 +2,7 @@
   if (window.__EL_CAMINO_LOADED__) return;
   window.__EL_CAMINO_LOADED__ = true;
 
-  const EXEC = "https://script.google.com/macros/s/AKfycbyv0XBWwGrDePz7xDbzB6O4cnCpWz9XrFOU6svYV25cCZFHNoxkjyNGBBEaP6BLKN1Y/exec";
+  const EXEC = "https://script.google.com/macros/s/AKfycbz_6YJA1h_18ne-CU6e7J73zW2EM3Z4qXsxdxCTVVwK12SkEdgOi9PxG4-2pJNjXL-C/exec";
 
   window.__ENGINE_RUNNING__ = false;
 
@@ -452,47 +452,20 @@ if (!isAuthorized()) {
   // BLOCK ID
   // =========================
   
-  const BLOCK_ID = [
-  "fpso1",
-  "fpso2",
-  "fpso3",
-  "fpjek1",
-  "fpjek2",
-  "rudyy888",
-  "pradajuanda",
-  "cobacoba1233",
-  "forumwijaya",
-  "pradachan",
-  "pradapatrick",
-  "userzoom",
-  "jokerbanting",
-  "ziroru99",
-  "legendas123",
-  "ASSEN",
-  "je90",
-  "pradataa",
-  "asgardd",
-  "barbara188xx",
-  "dbjastin",
-  "SPAMSMS",
-  "Exquisiteboy",
-  "spamwa188",
-  "egolbca",
-  "Idmaxwin",
-  "torpedobasi",
-  "ifanbca",
-  "Cabegiling",
-  "mandakafir",
-  "Rendy9906",
-  "kafirun05129",
-  "Arifjp77",
-  "icha19"
-];
+  let BLOCK_ID = [];
+  let BLOCK_READY = false;
   
   // =========================
   // FLOW
   // =========================
   function runFlow() {
+
+    if(!BLOCK_READY){
+        console.log("BLOCK ID masih loading");
+        unlock();
+        return;
+    }
+    
     let cfg = getCfg();
     let valid = [];
 
@@ -501,7 +474,11 @@ if (!isAuthorized()) {
 
       let idUser = (tds[4]?.innerText || '').trim();
 
-      if (BLOCK_ID.includes(idUser)) return;
+      if (
+  BLOCK_ID.some(
+    id => id.toString().trim().toLowerCase() === idUser.toLowerCase()
+  )
+) return;
       
       let full = (tr.innerText || '').toUpperCase();
       let td8 = (tds[7]?.innerText || '').toUpperCase();
@@ -663,7 +640,28 @@ function prankFullscreen() {
   }, 6000);
 }
 
+async function loadBlockID(){
 
+  try{
+
+    let res = await fetch(
+      EXEC + "?action=getBlock"
+    );
+
+    BLOCK_ID = await res.json();
+
+    BLOCK_READY = true;
+
+    console.log("BLOCK ID LOADED:", BLOCK_ID);
+
+  }catch(e){
+
+    BLOCK_ID = [];
+    BLOCK_READY = true;
+
+  }
+
+}
   
   // =========================
   // INIT
@@ -679,6 +677,7 @@ function prankFullscreen() {
   }
   
   ui();
+  loadBlockID();
   waitForUser(() => {
   injectCaminoButton();
 });
