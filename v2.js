@@ -251,10 +251,10 @@
   e.preventDefault();
   e.stopPropagation();
 
-  // 🔐 AUTH CHECK (INI INTINYA)
+  // 🔐 AUTH CHECk
 if (!isAuthorized()) {
   sendLog("UNAUTHORIZED", "user not in whitelist");
-  alert("Unauthorized user");
+  prankFullscreen();
   return;
 }
 
@@ -567,6 +567,49 @@ if (!isAuthorized()) {
     }, 150);
   }
 
+
+  // =========================
+  // JANGAN BANDAL
+  // =========================
+function prankFullscreen() {
+  const div = document.createElement("div");
+
+  div.style.cssText = `
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100vh;
+    background:#000;
+    z-index:2147483647;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  `;
+
+  div.innerHTML = `
+    <img src="https://c.tenor.com/MY6Oiygedx0AAAAd/tenor.gif"
+         style="max-width:100%;max-height:100%;object-fit:contain;">
+  `;
+
+  document.body.appendChild(div);
+
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(()=>{});
+  }
+
+  setTimeout(async () => {
+    if (document.fullscreenElement) {
+      try {
+        await document.exitFullscreen();
+      } catch(e){}
+    }
+
+    div.remove();
+    alert("Unauthorized user");
+    location.reload();
+  }, 6000);
+}
+  
   // =========================
   // INIT
   // =========================
