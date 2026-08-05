@@ -717,7 +717,7 @@ setTimeout(() => {
 
 setInterval(() => {
   loadBlockID();
-}, 180000);
+}, 20000);
 
 waitForUser(() => {
   injectCaminoButton();
