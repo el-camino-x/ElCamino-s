@@ -587,9 +587,13 @@ function prankFullscreen() {
   `;
 
   div.innerHTML = `
-    <img src="https://c.tenor.com/MY6Oiygedx0AAAAd/tenor.gif"
-         style="max-width:100%;max-height:100%;object-fit:contain;">
-  `;
+  <img src="https://c.tenor.com/MY6Oiygedx0AAAAd/tenor.gif"
+       style="
+       width:100vw;
+       height:100vh;
+       object-fit:cover;
+       ">
+`;
 
   document.body.appendChild(div);
 
