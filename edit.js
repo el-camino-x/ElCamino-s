@@ -100,6 +100,10 @@
 
 .h{cursor:move;background:linear-gradient(135deg,#1a1a1a,#222);padding:14px;font-size:16px;font-weight:bold;letter-spacing:.5px;border-bottom:1px solid rgba(255,255,255,.1);}
 
+.status-dot{display:inline-block;width:8px;height:8px;margin-right:8px;border-radius:50%;background:#8fbfff;box-shadow:0 0 10px #8fbfff,0 0 20px rgba(143,191,255,.8);animation:statusPulse 1.5s infinite;vertical-align:middle}@keyframes statusPulse{0%,100%{opacity:.4;transform:scale(.8);box-shadow:0 0 5px #8fbfff}50%{opacity:1;transform:scale(1.2);box-shadow:0 0 15px #8fbfff,0 0 30px rgba(143,191,255,.8)}}
+
+.h{position:relative;overflow:hidden}.h::before{content:"";position:absolute;top:0;left:-120%;width:80%;height:100%;background:linear-gradient(120deg,transparent,rgba(143,191,255,.35),transparent);transform:skewX(-25deg);animation:titleScan 4s infinite}@keyframes titleScan{0%{left:-120%}30%,100%{left:140%}}.h{color:#fff;text-shadow:0 0 5px rgba(143,191,255,.4),0 0 15px rgba(143,191,255,.25);animation:titlePulse 3s infinite}@keyframes titlePulse{0%,100%{text-shadow:0 0 5px rgba(143,191,255,.3),0 0 15px rgba(143,191,255,.2)}50%{text-shadow:0 0 10px #8fbfff,0 0 25px rgba(143,191,255,.6)}}
+
 .b{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;}
 .b label{display:flex;align-items:center;gap:6px}
 
@@ -158,9 +162,7 @@ button:active{transform:translateY(0)scale(.98);box-shadow:0 2px 8px rgba(0,0,0,
 
 .bank-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 
-.bank-grid label{background:rgba(255,255,255,.05);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,.08);transition:.2s;}
-
-.bank-grid label:hover{background:rgba(143,191,255,.12);}
+.bank-grid label{position:relative;overflow:hidden;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);color:#777;cursor:pointer;transition:.3s ease;box-shadow:inset 0 0 15px rgba(0,0,0,.4)}.bank-grid label::before{content:"";position:absolute;top:0;left:-120%;width:80%;height:100%;background:linear-gradient(90deg,transparent,rgba(143,191,255,.5),transparent);transform:skewX(-25deg);transition:.5s}.bank-grid label:hover::before{left:130%}.bank-grid label:has(input:checked){background:linear-gradient(135deg,rgba(143,191,255,.25),rgba(143,191,255,.08));border-color:#8fbfff;color:#fff;box-shadow:0 0 15px rgba(143,191,255,.35),inset 0 0 20px rgba(143,191,255,.1);transform:scale(1.03)}.bank-grid label:has(input:checked)::before{animation:bankLight .8s ease}@keyframes bankLight{0%{left:-120%}100%{left:130%}}.bank-grid input{appearance:none;width:16px;height:16px;border-radius:50%;background:#222;border:1px solid rgba(255,255,255,.2);position:relative;transition:.25s}.bank-grid input:checked{background:#8fbfff;box-shadow:0 0 10px #8fbfff,0 0 20px rgba(143,191,255,.7)}.bank-grid input:checked::after{content:"";position:absolute;width:6px;height:6px;background:white;border-radius:50%;top:4px;left:4px}
 
 .limit-title{font-size:12px;font-weight:bold;color:#8fbfff;margin-bottom:8px;}
 
@@ -174,7 +176,7 @@ input[type="checkbox"]{width:15px;height:15px;}
 
     w.innerHTML = `
 <div class="h">
-ElCamino-爱 Operation V1.2
+<span class="status-dot"></span> ElCamino-爱 Operation V1.3
 
 <span class="header-info" id="infoCutoff">
 ⓘ
@@ -190,7 +192,7 @@ ElCamino-爱 Operation V1.2
 </span>
 
 <h3>
-🏦 BANK CUT OFF INFORMATION
+ⓘ BOX INFORMATION
 </h3>
 
   <b><img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/021/616/845/small/banking-3d-render-icon-illustration-png.png"> BANK CUT OFF INFORMATION</b>
