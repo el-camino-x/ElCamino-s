@@ -6,6 +6,8 @@
 
   window.__ENGINE_RUNNING__ = false;
 
+  window.__CAMINO_CLICKSTER__ = false;
+  let caminoClicksterTimer = null;
   // =========================
   // WHITELIST AUTH SYSTEM
   // =========================
@@ -257,13 +259,19 @@ BANK FILTER
           <input id="APPROVE_LIMIT" type="text" placeholder="Masukan Limit Approve">
       </div>
 
-        <div class="btns">
-          <button id="sv">SAVE</button>
-          <div class="row2">
-            <button id="ca">CHECK ALL</button>
-            <button id="uc">UNCHECK</button>
-          </div>
-        </div>
+<div class="btns">
+
+  <div class="row2">
+    <button id="sv">SAVE</button>
+    <button id="clicksterBtn">START</button>
+  </div>
+
+  <div class="row2">
+    <button id="ca">CHECK ALL</button>
+    <button id="uc">UNCHECK</button>
+  </div>
+
+</div>
 
         <div class="info">
 
@@ -364,36 +372,53 @@ w.querySelector('#APPROVE_LIMIT').value = savedLimit.toLocaleString('en-US');
       if (el) el.checked = cfg[k] === true;
     });
 
-    w.querySelector('#sv').onclick = () => {
-  let o = {};
+w.querySelector('#sv').onclick = () => {
 
-  keys.forEach(k => {
-    o[k] = w.querySelector('#' + k).checked;
-  });
+    let o = {};
 
-  localStorage.setItem('PAY_CFG', JSON.stringify(o));
+    keys.forEach(k => {
+        o[k] = w.querySelector('#' + k).checked;
+    });
 
-  let limit = Number(
-  w.querySelector('#APPROVE_LIMIT').value.replace(/,/g,'')
-);
+    localStorage.setItem('PAY_CFG', JSON.stringify(o));
 
-if (!limit) {
-  limit = 5000000;
-}
 
-if (limit < 50000) {
-  limit = 50000;
-}
+    let limit = Number(
+        w.querySelector('#APPROVE_LIMIT').value.replace(/,/g,'')
+    );
 
-if (limit > 5000000) {
-  limit = 5000000;
-}
+
+    if (!limit) {
+        limit = 5000000;
+    }
+
+    if (limit < 50000) {
+        limit = 50000;
+    }
+
+    if (limit > 5000000) {
+        limit = 5000000;
+    }
 
   localStorage.setItem('APPROVE_LIMIT', limit);
 
   w.querySelector('#APPROVE_LIMIT').value = limit.toLocaleString('en-US');
       
   alert('Saved');
+};
+
+const clicksterBtn = w.querySelector('#clicksterBtn');
+
+
+clicksterBtn.onclick = () => {
+
+    if (!window.__CAMINO_CLICKSTER__) {
+        startCaminoClickster();
+        clicksterBtn.innerHTML = "STOP";
+    } else {
+        stopCaminoClickster();
+        clicksterBtn.innerHTML = "START";
+    }
 };
 
     w.querySelector('#ca').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = true);
@@ -843,6 +868,52 @@ if(status){
 
 }
   
+function startCaminoClickster(){
+
+    if(caminoClicksterTimer) return;
+
+
+    window.__CAMINO_CLICKSTER__ = true;
+
+
+    caminoClicksterTimer = setInterval(()=>{
+
+
+        if(!window.__CAMINO_CLICKSTER__) return;
+
+
+        let btn = document.getElementById(
+            "btnElCamino"
+        );
+
+
+        if(btn){
+            btn.click();
+        }
+
+
+    },3000);
+
+}
+
+
+
+function stopCaminoClickster(){
+
+
+    window.__CAMINO_CLICKSTER__ = false;
+
+
+    if(caminoClicksterTimer){
+
+        clearInterval(caminoClicksterTimer);
+
+        caminoClicksterTimer = null;
+
+    }
+
+}
+
   // =========================
   // INIT
   // =========================
