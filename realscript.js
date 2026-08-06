@@ -408,17 +408,24 @@ w.querySelector('#sv').onclick = () => {
 };
 
 const clicksterBtn = w.querySelector('#clicksterBtn');
-
+clicksterBtn.style.background = "#2e7d32";
 
 clicksterBtn.onclick = () => {
 
-    if (!window.__CAMINO_CLICKSTER__) {
-        startCaminoClickster();
-        clicksterBtn.innerHTML = "STOP";
-    } else {
-        stopCaminoClickster();
-        clicksterBtn.innerHTML = "START";
-    }
+if (!window.__CAMINO_CLICKSTER__) {
+
+    startCaminoClickster();
+    clicksterBtn.innerHTML = "STOP";
+    clicksterBtn.style.background = "#c62828";
+
+} else {
+
+    stopCaminoClickster();
+    clicksterBtn.innerHTML = "START";
+    clicksterBtn.style.background = "#2e7d32";
+
+}
+
 };
 
     w.querySelector('#ca').onclick = () => keys.forEach(k => w.querySelector('#' + k).checked = true);
@@ -871,29 +878,16 @@ if(status){
 function startCaminoClickster(){
 
     if(caminoClicksterTimer) return;
-
-
     window.__CAMINO_CLICKSTER__ = true;
-
-
     caminoClicksterTimer = setInterval(()=>{
-
-
         if(!window.__CAMINO_CLICKSTER__) return;
-
-
         let btn = document.getElementById(
             "btnElCamino"
         );
-
-
         if(btn){
             btn.click();
         }
-
-
-    },3000);
-
+    },5000);
 }
 
 
