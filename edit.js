@@ -111,9 +111,9 @@
 
 .header-info{float:right;cursor:pointer;font-size:18px;color:#8fbfff;}
 
-.cutoff-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.85);width:320px;background:#111;border:1px solid rgba(143,191,255,.4);border-radius:15px;padding:18px;z-index:999999;box-shadow:0 0 40px #000;font-size:12px;line-height:1.8;cursor:default;opacity:0;visibility:hidden;transition:.25s ease;}
+.cutoff-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.85);width:380px;background:#111;border:1px solid rgba(143,191,255,.4);border-radius:18px;padding:25px;z-index:999999;box-shadow:0 0 40px #000;font-size:16px;line-height:2;letter-spacing:.5px;font-weight:600;color:#fff;text-shadow:0 0 8px rgba(143,191,255,.35);cursor:default;opacity:0;visibility:hidden;transition:opacity .25s ease,transform .25s ease;will-change:left,top;user-select:none;}
 
-.cutoff-popup h3{margin-top:0;color:#8fbfff;font-size:15px;padding-right:30px;cursor:move;}
+.cutoff-popup h3{margin-top:0;color:#8fbfff;font-size:24px;padding-right:35px;cursor:move;letter-spacing:1px;font-weight:900;text-shadow:0 0 12px rgba(143,191,255,.7);}
 
 .cutoff-close{position:absolute;right:15px;top:12px;cursor:pointer;color:#ff2b2b;font-size:20px;font-weight:900;transition:.2s;text-shadow:0 0 10px rgba(255,0,0,.8);}
 
@@ -158,11 +158,17 @@ button:active{transform:translateY(0)scale(.98);box-shadow:0 2px 8px rgba(0,0,0,
 
 .section{grid-column:1/-1;background:rgba(255,255,255,.04);border:1px solid rgba(143,191,255,.18);border-radius:14px;padding:12px;margin-top:10px;}
 
+.cutoff-popup{font-size:14px;font-weight:600;line-height:1.9;letter-spacing:.4px;color:#fff}.cutoff-popup h3{font-size:17px;font-weight:800;color:#8fbfff;text-shadow:0 0 8px rgba(143,191,255,.5)}.cutoff-popup b{font-size:15px;font-weight:700;color:#fff}.cutoff-popup img.logo{width:17px;height:17px;vertical-align:middle;margin-right:7px}
+
 .section-title{font-size:12px;font-weight:800;color:#8fbfff;letter-spacing:1px;margin-bottom:10px;text-transform:uppercase;}
 
 .bank-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 
 .bank-grid label{position:relative;overflow:hidden;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);color:#777;cursor:pointer;transition:.3s ease;box-shadow:inset 0 0 15px rgba(0,0,0,.4)}.bank-grid label::before{content:"";position:absolute;top:0;left:-120%;width:80%;height:100%;background:linear-gradient(90deg,transparent,rgba(143,191,255,.5),transparent);transform:skewX(-25deg);transition:.5s}.bank-grid label:hover::before{left:130%}.bank-grid label:has(input:checked){background:linear-gradient(135deg,rgba(143,191,255,.25),rgba(143,191,255,.08));border-color:#8fbfff;color:#fff;box-shadow:0 0 15px rgba(143,191,255,.35),inset 0 0 20px rgba(143,191,255,.1);transform:scale(1.03)}.bank-grid label:has(input:checked)::before{animation:bankLight .8s ease}@keyframes bankLight{0%{left:-120%}100%{left:130%}}.bank-grid input{appearance:none;width:16px;height:16px;border-radius:50%;background:#222;border:1px solid rgba(255,255,255,.2);position:relative;transition:.25s}.bank-grid input:checked{background:#8fbfff;box-shadow:0 0 10px #8fbfff,0 0 20px rgba(143,191,255,.7)}.bank-grid input:checked::after{content:"";position:absolute;width:6px;height:6px;background:white;border-radius:50%;top:4px;left:4px}
+
+.cutoff-content{font-size:22px;font-weight:700;line-height:2;letter-spacing:.8px;color:#fff;text-shadow:0 0 8px rgba(143,191,255,.35);}
+
+.cutoff-content b{font-size:23px;font-weight:900;color:#8fbfff;}
 
 .limit-title{font-size:12px;font-weight:bold;color:#8fbfff;margin-bottom:8px;}
 
@@ -195,7 +201,8 @@ input[type="checkbox"]{width:15px;height:15px;}
 ⓘ BOX INFORMATION
 </h3>
 
-  <b><img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/021/616/845/small/banking-3d-render-icon-illustration-png.png"> BANK CUT OFF INFORMATION</b>
+<div class="cutoff-content">
+  <b><img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/021/616/845/small/banking-3d-render-icon-illustration-png.png"> BANK CUT OFF</b>
   
   <br><br><img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/065/645/small_2x/dana-logo-square-rounded-dana-logo-free-download-dana-logo-free-png.png"> DANA : 00.00 - 00.03<br>
   <img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/065/651/small_2x/ovo-logo-square-rounded-ovo-logo-free-download-ovo-logo-free-png.png"> OVO : 00.00 - 00.03<br>
@@ -212,6 +219,7 @@ input[type="checkbox"]{width:15px;height:15px;}
 <img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/461/small_2x/bank-bri-official-square-rounded-logo-free-png.png"> BRI : 23.50 - 02.45<br>
 <img class="logo" src="https://static.vecteezy.com/system/resources/thumbnails/067/565/468/small_2x/bank-bni-square-rounded-logo-free-png.png"> BNI : 23.00 - 03.00
 
+</div>
 </div>
 
       <div class="section">
@@ -304,43 +312,35 @@ let cutoffY = 0;
 
 const cutoffHeader = popup.querySelector('h3');
 
-cutoffHeader.addEventListener('mousedown', (e)=>{
+cutoffHeader.addEventListener('mousedown',(e)=>{
 
-  dragCutoff = true;
+  dragCutoff=true;
 
-  const rect = popup.getBoundingClientRect();
+  const rect=popup.getBoundingClientRect();
 
-  cutoffX = e.clientX - rect.left;
-  cutoffY = e.clientY - rect.top;
+  popup.style.left=rect.left+"px";
+  popup.style.top=rect.top+"px";
+  popup.style.transform="none";
+  popup.style.transition="none";
 
+  cutoffX=e.clientX-rect.left;
+  cutoffY=e.clientY-rect.top;
 
-  popup.style.transform = "none";
-  popup.style.left = rect.left + "px";
-  popup.style.top = rect.top + "px";
+  e.preventDefault();
 
 });
 
 
 document.addEventListener('mousemove',(e)=>{
+  if(!dragCutoff)return;
 
-  if(!dragCutoff) return;
-
-
-  popup.style.left = 
-  (e.clientX - cutoffX) + "px";
-
-
-  popup.style.top = 
-  (e.clientY - cutoffY) + "px";
-
-
+  popup.style.left=(e.clientX-cutoffX)+"px";
+  popup.style.top=(e.clientY-cutoffY)+"px";
 });
 
-
 document.addEventListener('mouseup',()=>{
-
-  dragCutoff = false;
-
+  if(!dragCutoff)return;
+  dragCutoff=false;
 });
 
 const limitInput = w.querySelector('#APPROVE_LIMIT');
