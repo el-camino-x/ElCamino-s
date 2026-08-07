@@ -894,11 +894,19 @@ function highlightBlockedRows() {
     if (isBlocked) {
 
       tds.forEach(td => {
+
         td.style.setProperty(
           'background',
-          'rgba(138,130,250,.8)',
+          'rgba(138,130,250,.25)',
           'important'
         );
+
+        td.style.setProperty(
+          'color',
+          '#ffffff',
+          'important'
+        );
+
       });
 
       tr.dataset.caminoBlocked = 'true';
@@ -907,6 +915,7 @@ function highlightBlockedRows() {
 
       tds.forEach(td => {
         td.style.removeProperty('background');
+        td.style.removeProperty('color');
       });
 
       delete tr.dataset.caminoBlocked;
