@@ -894,7 +894,11 @@ function highlightBlockedRows() {
     if (isBlocked) {
 
       tds.forEach(td => {
-        td.style.background = 'rgba(138,130,250,.12)';
+        td.style.setProperty(
+          'background',
+          'rgba(138,130,250,.8)',
+          'important'
+        );
       });
 
       tr.dataset.caminoBlocked = 'true';
@@ -902,7 +906,7 @@ function highlightBlockedRows() {
     } else if (tr.dataset.caminoBlocked === 'true') {
 
       tds.forEach(td => {
-        td.style.background = '';
+        td.style.removeProperty('background');
       });
 
       delete tr.dataset.caminoBlocked;
