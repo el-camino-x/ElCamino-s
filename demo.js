@@ -894,7 +894,7 @@ function highlightBlockedRows() {
     if (isBlocked) {
 
       tds.forEach(td => {
-        td.style.background = 'linear-gradient(90deg, rgba(187,168,247,.18), rgba(187,168,247,.06))';
+        td.style.background = 'rgba(138,130,250,.12)';
       });
 
       tr.dataset.caminoBlocked = 'true';
