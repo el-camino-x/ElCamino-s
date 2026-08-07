@@ -893,11 +893,19 @@ function highlightBlockedRows() {
 
     if (isBlocked) {
 
+      tr.dataset.caminoBlocked = 'true';
+
       tds.forEach(td => {
 
         td.style.setProperty(
-          'background',
+          'background-color',
           'rgba(138,130,250,.25)',
+          'important'
+        );
+
+        td.style.setProperty(
+          'background-image',
+          'none',
           'important'
         );
 
@@ -909,13 +917,14 @@ function highlightBlockedRows() {
 
       });
 
-      tr.dataset.caminoBlocked = 'true';
-
     } else if (tr.dataset.caminoBlocked === 'true') {
 
       tds.forEach(td => {
-        td.style.removeProperty('background');
+
+        td.style.removeProperty('background-color');
+        td.style.removeProperty('background-image');
         td.style.removeProperty('color');
+
       });
 
       delete tr.dataset.caminoBlocked;
