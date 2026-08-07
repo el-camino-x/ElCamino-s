@@ -894,9 +894,10 @@ function highlightBlockedRows() {
     if (isBlocked) {
 
       tds.forEach(td => {
-        td.style.background = '#7c3aed';
-        td.style.color = '#fff';
-        td.style.fontWeight = '700';
+td.style.background = 'rgba(120,100,150,.10)';
+td.style.color = '#d0ccd8';
+td.style.fontWeight = '600';
+td.style.boxShadow = 'inset 2px 0 0 rgba(139,92,246,.25)';
       });
 
       tr.dataset.caminoBlocked = 'true';
