@@ -750,78 +750,117 @@ animation:limitScanBlue 4s linear infinite;
 pointer-events:none
 }
 
+/* =========================
+   APPROVE LIMIT — CAMINO THEME
+========================= */
+
+.limit-box{
+    grid-column:1/-1;
+
+    margin:10px 8px 0;
+    padding:12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(60,120,255,.06),
+            rgba(100,80,255,.07),
+            rgba(150,80,255,.035)
+        );
+
+    border:1px solid rgba(110,130,255,.22);
+
+    border-radius:12px;
+
+    backdrop-filter:blur(12px);
+
+    box-shadow:
+        inset 0 0 25px rgba(80,100,255,.04),
+        0 4px 18px rgba(0,0,0,.3);
+
+    position:relative;
+    overflow:hidden;
+}
+
+.limit-box::before{
+    content:"";
+
+    position:absolute;
+    top:0;
+    left:-120%;
+
+    width:75%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            110deg,
+            transparent,
+            rgba(80,150,255,.12),
+            rgba(140,100,255,.16),
+            transparent
+        );
+
+    transform:skewX(-25deg);
+
+    animation:limitScanBlue 4s linear infinite;
+
+    pointer-events:none;
+}
+
 .limit-box label{
 display:block;
-
-font-size:11px;
-margin-bottom:8px;
-
-color:#9db8ff;
-
+font-size:14px;
+margin-bottom:10px;
+color:#91b4ff;
 font-weight:900;
-letter-spacing:1.8px;
-
+letter-spacing:2px;
 text-transform:uppercase;
-
 text-shadow:
-0 0 6px rgba(80,140,255,.7),
-0 0 14px rgba(130,80,255,.3)
+0 0 7px rgba(80,140,255,.75),
+0 0 16px rgba(130,80,255,.4)
 }
 
 .limit-box input{
 width:100%;
 box-sizing:border-box;
-
-padding:10px 13px;
-
-border-radius:9px;
-
-border:1px solid rgba(110,140,255,.25);
-
-background:
-rgba(2,4,12,.58);
-
+padding:13px 15px;
+border-radius:10px;
+border:1px solid rgba(110,140,255,.3);
+background:rgba(2,4,12,.68);
 color:#fff;
-
 outline:none;
-
-font-size:13px;
-font-weight:700;
-letter-spacing:.7px;
-
+font-size:16px;
+font-weight:800;
+letter-spacing:.8px;
 transition:.3s ease;
-
 box-shadow:
-inset 0 0 12px rgba(0,0,0,.3),
-0 4px 12px rgba(0,0,0,.18)
+inset 0 0 14px rgba(0,0,0,.35),
+0 4px 14px rgba(0,0,0,.2)
 }
 
 .limit-box input::placeholder{
-color:rgba(180,190,255,.28);
-font-weight:400
+color:rgba(180,190,255,.32);
+font-size:15px;
+font-weight:500
 }
 
 .limit-box input:hover{
-border-color:rgba(110,160,255,.6);
-
+border-color:rgba(110,160,255,.65);
 box-shadow:
-0 0 10px rgba(70,130,255,.14),
-inset 0 0 12px rgba(0,0,0,.35)
+0 0 12px rgba(70,130,255,.18),
+inset 0 0 14px rgba(0,0,0,.4)
 }
 
 .limit-box input:focus{
 border-color:#789cff;
-
-background:
-rgba(8,10,28,.9);
-
+background:rgba(8,10,28,.92);
 box-shadow:
-0 0 7px rgba(80,140,255,.55),
-0 0 18px rgba(120,80,255,.18),
-inset 0 0 10px rgba(80,120,255,.08);
-
+0 0 8px rgba(80,140,255,.6),
+0 0 20px rgba(120,80,255,.22),
+inset 0 0 12px rgba(80,120,255,.1);
 text-shadow:
-0 0 8px rgba(100,150,255,.4)
+0 0 8px rgba(100,150,255,.45)
 }
 
 .limit-box input::-webkit-inner-spin-button,
@@ -839,11 +878,9 @@ margin:0
 left:-120%;
 opacity:0
 }
-
 15%{
 opacity:1
 }
-
 45%,100%{
 left:145%;
 opacity:0
@@ -1627,187 +1664,293 @@ animation:bankLightBlue .8s ease
 
 
 /* =========================
-   CUTOFF POPUP
+   INFORMATION POPUP
+   EL CAMINO BLUE / PURPLE
 ========================= */
 
 .cutoff-popup{
-position:fixed;
+    position:fixed;
 
-top:50%;
-left:50%;
+    top:50%;
+    left:50%;
 
-transform:
-translate(-50%,-50%)
-scale(.85);
+    transform:
+        translate(-50%,-50%)
+        scale(.85);
 
-width:380px;
+    width:380px;
 
-background:
-linear-gradient(
-145deg,
-rgba(5,8,20,.98),
-rgba(15,10,30,.98),
-rgba(7,10,24,.98)
-);
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(80,140,255,.12),
+            transparent 42%
+        ),
+        linear-gradient(
+            145deg,
+            rgba(5,8,20,.99),
+            rgba(15,10,30,.99),
+            rgba(7,10,24,.99)
+        );
 
-border:1px solid rgba(110,140,255,.4);
+    border:1px solid rgba(110,140,255,.55);
 
-border-radius:17px;
+    border-radius:17px;
 
-padding:25px;
+    padding:25px;
 
-z-index:999999;
+    z-index:999999;
 
-box-shadow:
-0 0 40px #000,
-0 0 30px rgba(80,120,255,.1),
-0 0 35px rgba(130,70,255,.08);
+    box-shadow:
+        0 0 40px #000,
+        0 0 25px rgba(80,120,255,.20),
+        0 0 50px rgba(130,70,255,.12),
+        inset 0 0 25px rgba(80,120,255,.05);
 
-font-size:14px;
+    font-size:14px;
 
-line-height:1.9;
+    line-height:1.9;
 
-letter-spacing:.4px;
+    letter-spacing:.4px;
 
-font-weight:600;
+    font-weight:600;
 
-color:#fff;
+    color:#e9edff;
 
-text-shadow:
-0 0 8px rgba(120,150,255,.25);
+    text-shadow:
+        0 0 8px rgba(120,150,255,.25);
 
-cursor:default;
+    cursor:default;
 
-opacity:0;
-visibility:hidden;
+    opacity:0;
+    visibility:hidden;
 
-transition:
-opacity .25s ease,
-transform .25s ease;
+    transition:
+        opacity .25s ease,
+        transform .25s ease;
 
-will-change:left,top;
+    will-change:left,top;
 
-user-select:none;
+    user-select:none;
 
-backdrop-filter:blur(18px)
+    backdrop-filter:blur(18px);
+
+    overflow:hidden;
 }
+
+
+/* =========================
+   TOP BLUE / PURPLE RUNNER
+========================= */
+
+.cutoff-popup::before{
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:-100%;
+
+    width:70%;
+    height:2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #5ca8ff,
+            #8170ff,
+            #b06cff,
+            #62d5ff,
+            transparent
+        );
+
+    box-shadow:
+        0 0 6px rgba(90,160,255,.9),
+        0 0 14px rgba(120,90,255,.7),
+        0 0 25px rgba(90,150,255,.4);
+
+    animation:
+        infoBlueRunner 2.2s linear infinite;
+
+    pointer-events:none;
+}
+
+
+/* =========================
+   BLUE / PURPLE ATMOSPHERE
+========================= */
+
+.cutoff-popup::after{
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        radial-gradient(
+            circle at 10% 10%,
+            rgba(70,130,255,.08),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 90% 90%,
+            rgba(140,70,255,.07),
+            transparent 35%
+        );
+
+    pointer-events:none;
+}
+
+
+/* =========================
+   SHOW
+========================= */
 
 .cutoff-popup.show{
-opacity:1;
-visibility:visible;
+    opacity:1;
 
-transform:
-translate(-50%,-50%)
-scale(1);
+    visibility:visible;
 
-animation:cutoffBlueAnime .35s ease
+    transform:
+        translate(-50%,-50%)
+        scale(1);
+
+    animation:
+        cutoffBlueAnime .35s ease;
 }
+
+
+/* =========================
+   TITLE
+========================= */
 
 .cutoff-popup h3{
-margin-top:0;
+    margin-top:0;
 
-color:#91b4ff;
+    color:#91b4ff;
 
-font-size:18px;
+    font-size:18px;
 
-font-weight:900;
+    font-weight:900;
 
-letter-spacing:1px;
+    letter-spacing:1px;
 
-text-shadow:
-0 0 8px rgba(80,140,255,.65),
-0 0 18px rgba(130,80,255,.35);
+    text-shadow:
+        0 0 8px rgba(80,140,255,.9),
+        0 0 17px rgba(100,110,255,.6),
+        0 0 28px rgba(150,80,255,.3);
 
-padding-right:35px;
+    padding-right:35px;
 
-cursor:move
+    cursor:move;
+
+    position:relative;
+
+    z-index:2;
 }
+
+
+/* =========================
+   CLOSE
+========================= */
 
 .cutoff-close{
-position:absolute;
+    position:absolute;
 
-right:15px;
-top:12px;
+    right:15px;
+    top:12px;
 
-cursor:pointer;
+    cursor:pointer;
 
-color:#789cff;
+    color:#789cff;
 
-font-size:20px;
+    font-size:20px;
 
-font-weight:900;
+    font-weight:900;
 
-transition:.2s;
+    transition:.2s;
 
-text-shadow:
-0 0 10px rgba(70,120,255,.8)
+    text-shadow:
+        0 0 8px rgba(70,120,255,.9),
+        0 0 16px rgba(120,80,255,.45);
+
+    z-index:5;
 }
+
 
 .cutoff-close:hover{
-color:#b9a8ff;
+    color:#c3b8ff;
 
-transform:
-scale(1.15)
-rotate(8deg)
+    transform:
+        scale(1.15)
+        rotate(8deg);
+
+    text-shadow:
+        0 0 10px rgba(100,160,255,1),
+        0 0 22px rgba(130,80,255,.7),
+        0 0 35px rgba(100,140,255,.4);
 }
+
+
+/* =========================
+   CONTENT
+========================= */
 
 .cutoff-content{
-font-size:22px;
+    font-size:22px;
 
-font-weight:700;
+    font-weight:700;
 
-line-height:2;
+    line-height:2;
 
-letter-spacing:.8px;
+    letter-spacing:.8px;
 
-color:#fff;
+    color:#e9edff;
 
-text-shadow:
-0 0 8px rgba(100,140,255,.35)
+    text-shadow:
+        0 0 7px rgba(100,140,255,.35);
+
+    position:relative;
+
+    z-index:2;
 }
+
+
+/* =========================
+   BOLD CONTENT
+========================= */
 
 .cutoff-content b{
-font-size:23px;
+    font-size:23px;
 
-font-weight:900;
+    font-weight:900;
 
-color:#91b4ff;
+    color:#91b4ff;
 
-text-shadow:
-0 0 8px rgba(80,140,255,.55)
+    text-shadow:
+        0 0 8px rgba(80,140,255,.8),
+        0 0 16px rgba(130,80,255,.45);
 }
+
+
+/* =========================
+   LOGO
+========================= */
 
 .cutoff-popup img.logo{
-width:17px;
-height:17px;
-vertical-align:middle;
-margin-right:7px
-}
+    width:17px;
 
-@keyframes cutoffBlueAnime{
-0%{
-opacity:0;
+    height:17px;
 
-transform:
-translate(-50%,-50%)
-scale(.85);
+    vertical-align:middle;
 
-box-shadow:
-0 0 0 rgba(80,130,255,0)
-}
+    margin-right:7px;
 
-100%{
-opacity:1;
-
-transform:
-translate(-50%,-50%)
-scale(1);
-
-box-shadow:
-0 0 40px #000,
-0 0 25px rgba(70,120,255,.16),
-0 0 35px rgba(130,70,255,.1)
-}
+    filter:
+        drop-shadow(0 0 4px rgba(80,150,255,.65))
+        drop-shadow(0 0 8px rgba(130,80,255,.35));
 }
 
 
@@ -1816,14 +1959,91 @@ box-shadow:
 ========================= */
 
 .cutoff-title{
-color:#91b4ff
+    color:#91b4ff;
+
+    font-weight:900;
+
+    text-shadow:
+        0 0 7px rgba(80,140,255,.75),
+        0 0 15px rgba(130,80,255,.35);
 }
 
+
+/* =========================
+   LIMIT TITLE
+========================= */
+
 .limit-title{
-font-size:12px;
-font-weight:bold;
-color:#91b4ff;
-margin-bottom:8px
+    font-size:12px;
+
+    font-weight:bold;
+
+    color:#91b4ff;
+
+    margin-bottom:8px;
+
+    text-shadow:
+        0 0 7px rgba(80,140,255,.65),
+        0 0 14px rgba(130,80,255,.3);
+}
+
+
+/* =========================
+   BLUE / PURPLE POPUP ANIMATION
+========================= */
+
+@keyframes cutoffBlueAnime{
+
+    0%{
+        opacity:0;
+
+        transform:
+            translate(-50%,-50%)
+            scale(.85);
+
+        box-shadow:
+            0 0 0 rgba(80,130,255,0);
+    }
+
+    100%{
+        opacity:1;
+
+        transform:
+            translate(-50%,-50%)
+            scale(1);
+
+        box-shadow:
+            0 0 40px #000,
+            0 0 25px rgba(70,120,255,.18),
+            0 0 45px rgba(130,70,255,.10),
+            inset 0 0 25px rgba(80,120,255,.05);
+    }
+}
+
+
+/* =========================
+   RUNNING LIGHT
+========================= */
+
+@keyframes infoBlueRunner{
+
+    0%{
+        left:-100%;
+        opacity:0;
+    }
+
+    15%{
+        opacity:1;
+    }
+
+    50%{
+        opacity:1;
+    }
+
+    100%{
+        left:150%;
+        opacity:0;
+    }
 }
 
 
@@ -1926,31 +2146,144 @@ transparent
 }
 
 .marq{
-display:inline-block;
+display:inline-flex;
+align-items:center;
 
 white-space:nowrap;
+width:max-content;
 
 will-change:transform;
 
-animation:mar 48s linear infinite;
+animation:mar 42s linear infinite;
 
-color:#8fb5ff;
+font-size:11px;
+font-weight:900;
+
+letter-spacing:2.2px;
+
+color:#a8c3ff;
 
 text-shadow:
-0 0 6px rgba(80,140,255,.4)
+0 0 5px rgba(100,150,255,.65),
+0 0 12px rgba(80,120,255,.28),
+0 0 22px rgba(120,80,255,.12);
+
+filter:saturate(1.15);
 }
 
+
 .marq span{
-padding-right:90px
+display:inline-block;
+
+padding-right:100px;
+
+color:#a8c3ff;
+
+text-shadow:
+0 0 5px rgba(100,150,255,.65),
+0 0 12px rgba(80,120,255,.28),
+0 0 22px rgba(120,80,255,.12);
 }
+
+
+.ft{
+position:relative;
+
+overflow:hidden;
+
+background:
+linear-gradient(
+90deg,
+rgba(3,6,16,.98),
+rgba(8,10,25,.92),
+rgba(3,6,16,.98)
+);
+
+border-top:1px solid rgba(110,145,255,.16);
+border-bottom:1px solid rgba(110,145,255,.16);
+
+box-shadow:
+inset 0 1px 0 rgba(255,255,255,.025),
+inset 0 -1px 0 rgba(0,0,0,.45),
+0 0 18px rgba(50,80,180,.08);
+}
+
+
+.ft::before{
+content:"";
+
+position:absolute;
+
+top:0;
+bottom:0;
+left:-20%;
+
+width:18%;
+
+background:
+linear-gradient(
+90deg,
+transparent,
+rgba(120,160,255,.08),
+transparent
+);
+
+transform:skewX(-20deg);
+
+animation:marqScan 5s ease-in-out infinite;
+
+pointer-events:none;
+}
+
+
+.ft::after{
+content:"";
+
+position:absolute;
+
+left:0;
+right:0;
+bottom:0;
+
+height:1px;
+
+background:
+linear-gradient(
+90deg,
+transparent,
+rgba(100,145,255,.35),
+rgba(150,100,255,.25),
+transparent
+);
+
+opacity:.7;
+}
+
 
 @keyframes mar{
 0%{
-transform:translateX(0)
+transform:translateX(0);
 }
 
 100%{
-transform:translateX(-50%)
+transform:translateX(-50%);
+}
+}
+
+
+@keyframes marqScan{
+0%,65%{
+left:-20%;
+opacity:0;
+}
+
+75%{
+opacity:1;
+}
+
+100%{
+left:110%;
+opacity:0;
 }
 }
 
