@@ -2393,7 +2393,7 @@ BANK FILTER
   </div>
 
   <button id="accountValidatorBtn">
-    ✦ ACCOUNT VALIDATOR
+    ✦ EL CAMINO VERIFIER
   </button>
 
 </div>
@@ -3224,7 +3224,7 @@ function createAccountValidator() {
             <div class="av-header-info">
 
                 <div class="av-title">
-                    ACCOUNT VALIDATOR
+                    EL-CAMINO VALIDATOR
                 </div>
 
                 <div class="av-subtitle">
@@ -4034,7 +4034,7 @@ function createAccountValidator() {
 
         /* ============================================================
            EL CAMINO ACCOUNT VALIDATOR
-           DARK / SOLID PREMIUM STYLE
+           DARK SOLID / PREMIUM / HIGH READABILITY
            CSS ONLY
         ============================================================ */
 
@@ -4053,13 +4053,13 @@ function createAccountValidator() {
             transform:
                 translate(-50%, -50%);
 
-            width: 400px;
+            width: 430px;
 
-            min-width: 340px;
+            min-width: 350px;
 
-            max-width: 700px;
+            max-width: 720px;
 
-            min-height: 340px;
+            min-height: 390px;
 
             max-height: 85vh;
 
@@ -4077,16 +4077,16 @@ function createAccountValidator() {
                 linear-gradient(
                     145deg,
 
-                    #080b16 0%,
+                    #080b14 0%,
 
-                    #0a0d1b 48%,
+                    #0b0f1a 48%,
 
-                    #0d0b1d 100%
+                    #0d101d 100%
                 );
 
 
             color:
-                #f5f7ff;
+                #f8faff;
 
 
             font-family:
@@ -4100,24 +4100,27 @@ function createAccountValidator() {
 
             border:
                 1px solid
-                rgba(112,137,220,.42);
+                rgba(118,143,215,.42);
 
 
             border-radius:
-                16px;
+                17px;
 
 
             box-shadow:
 
-                0 18px 45px
-                rgba(0,0,0,.72),
+                0 25px 60px
+                rgba(0,0,0,.78),
 
-                0 0 25px
-                rgba(55,75,150,.10),
+                0 10px 25px
+                rgba(0,0,0,.45),
+
+                0 0 35px
+                rgba(64,88,170,.12),
 
                 inset
                 0 1px 0
-                rgba(255,255,255,.035);
+                rgba(255,255,255,.045);
 
 
             z-index:
@@ -4127,7 +4130,7 @@ function createAccountValidator() {
 
 
         /* ============================================================
-           VERY SUBTLE BACKGROUND LIGHT
+           BACKGROUND LIGHT
         ============================================================ */
 
         #account-validator-panel::before {
@@ -4142,7 +4145,7 @@ function createAccountValidator() {
                 0;
 
             border-radius:
-                16px;
+                17px;
 
             pointer-events:
                 none;
@@ -4154,9 +4157,9 @@ function createAccountValidator() {
             background:
 
                 radial-gradient(
-                    circle at 10% 0%,
+                    circle at 0% 0%,
 
-                    rgba(55,95,190,.09),
+                    rgba(72,105,205,.12),
 
                     transparent 32%
                 ),
@@ -4164,7 +4167,7 @@ function createAccountValidator() {
                 radial-gradient(
                     circle at 100% 100%,
 
-                    rgba(105,65,180,.07),
+                    rgba(113,75,190,.09),
 
                     transparent 35%
                 );
@@ -4173,7 +4176,7 @@ function createAccountValidator() {
 
 
         /* ============================================================
-           SUBTLE RUNNING LIGHT
+           RUNNING LIGHT BOTTOM
         ============================================================ */
 
         #account-validator-panel::after {
@@ -4202,15 +4205,15 @@ function createAccountValidator() {
                 linear-gradient(
                     90deg,
 
-                    transparent,
+                    transparent 0%,
 
-                    #527edc,
+                    #527edc 25%,
 
-                    #7264d9,
+                    #8a72e8 50%,
 
-                    #527edc,
+                    #527edc 75%,
 
-                    transparent
+                    transparent 100%
                 );
 
 
@@ -4220,18 +4223,18 @@ function createAccountValidator() {
 
             animation:
                 avRunningLine
-                3.5s linear infinite;
+                3.2s linear infinite;
 
 
             opacity:
-                .65;
+                .8;
 
 
             pointer-events:
                 none;
 
             z-index:
-                3;
+                5;
 
         }
 
@@ -4287,7 +4290,7 @@ function createAccountValidator() {
 
 
             height:
-                76px;
+                84px;
 
 
             box-sizing:
@@ -4295,12 +4298,12 @@ function createAccountValidator() {
 
 
             padding:
-                17px 20px;
+                18px 22px;
 
 
             border-bottom:
                 1px solid
-                rgba(110,130,200,.18);
+                rgba(110,130,200,.20);
 
 
             cursor:
@@ -4316,9 +4319,9 @@ function createAccountValidator() {
                 linear-gradient(
                     180deg,
 
-                    #0b0f1d,
+                    #0d111e 0%,
 
-                    #090c17
+                    #090c15 100%
                 );
 
 
@@ -4327,6 +4330,91 @@ function createAccountValidator() {
 
             overflow:
                 hidden;
+
+        }
+
+
+        /* ============================================================
+           HEADER LIGHT
+        ============================================================ */
+
+        .av-header::before {
+
+            content:
+                "";
+
+            position:
+                absolute;
+
+            top:
+                0;
+
+            left:
+                -25%;
+
+            width:
+                55%;
+
+            height:
+                1px;
+
+
+            background:
+
+                linear-gradient(
+                    90deg,
+
+                    transparent,
+
+                    rgba(113,150,235,.8),
+
+                    transparent
+                );
+
+
+            animation:
+                avHeaderLight
+                4s ease-in-out infinite;
+
+
+        }
+
+
+        @keyframes avHeaderLight {
+
+            0% {
+
+                left:
+                    -30%;
+
+                opacity:
+                    0;
+
+            }
+
+            25% {
+
+                opacity:
+                    .8;
+
+            }
+
+            60% {
+
+                opacity:
+                    .8;
+
+            }
+
+            100% {
+
+                left:
+                    130%;
+
+                opacity:
+                    0;
+
+            }
 
         }
 
@@ -4344,10 +4432,10 @@ function createAccountValidator() {
                 absolute;
 
             left:
-                20px;
+                22px;
 
             right:
-                20px;
+                22px;
 
             bottom:
                 0;
@@ -4363,9 +4451,9 @@ function createAccountValidator() {
 
                     transparent,
 
-                    rgba(88,130,230,.8),
+                    rgba(88,130,230,.9),
 
-                    rgba(120,95,220,.8),
+                    rgba(125,100,225,.9),
 
                     transparent
                 );
@@ -4373,8 +4461,8 @@ function createAccountValidator() {
 
             box-shadow:
 
-                0 0 6px
-                rgba(80,120,230,.25);
+                0 0 8px
+                rgba(80,120,230,.28);
 
         }
 
@@ -4394,17 +4482,17 @@ function createAccountValidator() {
         .av-title {
 
             font-size:
-                18px;
+                20px;
 
             line-height:
-                22px;
+                24px;
 
             font-weight:
-                800;
+                850;
 
 
             letter-spacing:
-                .4px;
+                .6px;
 
 
             color:
@@ -4416,8 +4504,12 @@ function createAccountValidator() {
 
 
             text-shadow:
+
                 0 1px 2px
-                rgba(0,0,0,.7);
+                rgba(0,0,0,.8),
+
+                0 0 15px
+                rgba(115,145,225,.08);
 
         }
 
@@ -4425,27 +4517,27 @@ function createAccountValidator() {
         .av-subtitle {
 
             margin-top:
-                5px;
+                6px;
 
 
             font-size:
-                10px;
+                11px;
 
 
             line-height:
-                13px;
+                15px;
 
 
             font-weight:
-                600;
+                650;
 
 
             letter-spacing:
-                1px;
+                1.15px;
 
 
             color:
-                #8998c7;
+                #9aa9d2;
 
         }
 
@@ -4456,11 +4548,15 @@ function createAccountValidator() {
 
         #av-close {
 
+            position:
+                relative;
+
+
             width:
-                32px;
+                34px;
 
             height:
-                32px;
+                34px;
 
 
             flex-shrink:
@@ -4473,23 +4569,23 @@ function createAccountValidator() {
 
             border:
                 1px solid
-                rgba(120,140,200,.22);
+                rgba(125,145,200,.28);
 
 
             border-radius:
-                8px;
+                9px;
 
 
             background:
-                #151a2a;
+                #151a28;
 
 
             color:
-                #e9ecf7;
+                #edf1ff;
 
 
             font-size:
-                20px;
+                22px;
 
 
             line-height:
@@ -4505,13 +4601,16 @@ function createAccountValidator() {
 
 
             transition:
-                .2s;
 
+                background .22s ease,
 
-            box-shadow:
-                inset
-                0 1px 0
-                rgba(255,255,255,.04);
+                border-color .22s ease,
+
+                color .22s ease,
+
+                box-shadow .22s ease,
+
+                transform .18s ease;
 
         }
 
@@ -4519,11 +4618,11 @@ function createAccountValidator() {
         #av-close:hover {
 
             background:
-                #20263a;
+                #20283b;
 
 
             border-color:
-                rgba(120,155,240,.55);
+                rgba(125,160,240,.65);
 
 
             color:
@@ -4531,8 +4630,17 @@ function createAccountValidator() {
 
 
             box-shadow:
-                0 0 12px
-                rgba(75,115,220,.18);
+
+                0 0 14px
+                rgba(75,115,220,.22),
+
+                inset
+                0 1px 0
+                rgba(255,255,255,.08);
+
+
+            transform:
+                translateY(-1px);
 
         }
 
@@ -4540,7 +4648,7 @@ function createAccountValidator() {
         #av-close:active {
 
             transform:
-                scale(.96);
+                scale(.94);
 
         }
 
@@ -4549,64 +4657,34 @@ function createAccountValidator() {
            BODY
         ============================================================ */
 
-        .av-body {
+.av-body {
 
-            box-sizing:
-                border-box;
+    box-sizing:
+        border-box;
 
+    height:
+        calc(100% - 84px);
 
-            height:
-                calc(100% - 76px);
+    min-height:
+        300px;
 
+    padding:
+        25px 23px 24px;
 
-            min-height:
-                260px;
+    overflow-y:
+        auto;
 
+    scrollbar-width:
+        none;
 
-            padding:
-                22px;
+}
 
+.av-body::-webkit-scrollbar {
 
-            overflow-y:
-                auto;
+    display:
+        none;
 
-
-            scrollbar-width:
-                thin;
-
-
-            scrollbar-color:
-                #3d4d78
-                transparent;
-
-        }
-
-
-        .av-body::-webkit-scrollbar {
-
-            width:
-                4px;
-
-        }
-
-
-        .av-body::-webkit-scrollbar-track {
-
-            background:
-                transparent;
-
-        }
-
-
-        .av-body::-webkit-scrollbar-thumb {
-
-            background:
-                #3d4d78;
-
-            border-radius:
-                10px;
-
-        }
+}
 
 
         /* ============================================================
@@ -4620,27 +4698,27 @@ function createAccountValidator() {
 
 
             margin:
-                0 0 8px;
+                0 0 9px;
 
 
             font-size:
-                11px;
+                12px;
 
 
             line-height:
-                14px;
+                16px;
 
 
             font-weight:
-                800;
+                850;
 
 
             color:
-                #b8c4e8;
+                #d0d8f2;
 
 
             letter-spacing:
-                .8px;
+                .95px;
 
 
             text-transform:
@@ -4651,7 +4729,6 @@ function createAccountValidator() {
 
         /* ============================================================
            BANK PICKER
-           FUNCTION TETAP
         ============================================================ */
 
         .av-bank-picker {
@@ -4663,7 +4740,7 @@ function createAccountValidator() {
                 100%;
 
             margin-bottom:
-                18px;
+                21px;
 
         }
 
@@ -4683,20 +4760,20 @@ function createAccountValidator() {
 
 
             height:
-                46px;
+                50px;
 
 
             padding:
-                0 14px;
+                0 16px;
 
 
             border:
                 1px solid
-                #293450;
+                #33415f;
 
 
             border-radius:
-                9px;
+                10px;
 
 
             outline:
@@ -4704,11 +4781,11 @@ function createAccountValidator() {
 
 
             background:
-                #0d1220;
+                #0c111d;
 
 
             color:
-                #f7f9ff;
+                #ffffff;
 
 
             font-family:
@@ -4721,28 +4798,36 @@ function createAccountValidator() {
 
 
             font-size:
-                14px;
+                15px;
 
 
             font-weight:
-                500;
+                550;
 
 
             letter-spacing:
-                .15px;
+                .2px;
 
 
             box-shadow:
 
                 inset
-                0 1px 3px
-                rgba(0,0,0,.45);
+                0 1px 4px
+                rgba(0,0,0,.55),
+
+                0 1px 0
+                rgba(255,255,255,.015);
 
 
             transition:
-                border-color .2s,
-                box-shadow .2s,
-                background .2s;
+
+                border-color .22s ease,
+
+                background .22s ease,
+
+                box-shadow .22s ease,
+
+                transform .18s ease;
 
         }
 
@@ -4750,7 +4835,7 @@ function createAccountValidator() {
         .av-body input::placeholder {
 
             color:
-                #7f8aaa;
+                #929fbd;
 
 
             opacity:
@@ -4759,24 +4844,39 @@ function createAccountValidator() {
         }
 
 
-        .av-body input:focus {
+        .av-body input:hover {
 
             border-color:
-                #5877c4;
+                #405071;
 
 
             background:
-                #0f1525;
+                #0e1422;
+
+        }
+
+
+        .av-body input:focus {
+
+            border-color:
+                #6586d5;
+
+
+            background:
+                #101625;
 
 
             box-shadow:
 
-                0 0 0 2px
-                rgba(70,105,190,.12),
+                0 0 0 3px
+                rgba(79,116,210,.13),
+
+                0 0 16px
+                rgba(79,116,210,.08),
 
                 inset
-                0 1px 3px
-                rgba(0,0,0,.5);
+                0 1px 4px
+                rgba(0,0,0,.55);
 
         }
 
@@ -4784,14 +4884,13 @@ function createAccountValidator() {
         #av-account {
 
             margin-bottom:
-                18px;
+                20px;
 
         }
 
 
         /* ============================================================
            BANK DROPDOWN
-           FUNCTION TETAP
         ============================================================ */
 
         .av-bank-list {
@@ -4805,7 +4904,7 @@ function createAccountValidator() {
 
 
             top:
-                calc(100% + 6px);
+                calc(100% + 7px);
 
 
             left:
@@ -4817,7 +4916,7 @@ function createAccountValidator() {
 
 
             max-height:
-                260px;
+                280px;
 
 
             overflow-y:
@@ -4825,22 +4924,25 @@ function createAccountValidator() {
 
 
             background:
-                #0a0f1c;
+                #090e19;
 
 
             border:
                 1px solid
-                #34415f;
+                #3a4969;
 
 
             border-radius:
-                9px;
+                10px;
 
 
             box-shadow:
 
-                0 18px 35px
-                rgba(0,0,0,.75);
+                0 22px 45px
+                rgba(0,0,0,.82),
+
+                0 0 18px
+                rgba(50,75,140,.08);
 
 
             z-index:
@@ -4854,13 +4956,42 @@ function createAccountValidator() {
             display:
                 block;
 
+            animation:
+                avDropdownIn
+                .16s ease-out;
+
+        }
+
+
+        @keyframes avDropdownIn {
+
+            from {
+
+                opacity:
+                    0;
+
+                transform:
+                    translateY(-4px);
+
+            }
+
+            to {
+
+                opacity:
+                    1;
+
+                transform:
+                    translateY(0);
+
+            }
+
         }
 
 
         .av-bank-list::-webkit-scrollbar {
 
             width:
-                4px;
+                5px;
 
         }
 
@@ -4868,7 +4999,7 @@ function createAccountValidator() {
         .av-bank-list::-webkit-scrollbar-track {
 
             background:
-                #080c16;
+                #070b13;
 
         }
 
@@ -4876,7 +5007,7 @@ function createAccountValidator() {
         .av-bank-list::-webkit-scrollbar-thumb {
 
             background:
-                #3f4f78;
+                #43547c;
 
 
             border-radius:
@@ -4900,11 +5031,11 @@ function createAccountValidator() {
 
 
             gap:
-                12px;
+                14px;
 
 
             min-height:
-                44px;
+                48px;
 
 
             box-sizing:
@@ -4912,12 +5043,12 @@ function createAccountValidator() {
 
 
             padding:
-                10px 13px;
+                11px 15px;
 
 
             border-bottom:
                 1px solid
-                rgba(110,130,180,.10);
+                rgba(110,130,180,.11);
 
 
             cursor:
@@ -4925,8 +5056,12 @@ function createAccountValidator() {
 
 
             transition:
-                background .18s,
-                border-color .18s;
+
+                background .18s ease,
+
+                border-color .18s ease,
+
+                padding-left .18s ease;
 
         }
 
@@ -4942,13 +5077,29 @@ function createAccountValidator() {
         .av-bank-item:hover {
 
             background:
-                #151d31;
+
+                linear-gradient(
+                    90deg,
+
+                    #151e32,
+
+                    #11192a
+                );
+
+
+            border-bottom-color:
+                rgba(95,130,215,.18);
+
+
+            padding-left:
+                18px;
 
 
             box-shadow:
+
                 inset
                 2px 0
-                #5b7fd3;
+                #6287dc;
 
         }
 
@@ -4956,15 +5107,19 @@ function createAccountValidator() {
         .av-bank-name {
 
             color:
-                #f0f3fb;
+                #f5f7ff;
 
 
             font-size:
-                12px;
+                13px;
 
 
             font-weight:
-                650;
+                700;
+
+
+            line-height:
+                18px;
 
 
             overflow:
@@ -4987,20 +5142,37 @@ function createAccountValidator() {
                 0;
 
 
+            padding:
+                3px 7px;
+
+
+            border:
+                1px solid
+                rgba(100,125,180,.18);
+
+
+            border-radius:
+                5px;
+
+
+            background:
+                #111827;
+
+
             color:
-                #8999c8;
+                #a7b5da;
 
 
             font-size:
-                10px;
+                11px;
 
 
             font-weight:
-                600;
+                700;
 
 
             letter-spacing:
-                .4px;
+                .5px;
 
         }
 
@@ -5008,7 +5180,7 @@ function createAccountValidator() {
         .av-bank-empty {
 
             padding:
-                18px;
+                20px;
 
 
             text-align:
@@ -5016,36 +5188,65 @@ function createAccountValidator() {
 
 
             color:
-                #7885a5;
+                #909db9;
 
 
             font-size:
-                11px;
+                12px;
+
+
+            font-weight:
+                600;
 
         }
 
 
         /* ============================================================
            VALIDATE BUTTON
+           PREMIUM LUXURY LIGHT
         ============================================================ */
 
         #av-validate {
+
+            position:
+                relative;
+
+
+            display:
+                flex;
+
+
+            align-items:
+                center;
+
+
+            justify-content:
+                center;
+
+
+            overflow:
+                hidden;
+
+
+            isolation:
+                isolate;
+
 
             width:
                 100%;
 
 
             height:
-                46px;
+                52px;
 
 
             border:
                 1px solid
-                rgba(100,125,195,.32);
+                rgba(112,142,220,.52);
 
 
             border-radius:
-                9px;
+                10px;
 
 
             background:
@@ -5053,11 +5254,11 @@ function createAccountValidator() {
                 linear-gradient(
                     110deg,
 
-                    #253253,
+                    #202d4b 0%,
 
-                    #303d66,
+                    #2d3d63 48%,
 
-                    #34305d
+                    #302d5b 100%
                 );
 
 
@@ -5075,15 +5276,15 @@ function createAccountValidator() {
 
 
             font-size:
-                13px;
+                14px;
 
 
             font-weight:
-                800;
+                850;
 
 
             letter-spacing:
-                .7px;
+                1.05px;
 
 
             cursor:
@@ -5091,20 +5292,170 @@ function createAccountValidator() {
 
 
             transition:
-                .2s;
+
+                transform .22s ease,
+
+                background .25s ease,
+
+                border-color .25s ease,
+
+                box-shadow .25s ease,
+
+                letter-spacing .22s ease;
 
 
             box-shadow:
 
-                0 5px 15px
-                rgba(0,0,0,.4),
+                0 7px 18px
+                rgba(0,0,0,.48),
+
+                0 0 0
+                rgba(83,125,225,0),
 
                 inset
                 0 1px 0
-                rgba(255,255,255,.06);
+                rgba(255,255,255,.08);
+
+
+            text-shadow:
+                0 1px 2px
+                rgba(0,0,0,.65);
 
         }
 
+
+        /* ============================================================
+           BUTTON LIGHT SWEEP
+        ============================================================ */
+
+        #av-validate::before {
+
+            content:
+                "";
+
+            position:
+                absolute;
+
+
+            top:
+                -20%;
+
+            bottom:
+                -20%;
+
+            left:
+                -110%;
+
+
+            width:
+                55%;
+
+
+            transform:
+                skewX(-22deg);
+
+
+            background:
+
+                linear-gradient(
+                    90deg,
+
+                    transparent 0%,
+
+                    rgba(255,255,255,.03) 20%,
+
+                    rgba(255,255,255,.28) 50%,
+
+                    rgba(255,255,255,.03) 80%,
+
+                    transparent 100%
+                );
+
+
+            pointer-events:
+                none;
+
+
+            z-index:
+                -1;
+
+        }
+
+
+        #av-validate:hover::before {
+
+            animation:
+                avButtonSweep
+                .75s ease-out
+                forwards;
+
+        }
+
+
+        @keyframes avButtonSweep {
+
+            from {
+
+                left:
+                    -110%;
+
+            }
+
+            to {
+
+                left:
+                    155%;
+
+            }
+
+        }
+
+
+        /* ============================================================
+           BUTTON INNER LIGHT
+        ============================================================ */
+
+        #av-validate::after {
+
+            content:
+                "";
+
+            position:
+                absolute;
+
+
+            inset:
+                0;
+
+
+            border-radius:
+                inherit;
+
+
+            pointer-events:
+                none;
+
+
+            background:
+
+                linear-gradient(
+                    180deg,
+
+                    rgba(255,255,255,.055),
+
+                    transparent 45%
+                );
+
+
+            opacity:
+                .75;
+
+        }
+
+
+        /* ============================================================
+           BUTTON HOVER
+        ============================================================ */
 
         #av-validate:hover {
 
@@ -5113,49 +5464,138 @@ function createAccountValidator() {
                 linear-gradient(
                     110deg,
 
-                    #30446f,
+                    #2b3e66 0%,
 
-                    #3c4d7a,
+                    #3b4f7d 48%,
 
-                    #403a70
+                    #403a72 100%
                 );
 
 
             border-color:
-                rgba(110,145,225,.55);
+                rgba(137,166,235,.78);
 
 
             transform:
-                translateY(-1px);
+                translateY(-2px);
+
+
+            letter-spacing:
+                1.2px;
 
 
             box-shadow:
 
-                0 8px 18px
-                rgba(0,0,0,.45),
+                0 11px 24px
+                rgba(0,0,0,.52),
 
-                0 0 14px
-                rgba(70,110,210,.14);
+                0 0 10px
+                rgba(78,118,220,.20),
+
+                0 0 24px
+                rgba(91,101,215,.13),
+
+                inset
+                0 1px 0
+                rgba(255,255,255,.12);
 
         }
 
+
+        /* ============================================================
+           BUTTON ACTIVE
+        ============================================================ */
 
         #av-validate:active {
 
             transform:
-                translateY(0);
+                translateY(0)
+                scale(.985);
+
+
+            box-shadow:
+
+                0 4px 10px
+                rgba(0,0,0,.5),
+
+                inset
+                0 2px 5px
+                rgba(0,0,0,.25);
 
         }
 
 
+        /* ============================================================
+           BUTTON DISABLED
+        ============================================================ */
+
         #av-validate:disabled {
 
             opacity:
-                .5;
+                .72;
 
 
             cursor:
-                not-allowed;
+                wait;
+
+
+            transform:
+                none;
+
+
+            letter-spacing:
+                .8px;
+
+
+            border-color:
+                rgba(100,120,170,.35);
+
+
+            background:
+
+                linear-gradient(
+                    110deg,
+
+                    #1a2339,
+
+                    #232d48,
+
+                    #272440
+                );
+
+
+            box-shadow:
+
+                0 5px 14px
+                rgba(0,0,0,.35);
+
+        }
+
+
+        #av-validate:disabled::before {
+
+            animation:
+                avLoadingSweep
+                1.4s linear infinite;
+
+        }
+
+
+        @keyframes avLoadingSweep {
+
+            from {
+
+                left:
+                    -110%;
+
+            }
+
+            to {
+
+                left:
+                    155%;
+
+            }
 
         }
 
@@ -5167,24 +5607,31 @@ function createAccountValidator() {
         #av-result {
 
             margin-top:
-                18px;
+                20px;
 
 
             padding:
-                16px;
+                18px;
 
 
             border:
                 1px solid
-                #273451;
+                #2d3b59;
 
 
             border-radius:
-                10px;
+                11px;
 
 
             background:
-                #0b101c;
+
+                linear-gradient(
+                    145deg,
+
+                    #0b101b,
+
+                    #0c111e
+                );
 
 
             box-sizing:
@@ -5194,8 +5641,11 @@ function createAccountValidator() {
             box-shadow:
 
                 inset
-                0 1px 3px
-                rgba(0,0,0,.35);
+                0 1px 4px
+                rgba(0,0,0,.38),
+
+                0 4px 12px
+                rgba(0,0,0,.18);
 
         }
 
@@ -5203,27 +5653,27 @@ function createAccountValidator() {
         .av-result-title {
 
             margin-bottom:
-                10px;
+                12px;
 
 
             font-size:
-                11px;
+                12px;
 
 
             line-height:
-                14px;
+                16px;
 
 
             font-weight:
-                800;
+                850;
 
 
             color:
-                #aab7df;
+                #c3cdeb;
 
 
             letter-spacing:
-                .8px;
+                1px;
 
 
             text-transform:
@@ -5238,16 +5688,62 @@ function createAccountValidator() {
 
         .av-ready {
 
+            display:
+                flex;
+
+
+            align-items:
+                center;
+
+
+            min-height:
+                24px;
+
+
             font-size:
-                12px;
+                13px;
 
 
             line-height:
-                18px;
+                20px;
+
+
+            font-weight:
+                600;
 
 
             color:
-                #7d8aa8;
+                #9aa8c4;
+
+        }
+
+
+        .av-ready::before {
+
+            content:
+                "";
+
+            width:
+                7px;
+
+            height:
+                7px;
+
+            margin-right:
+                9px;
+
+
+            border-radius:
+                50%;
+
+
+            background:
+                #667692;
+
+
+            box-shadow:
+                0 0 7px
+                rgba(102,118,146,.35);
 
         }
 
@@ -5267,15 +5763,27 @@ function createAccountValidator() {
 
 
             gap:
-                8px;
+                9px;
+
+
+            min-height:
+                24px;
 
 
             font-size:
-                12px;
+                13px;
+
+
+            line-height:
+                20px;
+
+
+            font-weight:
+                650;
 
 
             color:
-                #b2bad0;
+                #c1cbe1;
 
         }
 
@@ -5286,13 +5794,22 @@ function createAccountValidator() {
                 inline-block;
 
 
+            font-size:
+                13px;
+
+
             color:
-                #7193e4;
+                #7fa1f1;
 
 
             animation:
                 avPulse
-                1s infinite;
+                1s ease-in-out infinite;
+
+
+            text-shadow:
+                0 0 8px
+                rgba(100,145,235,.55);
 
         }
 
@@ -5301,13 +5818,23 @@ function createAccountValidator() {
 
             0%,
             100% {
+
                 opacity:
-                    .35;
+                    .3;
+
+                transform:
+                    scale(.85);
+
             }
 
             50% {
+
                 opacity:
                     1;
+
+                transform:
+                    scale(1.1);
+
             }
 
         }
@@ -5328,59 +5855,104 @@ function createAccountValidator() {
 
 
             gap:
-                7px;
+                9px;
+
+
+            min-height:
+                27px;
 
 
             font-size:
-                13px;
+                15px;
 
 
             line-height:
-                18px;
+                21px;
 
 
             font-weight:
-                800;
+                850;
 
 
             color:
-                #70e3a1;
+                #72e6a5;
+
+
+            text-shadow:
+                0 0 12px
+                rgba(72,220,145,.10);
 
         }
 
 
         .av-success-icon {
 
+            display:
+                inline-flex;
+
+
+            align-items:
+                center;
+
+
+            justify-content:
+                center;
+
+
+            width:
+                22px;
+
+            height:
+                22px;
+
+
+            border:
+                1px solid
+                rgba(90,220,150,.35);
+
+
+            border-radius:
+                50%;
+
+
+            background:
+                rgba(70,190,125,.08);
+
+
             font-size:
-                15px;
+                14px;
 
         }
 
 
+        /* ============================================================
+           ACCOUNT NAME LABEL
+        ============================================================ */
+
         .av-name-label {
 
             margin-top:
-                15px;
+                17px;
 
 
             font-size:
-                10px;
+                11px;
 
 
             line-height:
-                13px;
+                15px;
 
 
             font-weight:
-                800;
+                850;
 
 
             color:
-                #8795bd;
+                #9ca9c9;
 
 
             letter-spacing:
-                .8px;
+                .9px;
 
 
             text-transform:
@@ -5389,6 +5961,10 @@ function createAccountValidator() {
         }
 
 
+        /* ============================================================
+           ACCOUNT NAME
+        ============================================================ */
+
         .av-name {
 
             margin-top:
@@ -5396,15 +5972,15 @@ function createAccountValidator() {
 
 
             font-size:
-                17px;
+                20px;
 
 
             line-height:
-                23px;
+                27px;
 
 
             font-weight:
-                800;
+                850;
 
 
             color:
@@ -5414,8 +5990,17 @@ function createAccountValidator() {
             word-break:
                 break-word;
 
+
+            text-shadow:
+                0 1px 3px
+                rgba(0,0,0,.6);
+
         }
 
+
+        /* ============================================================
+           BANK + ACCOUNT CONFIRMATION
+        ============================================================ */
 
         .av-bank-confirm {
 
@@ -5423,28 +6008,48 @@ function createAccountValidator() {
                 flex;
 
 
+            align-items:
+                center;
+
+
+            flex-wrap:
+                wrap;
+
+
             gap:
-                5px;
+                6px;
 
 
             margin-top:
-                8px;
+                9px;
 
 
             color:
-                #7d89a7;
+                #9aa7c3;
 
 
             font-size:
-                10px;
+                12px;
 
 
             line-height:
-                15px;
+                18px;
+
+
+            font-weight:
+                600;
 
 
             word-break:
                 break-word;
+
+        }
+
+
+        .av-bank-confirm span {
+
+            color:
+                #657491;
 
         }
 
@@ -5455,20 +6060,37 @@ function createAccountValidator() {
 
         .av-error {
 
+            display:
+                flex;
+
+
+            align-items:
+                center;
+
+
+            min-height:
+                24px;
+
+
             font-size:
-                13px;
+                14px;
 
 
             line-height:
-                18px;
+                20px;
 
 
             font-weight:
-                800;
+                850;
 
 
             color:
-                #ff7474;
+                #ff7777;
+
+
+            text-shadow:
+                0 0 10px
+                rgba(255,80,80,.08);
 
         }
 
@@ -5476,19 +6098,40 @@ function createAccountValidator() {
         .av-error-detail {
 
             margin-top:
-                7px;
+                9px;
+
+
+            padding:
+                9px 11px;
+
+
+            border-left:
+                2px solid
+                rgba(255,95,95,.45);
+
+
+            border-radius:
+                3px;
+
+
+            background:
+                rgba(255,70,70,.035);
 
 
             font-size:
-                11px;
+                12px;
 
 
             line-height:
-                17px;
+                18px;
+
+
+            font-weight:
+                550;
 
 
             color:
-                #a1a9ba;
+                #b5bdce;
 
 
             word-break:
@@ -5504,7 +6147,7 @@ function createAccountValidator() {
         .av-json {
 
             max-height:
-                180px;
+                200px;
 
 
             overflow:
@@ -5512,36 +6155,36 @@ function createAccountValidator() {
 
 
             margin-top:
-                10px;
-
-
-            padding:
                 11px;
 
 
+            padding:
+                12px;
+
+
             border-radius:
-                7px;
+                8px;
 
 
             background:
-                #070b14;
+                #070b13;
 
 
             border:
                 1px solid
-                #202b44;
+                #25314b;
 
 
             color:
-                #9eadd5;
+                #aab9df;
 
 
             font-size:
-                10px;
+                11px;
 
 
             line-height:
-                15px;
+                16px;
 
 
             font-family:
@@ -5565,7 +6208,7 @@ function createAccountValidator() {
         .av-json::-webkit-scrollbar {
 
             width:
-                4px;
+                5px;
 
         }
 
@@ -5573,11 +6216,19 @@ function createAccountValidator() {
         .av-json::-webkit-scrollbar-thumb {
 
             background:
-                #3f4f78;
+                #43547b;
 
 
             border-radius:
                 10px;
+
+        }
+
+
+        .av-json::-webkit-scrollbar-thumb:hover {
+
+            background:
+                #566a99;
 
         }
 
@@ -5598,6 +6249,22 @@ function createAccountValidator() {
 
 
         /* ============================================================
+           SELECTION
+        ============================================================ */
+
+        #account-validator-panel ::selection {
+
+            background:
+                rgba(100,135,220,.30);
+
+
+            color:
+                #ffffff;
+
+        }
+
+
+        /* ============================================================
            RESPONSIVE
         ============================================================ */
 
@@ -5608,13 +6275,33 @@ function createAccountValidator() {
                 width:
                     calc(100vw - 30px);
 
+                min-width:
+                    0;
+
+                border-radius:
+                    15px;
+
+            }
+
+
+            .av-header {
+
+                height:
+                    78px;
+
+                padding:
+                    17px 18px;
+
             }
 
 
             .av-body {
 
+                height:
+                    calc(100% - 78px);
+
                 padding:
-                    18px;
+                    21px 18px 22px;
 
             }
 
@@ -5622,7 +6309,53 @@ function createAccountValidator() {
             .av-title {
 
                 font-size:
-                    16px;
+                    18px;
+
+            }
+
+
+            .av-subtitle {
+
+                font-size:
+                    10px;
+
+            }
+
+
+            .av-name {
+
+                font-size:
+                    18px;
+
+            }
+
+        }
+
+
+        /* ============================================================
+           REDUCED MOTION
+        ============================================================ */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            #account-validator-panel::after,
+
+            .av-header::before,
+
+            .av-bank-list.show,
+
+            .av-loading-dot {
+
+                animation:
+                    none !important;
+
+            }
+
+
+            #av-validate::before {
+
+                animation:
+                    none !important;
 
             }
 
