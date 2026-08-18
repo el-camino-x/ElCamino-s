@@ -2288,6 +2288,8 @@ opacity:0;
 }
 
 
+
+
 /* =========================
    CHECKBOX
 ========================= */
@@ -2389,6 +2391,10 @@ BANK FILTER
     <button id="ca">CHECK ALL</button>
     <button id="uc">UNCHECK</button>
   </div>
+
+  <button id="accountValidatorBtn">
+    ✦ ACCOUNT VALIDATOR
+  </button>
 
 </div>
 
@@ -2873,6 +2879,2859 @@ clicksterBtn.addEventListener('mouseup', () => {
 
 setClicksterButton(false);
 
+// ============================================================
+// ACCOUNT VALIDATOR
+// APIVALIDASI V4
+// EL-CAMINO SYSTEM
+// ============================================================
+
+
+// ============================================================
+// CONFIG
+// ============================================================
+
+const API_KEY = "ew_18371fce5b6cdb8aaf9356ef2777fd06ef3fe82c";
+
+const API_BASE =
+    "https://app.apivalidasi.my.id";
+
+
+// ============================================================
+// BANK / E-WALLET LIST
+// Sesuai daftar APIVALIDASI V4
+// ============================================================
+
+const AV_BANK_LIST = [
+
+    // =========================
+    // BANK
+    // =========================
+
+    ["BRI", "002"],
+    ["MANDIRI", "008"],
+    ["BNI", "009"],
+    ["DANAMON", "011"],
+    ["BANK PERMATA SYARIAH", "013"],
+    ["BCA", "014"],
+    ["BANK MAYBANK SYARIAH", "016"],
+    ["PANIN", "019"],
+    ["CIMB NIAGA", "022"],
+    ["UOB", "023"],
+    ["OCBC", "028"],
+    ["CITIBANK", "031"],
+    ["JPMCC1IN", "032"],
+    ["BANK OF AMERICA", "033"],
+    ["CCB INDONESIA", "036"],
+    ["AG INT", "037"],
+    ["HSBC", "041"],
+    ["TOKYO MUFJ", "042"],
+    ["DBS", "046"],
+    ["BANK RESONA PERDANIA", "047"],
+    ["BANK MIZUHO", "048"],
+    ["STANDARD CHARTER", "050"],
+    ["CAPITAL INDONESIA", "054"],
+    ["BNP PARIBAS", "057"],
+    ["RABOBANK", "060"],
+    ["ANZ", "061"],
+    ["DEUTSCHE", "067"],
+    ["CHINA LTD", "069"],
+
+    ["BUMI ARTA", "076"],
+    ["EKONOMI RAHARJA", "087"],
+    ["ANTAR DAERAH", "088"],
+    ["J TRUST", "095"],
+    ["MAYAPADA", "097"],
+
+    ["BJB BPD JABAR BANTEN", "110"],
+    ["BANK JAKARTA SYARIAH", "111"],
+    ["BPD YOGYAKARTA", "112"],
+    ["BPD JATENG", "113"],
+    ["BPD JAWA TIMUR SYARIAH", "114"],
+    ["BPD JAMBI", "115"],
+    ["ACEH", "116"],
+    ["BPD SUMUT", "117"],
+    ["BANK NAGARI", "118"],
+    ["BPD RIAU KEPRI", "119"],
+    ["BPD SUMATERA SELATAN DAN BANGKA BELITUNG SYARIAH", "120"],
+    ["BPD LAMPUNG", "121"],
+    ["BPD KALIMANTAN SELATAN SYARIAH", "122"],
+    ["BPD KALBAR", "123"],
+    ["BPD KALTIM", "124"],
+    ["KALTENG", "125"],
+    ["BPD SULSEL SELBAR", "126"],
+    ["BPD SULUTGO", "127"],
+    ["BPD NTB", "128"],
+    ["BPD BALI", "129"],
+    ["BPD NTT", "130"],
+    ["BPD MALUKU", "131"],
+    ["BPD PAPUA", "132"],
+    ["BPD BENGKULU", "133"],
+    ["BPD SULTENG", "134"],
+    ["BPD BANTEN", "137"],
+
+    ["BNP", "145"],
+    ["BOII", "146"],
+    ["MUAMALAT", "147"],
+    ["MESTIKA", "151"],
+    ["BANK SHINHAN", "152"],
+    ["SINARMAS", "153"],
+    ["MASPION", "157"],
+    ["GANESHA", "161"],
+    ["ICBC", "164"],
+    ["QNB", "167"],
+
+    ["BTN", "200"],
+    ["BWS", "212"],
+    ["SMBC", "213"],
+
+    ["BRI SYARIAH", "422"],
+    ["BJB SYARIAH", "425"],
+    ["MEGA", "426"],
+    ["BNI SYARIAH", "427"],
+    ["KB BUKOPIN", "441"],
+    ["BSI", "451"],
+    ["BISNIS INTERNASIONAL", "459"],
+    ["JASA JAKARTA", "472"],
+    ["HANA", "484"],
+    ["MNC", "485"],
+    ["NEO COMMERCE", "490"],
+    ["BRI AGRO", "494"],
+    ["SBI", "498"],
+    ["BCA DIGITAL", "501"],
+    ["NOBU", "503"],
+    ["MEGA SYARIAH", "506"],
+    ["INA", "513"],
+    ["PANIN SYARIAH", "517"],
+    ["PRIMA MASTER", "520"],
+    ["BANK BUKOPIN SYARIAH", "521"],
+    ["SAMPOERNA", "523"],
+    ["BANK OKE INDONESIA", "526"],
+    ["AMAR BANK", "531"],
+    ["SEABANK", "535"],
+    ["BCA SYARIAH", "536"],
+    ["JAGO", "542"],
+    ["BANK NANO SYARIAH", "546"],
+    ["BTPN SYARIAH", "547"],
+    ["MAS", "548"],
+    ["MAYORA", "553"],
+    ["INDEX", "555"],
+    ["CENTRATAMA", "559"],
+    ["SUPERBANK", "562"],
+    ["MANTAP", "564"],
+    ["VICTORIA", "566"],
+    ["ALLO BANK", "567"],
+    ["BANK IBK", "945"],
+    ["BANK ALADIN SYARIAH", "947"],
+    ["CHINATRUST", "949"],
+
+
+    // =========================
+    // E-WALLET
+    // =========================
+
+    ["DANA", "dana"],
+    ["GOPAY", "gopay"],
+    ["GOPAY DRIVER", "gopaydriver"],
+    ["LINKAJA", "linkaja"],
+    ["MAXIM", "maxim"],
+    ["OVO", "ovo"],
+    ["SHOPEEPAY", "shopeepay"]
+
+];
+
+
+// ============================================================
+// ESCAPE HTML
+// ============================================================
+
+function avEscape(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// ============================================================
+// VALIDATE ACCOUNT
+// ============================================================
+
+async function validateAccount(
+    bankCode,
+    accountNumber
+) {
+
+    if (!bankCode) {
+
+        throw new Error(
+            "BANK TIDAK DIDUKUNG"
+        );
+
+    }
+
+
+    if (!accountNumber) {
+
+        throw new Error(
+            "NOMOR REKENING KOSONG"
+        );
+
+    }
+
+
+    const url =
+        `${API_BASE}/api/v3/validate` +
+        `?code=${encodeURIComponent(bankCode)}` +
+        `&accountNumber=${encodeURIComponent(accountNumber)}`;
+
+
+    console.log(
+        "[ACCOUNT VALIDATOR] REQUEST:",
+        url
+    );
+
+
+    const response =
+        await fetch(
+            url,
+            {
+
+                method: "GET",
+
+                headers: {
+
+                    "X-API-Key":
+                        API_KEY,
+
+                    "X-Idempotency-Key":
+                        "elcamino-validator-" +
+                        Date.now()
+
+                }
+
+            }
+        );
+
+
+    let data;
+
+
+    try {
+
+        data =
+            await response.json();
+
+    }
+
+    catch {
+
+        throw new Error(
+            `Response API tidak valid (HTTP ${response.status})`
+        );
+
+    }
+
+
+    console.log(
+        "[ACCOUNT VALIDATOR] RESPONSE:",
+        response.status,
+        data
+    );
+
+
+    // ========================================================
+    // ERROR
+    // ========================================================
+
+    if (!response.ok) {
+
+        throw new Error(
+
+            data?.message ||
+
+            data?.error ||
+
+            data?.error_code ||
+
+            `HTTP ${response.status}`
+
+        );
+
+    }
+
+
+    if (
+        data?.success === false
+    ) {
+
+        throw new Error(
+
+            data?.message ||
+
+            data?.error ||
+
+            "Validasi gagal"
+
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+// ============================================================
+// CREATE PANEL
+// ============================================================
+
+function createAccountValidator() {
+
+
+    // Jangan double panel
+    if (
+        document.getElementById(
+            "account-validator-panel"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const panel =
+        document.createElement("div");
+
+
+    panel.id =
+        "account-validator-panel";
+
+
+    panel.innerHTML = `
+
+        <!-- =================================================
+             HEADER
+        ================================================= -->
+
+        <div class="av-header">
+
+            <div class="av-header-info">
+
+                <div class="av-title">
+                    ACCOUNT VALIDATOR
+                </div>
+
+                <div class="av-subtitle">
+                    EL-CAMINO BANK VERIFICATION
+                </div>
+
+            </div>
+
+
+            <button
+                id="av-close"
+                type="button"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             BODY
+        ================================================= -->
+
+        <div class="av-body">
+
+
+            <!-- BANK -->
+
+            <label>
+                BANK / E-WALLET
+            </label>
+
+
+            <div class="av-bank-picker">
+
+                <input
+                    id="av-bank-search"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="Cari bank / e-wallet..."
+                />
+
+
+                <input
+                    id="av-bank-value"
+                    type="hidden"
+                />
+
+
+                <div
+                    id="av-bank-list"
+                    class="av-bank-list"
+                ></div>
+
+            </div>
+
+
+            <!-- ACCOUNT -->
+
+            <label>
+                ACCOUNT NUMBER
+            </label>
+
+
+            <input
+                id="av-account"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="Masukkan nomor rekening"
+            />
+
+
+            <!-- VALIDATE -->
+
+            <button
+                id="av-validate"
+                type="button"
+            >
+                VALIDATE
+            </button>
+
+
+            <!-- RESULT -->
+
+            <div id="av-result">
+
+                <div class="av-result-title">
+                    RESULT
+                </div>
+
+
+                <div id="av-status">
+
+                    <div class="av-ready">
+                        READY TO VALIDATE
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        panel
+    );
+
+
+    // ========================================================
+    // ELEMENT
+    // ========================================================
+
+    const closeButton =
+        document.getElementById(
+            "av-close"
+        );
+
+
+    const bankSearch =
+        document.getElementById(
+            "av-bank-search"
+        );
+
+
+    const bankValue =
+        document.getElementById(
+            "av-bank-value"
+        );
+
+
+    const bankList =
+        document.getElementById(
+            "av-bank-list"
+        );
+
+
+    const accountInput =
+        document.getElementById(
+            "av-account"
+        );
+
+
+    const validateButton =
+        document.getElementById(
+            "av-validate"
+        );
+
+
+    const statusBox =
+        document.getElementById(
+            "av-status"
+        );
+
+
+    // ========================================================
+    // RENDER BANK LIST
+    // ========================================================
+
+    function renderBankList(
+        keyword = ""
+    ) {
+
+        const query =
+            keyword
+                .trim()
+                .toLowerCase();
+
+
+        const filtered =
+            AV_BANK_LIST.filter(
+                item => {
+
+                    const name =
+                        item[0]
+                            .toLowerCase();
+
+                    const code =
+                        item[1]
+                            .toLowerCase();
+
+
+                    return (
+                        name.includes(query) ||
+                        code.includes(query)
+                    );
+
+                }
+            );
+
+
+        bankList.innerHTML =
+            filtered.map(
+                item => `
+
+                    <div
+                        class="av-bank-item"
+                        data-name="${avEscape(item[0])}"
+                        data-code="${avEscape(item[1])}"
+                    >
+
+                        <span class="av-bank-name">
+                            ${avEscape(item[0])}
+                        </span>
+
+                        <span class="av-bank-code">
+                            ${avEscape(item[1])}
+                        </span>
+
+                    </div>
+
+                `
+            ).join("");
+
+
+        if (
+            !filtered.length
+        ) {
+
+            bankList.innerHTML = `
+
+                <div class="av-bank-empty">
+                    BANK TIDAK DITEMUKAN
+                </div>
+
+            `;
+
+        }
+
+
+        bankList
+            .querySelectorAll(
+                ".av-bank-item"
+            )
+            .forEach(
+                item => {
+
+                    item.onclick =
+                        () => {
+
+                            bankSearch.value =
+                                item.dataset.name;
+
+
+                            bankValue.value =
+                                item.dataset.code;
+
+
+                            bankList.classList.remove(
+                                "show"
+                            );
+
+                        };
+
+                }
+            );
+
+
+        bankList.classList.add(
+            "show"
+        );
+
+    }
+
+
+    // ========================================================
+    // BANK SEARCH
+    // ========================================================
+
+    bankSearch.addEventListener(
+        "focus",
+        () => {
+
+            renderBankList(
+                bankSearch.value
+            );
+
+        }
+    );
+
+
+    bankSearch.addEventListener(
+        "input",
+        () => {
+
+            bankValue.value =
+                "";
+
+            renderBankList(
+                bankSearch.value
+            );
+
+        }
+    );
+
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            if (
+                !event.target.closest(
+                    ".av-bank-picker"
+                )
+            ) {
+
+                bankList.classList.remove(
+                    "show"
+                );
+
+            }
+
+        }
+    );
+
+
+    // ========================================================
+    // CLOSE
+    // ========================================================
+
+    closeButton.onclick =
+        () => {
+
+            panel.remove();
+
+        };
+
+
+    // ========================================================
+    // DRAG PANEL
+    // ========================================================
+
+    let isDragging =
+        false;
+
+    let dragOffsetX =
+        0;
+
+    let dragOffsetY =
+        0;
+
+
+    const header =
+        panel.querySelector(
+            ".av-header"
+        );
+
+
+    header.addEventListener(
+        "mousedown",
+        event => {
+
+            if (
+                event.target.closest(
+                    "#av-close"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            isDragging =
+                true;
+
+
+            const rect =
+                panel.getBoundingClientRect();
+
+
+            dragOffsetX =
+                event.clientX -
+                rect.left;
+
+
+            dragOffsetY =
+                event.clientY -
+                rect.top;
+
+
+            panel.style.left =
+                rect.left + "px";
+
+
+            panel.style.top =
+                rect.top + "px";
+
+
+            panel.style.transform =
+                "none";
+
+
+            document.body.style.userSelect =
+                "none";
+
+        }
+    );
+
+
+    document.addEventListener(
+        "mousemove",
+        event => {
+
+            if (
+                !isDragging
+            ) {
+
+                return;
+
+            }
+
+
+            let x =
+                event.clientX -
+                dragOffsetX;
+
+
+            let y =
+                event.clientY -
+                dragOffsetY;
+
+
+            const maxX =
+                window.innerWidth -
+                panel.offsetWidth;
+
+
+            const maxY =
+                window.innerHeight -
+                panel.offsetHeight;
+
+
+            x =
+                Math.max(
+                    0,
+                    Math.min(
+                        x,
+                        maxX
+                    )
+                );
+
+
+            y =
+                Math.max(
+                    0,
+                    Math.min(
+                        y,
+                        maxY
+                    )
+                );
+
+
+            panel.style.left =
+                x + "px";
+
+
+            panel.style.top =
+                y + "px";
+
+        }
+    );
+
+
+    document.addEventListener(
+        "mouseup",
+        () => {
+
+            if (
+                !isDragging
+            ) {
+
+                return;
+
+            }
+
+
+            isDragging =
+                false;
+
+
+            document.body.style.userSelect =
+                "";
+
+        }
+    );
+
+
+    // ========================================================
+    // VALIDATE
+    // ========================================================
+
+    validateButton.onclick =
+        async () => {
+
+
+            const bankCode =
+                bankValue.value;
+
+
+            const bankName =
+                bankSearch.value
+                    .trim();
+
+
+            const accountNumber =
+                accountInput.value
+                    .trim();
+
+
+            // ------------------------------------------------
+            // CHECK BANK
+            // ------------------------------------------------
+
+            if (
+                !bankCode
+            ) {
+
+                statusBox.innerHTML = `
+
+                    <div class="av-error">
+                        ✕ PILIH BANK TERLEBIH DAHULU
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            // ------------------------------------------------
+            // CHECK ACCOUNT
+            // ------------------------------------------------
+
+            if (
+                !accountNumber
+            ) {
+
+                statusBox.innerHTML = `
+
+                    <div class="av-error">
+                        ✕ NOMOR REKENING KOSONG
+                    </div>
+
+                `;
+
+                accountInput.focus();
+
+                return;
+
+            }
+
+
+            // ------------------------------------------------
+            // LOADING
+            // ------------------------------------------------
+
+            validateButton.disabled =
+                true;
+
+
+            validateButton.textContent =
+                "CHECKING...";
+
+
+            statusBox.innerHTML = `
+
+                <div class="av-loading">
+
+                    <span class="av-loading-dot">
+                        ●
+                    </span>
+
+                    EL-CAMINO TEAM
+                    ON CHECKING...
+
+                </div>
+
+            `;
+
+
+            try {
+
+
+                const result =
+                    await validateAccount(
+                        bankCode,
+                        accountNumber
+                    );
+
+
+                console.log(
+                    "[ACCOUNT VALIDATOR] RESULT:",
+                    result
+                );
+
+
+                // =================================================
+                // ACCOUNT NAME
+                // =================================================
+
+                const name =
+
+                    result?.data?.account_name ||
+
+                    result?.data?.nama ||
+
+                    result?.account_name ||
+
+                    result?.nama ||
+
+                    result?.data?.accountName ||
+
+                    result?.accountName;
+
+
+                // =================================================
+                // SUCCESS
+                // =================================================
+
+                if (
+                    result?.success &&
+                    name
+                ) {
+
+                    statusBox.innerHTML = `
+
+                        <div class="av-success">
+
+                            <span class="av-success-icon">
+                                ✓
+                            </span>
+
+                            ACCOUNT VALID
+
+                        </div>
+
+
+                        <div class="av-name-label">
+                            ACCOUNT NAME
+                        </div>
+
+
+                        <div class="av-name">
+                            ${avEscape(name)}
+                        </div>
+
+
+                        <div class="av-bank-confirm">
+
+                            ${avEscape(bankName)}
+
+                            <span>•</span>
+
+                            ${avEscape(accountNumber)}
+
+                        </div>
+
+                    `;
+
+                }
+
+                else if (
+                    result?.success
+                ) {
+
+                    statusBox.innerHTML = `
+
+                        <div class="av-success">
+
+                            ✓ REQUEST SUCCESS
+
+                        </div>
+
+
+                        <pre class="av-json">${avEscape(
+                            JSON.stringify(
+                                result,
+                                null,
+                                2
+                            )
+                        )}</pre>
+
+                    `;
+
+                }
+
+                else {
+
+                    throw new Error(
+                        result?.message ||
+                        "Validasi gagal"
+                    );
+
+                }
+
+
+            }
+
+
+            catch (
+                error
+            ) {
+
+
+                console.error(
+                    "[ACCOUNT VALIDATOR]",
+                    error
+                );
+
+
+                statusBox.innerHTML = `
+
+                    <div class="av-error">
+
+                        ✕ VALIDATION ERROR
+
+                    </div>
+
+
+                    <div class="av-error-detail">
+
+                        ${avEscape(
+                            error.message
+                        )}
+
+                    </div>
+
+                `;
+
+            }
+
+
+            finally {
+
+
+                validateButton.disabled =
+                    false;
+
+
+                validateButton.textContent =
+                    "VALIDATE";
+
+            }
+
+        };
+
+
+    // ========================================================
+    // ENTER = VALIDATE
+    // ========================================================
+
+    accountInput.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "Enter"
+            ) {
+
+                validateButton.click();
+
+            }
+
+        }
+    );
+
+
+    // ========================================================
+    // DEFAULT FOCUS
+    // ========================================================
+
+    setTimeout(
+        () => {
+
+            bankSearch.focus();
+
+        },
+        100
+    );
+
+}
+
+
+(function injectAccountValidatorCSS() {
+
+    if (
+        document.getElementById(
+            "account-validator-style"
+        )
+    ) {
+        return;
+    }
+
+    const style =
+        document.createElement("style");
+
+    style.id =
+        "account-validator-style";
+
+    style.textContent = `
+
+        /* ============================================================
+           EL CAMINO ACCOUNT VALIDATOR
+           DARK / SOLID PREMIUM STYLE
+           CSS ONLY
+        ============================================================ */
+
+
+        /* ============================================================
+           MAIN PANEL
+        ============================================================ */
+
+        #account-validator-panel {
+
+            position: fixed;
+
+            top: 50%;
+            left: 50%;
+
+            transform:
+                translate(-50%, -50%);
+
+            width: 400px;
+
+            min-width: 340px;
+
+            max-width: 700px;
+
+            min-height: 340px;
+
+            max-height: 85vh;
+
+            resize: both;
+
+            overflow: hidden;
+
+            box-sizing: border-box;
+
+            isolation: isolate;
+
+
+            background:
+
+                linear-gradient(
+                    145deg,
+
+                    #080b16 0%,
+
+                    #0a0d1b 48%,
+
+                    #0d0b1d 100%
+                );
+
+
+            color:
+                #f5f7ff;
+
+
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+
+            border:
+                1px solid
+                rgba(112,137,220,.42);
+
+
+            border-radius:
+                16px;
+
+
+            box-shadow:
+
+                0 18px 45px
+                rgba(0,0,0,.72),
+
+                0 0 25px
+                rgba(55,75,150,.10),
+
+                inset
+                0 1px 0
+                rgba(255,255,255,.035);
+
+
+            z-index:
+                999999999;
+
+        }
+
+
+        /* ============================================================
+           VERY SUBTLE BACKGROUND LIGHT
+        ============================================================ */
+
+        #account-validator-panel::before {
+
+            content:
+                "";
+
+            position:
+                absolute;
+
+            inset:
+                0;
+
+            border-radius:
+                16px;
+
+            pointer-events:
+                none;
+
+            z-index:
+                0;
+
+
+            background:
+
+                radial-gradient(
+                    circle at 10% 0%,
+
+                    rgba(55,95,190,.09),
+
+                    transparent 32%
+                ),
+
+                radial-gradient(
+                    circle at 100% 100%,
+
+                    rgba(105,65,180,.07),
+
+                    transparent 35%
+                );
+
+        }
+
+
+        /* ============================================================
+           SUBTLE RUNNING LIGHT
+        ============================================================ */
+
+        #account-validator-panel::after {
+
+            content:
+                "";
+
+            position:
+                absolute;
+
+            left:
+                0;
+
+            right:
+                0;
+
+            bottom:
+                0;
+
+            height:
+                2px;
+
+
+            background:
+
+                linear-gradient(
+                    90deg,
+
+                    transparent,
+
+                    #527edc,
+
+                    #7264d9,
+
+                    #527edc,
+
+                    transparent
+                );
+
+
+            background-size:
+                220% 100%;
+
+
+            animation:
+                avRunningLine
+                3.5s linear infinite;
+
+
+            opacity:
+                .65;
+
+
+            pointer-events:
+                none;
+
+            z-index:
+                3;
+
+        }
+
+
+        @keyframes avRunningLine {
+
+            0% {
+
+                background-position:
+                    220% 0;
+
+            }
+
+            100% {
+
+                background-position:
+                    -220% 0;
+
+            }
+
+        }
+
+
+        /* ============================================================
+           CONTENT ABOVE BACKGROUND
+        ============================================================ */
+
+        #account-validator-panel > * {
+
+            position:
+                relative;
+
+            z-index:
+                2;
+
+        }
+
+
+        /* ============================================================
+           HEADER
+        ============================================================ */
+
+        .av-header {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+
+            height:
+                76px;
+
+
+            box-sizing:
+                border-box;
+
+
+            padding:
+                17px 20px;
+
+
+            border-bottom:
+                1px solid
+                rgba(110,130,200,.18);
+
+
+            cursor:
+                move;
+
+
+            user-select:
+                none;
+
+
+            background:
+
+                linear-gradient(
+                    180deg,
+
+                    #0b0f1d,
+
+                    #090c17
+                );
+
+
+            position:
+                relative;
+
+            overflow:
+                hidden;
+
+        }
+
+
+        /* ============================================================
+           HEADER ACCENT
+        ============================================================ */
+
+        .av-header::after {
+
+            content:
+                "";
+
+            position:
+                absolute;
+
+            left:
+                20px;
+
+            right:
+                20px;
+
+            bottom:
+                0;
+
+            height:
+                1px;
+
+
+            background:
+
+                linear-gradient(
+                    90deg,
+
+                    transparent,
+
+                    rgba(88,130,230,.8),
+
+                    rgba(120,95,220,.8),
+
+                    transparent
+                );
+
+
+            box-shadow:
+
+                0 0 6px
+                rgba(80,120,230,.25);
+
+        }
+
+
+        /* ============================================================
+           HEADER INFO
+        ============================================================ */
+
+        .av-header-info {
+
+            min-width:
+                0;
+
+        }
+
+
+        .av-title {
+
+            font-size:
+                18px;
+
+            line-height:
+                22px;
+
+            font-weight:
+                800;
+
+
+            letter-spacing:
+                .4px;
+
+
+            color:
+                #ffffff;
+
+
+            white-space:
+                nowrap;
+
+
+            text-shadow:
+                0 1px 2px
+                rgba(0,0,0,.7);
+
+        }
+
+
+        .av-subtitle {
+
+            margin-top:
+                5px;
+
+
+            font-size:
+                10px;
+
+
+            line-height:
+                13px;
+
+
+            font-weight:
+                600;
+
+
+            letter-spacing:
+                1px;
+
+
+            color:
+                #8998c7;
+
+        }
+
+
+        /* ============================================================
+           CLOSE BUTTON
+        ============================================================ */
+
+        #av-close {
+
+            width:
+                32px;
+
+            height:
+                32px;
+
+
+            flex-shrink:
+                0;
+
+
+            padding:
+                0;
+
+
+            border:
+                1px solid
+                rgba(120,140,200,.22);
+
+
+            border-radius:
+                8px;
+
+
+            background:
+                #151a2a;
+
+
+            color:
+                #e9ecf7;
+
+
+            font-size:
+                20px;
+
+
+            line-height:
+                30px;
+
+
+            font-weight:
+                400;
+
+
+            cursor:
+                pointer;
+
+
+            transition:
+                .2s;
+
+
+            box-shadow:
+                inset
+                0 1px 0
+                rgba(255,255,255,.04);
+
+        }
+
+
+        #av-close:hover {
+
+            background:
+                #20263a;
+
+
+            border-color:
+                rgba(120,155,240,.55);
+
+
+            color:
+                #ffffff;
+
+
+            box-shadow:
+                0 0 12px
+                rgba(75,115,220,.18);
+
+        }
+
+
+        #av-close:active {
+
+            transform:
+                scale(.96);
+
+        }
+
+
+        /* ============================================================
+           BODY
+        ============================================================ */
+
+        .av-body {
+
+            box-sizing:
+                border-box;
+
+
+            height:
+                calc(100% - 76px);
+
+
+            min-height:
+                260px;
+
+
+            padding:
+                22px;
+
+
+            overflow-y:
+                auto;
+
+
+            scrollbar-width:
+                thin;
+
+
+            scrollbar-color:
+                #3d4d78
+                transparent;
+
+        }
+
+
+        .av-body::-webkit-scrollbar {
+
+            width:
+                4px;
+
+        }
+
+
+        .av-body::-webkit-scrollbar-track {
+
+            background:
+                transparent;
+
+        }
+
+
+        .av-body::-webkit-scrollbar-thumb {
+
+            background:
+                #3d4d78;
+
+            border-radius:
+                10px;
+
+        }
+
+
+        /* ============================================================
+           LABELS
+        ============================================================ */
+
+        .av-body label {
+
+            display:
+                block;
+
+
+            margin:
+                0 0 8px;
+
+
+            font-size:
+                11px;
+
+
+            line-height:
+                14px;
+
+
+            font-weight:
+                800;
+
+
+            color:
+                #b8c4e8;
+
+
+            letter-spacing:
+                .8px;
+
+
+            text-transform:
+                uppercase;
+
+        }
+
+
+        /* ============================================================
+           BANK PICKER
+           FUNCTION TETAP
+        ============================================================ */
+
+        .av-bank-picker {
+
+            position:
+                relative;
+
+            width:
+                100%;
+
+            margin-bottom:
+                18px;
+
+        }
+
+
+        /* ============================================================
+           INPUTS
+        ============================================================ */
+
+        .av-body input {
+
+            box-sizing:
+                border-box;
+
+
+            width:
+                100%;
+
+
+            height:
+                46px;
+
+
+            padding:
+                0 14px;
+
+
+            border:
+                1px solid
+                #293450;
+
+
+            border-radius:
+                9px;
+
+
+            outline:
+                none;
+
+
+            background:
+                #0d1220;
+
+
+            color:
+                #f7f9ff;
+
+
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+
+            font-size:
+                14px;
+
+
+            font-weight:
+                500;
+
+
+            letter-spacing:
+                .15px;
+
+
+            box-shadow:
+
+                inset
+                0 1px 3px
+                rgba(0,0,0,.45);
+
+
+            transition:
+                border-color .2s,
+                box-shadow .2s,
+                background .2s;
+
+        }
+
+
+        .av-body input::placeholder {
+
+            color:
+                #7f8aaa;
+
+
+            opacity:
+                1;
+
+        }
+
+
+        .av-body input:focus {
+
+            border-color:
+                #5877c4;
+
+
+            background:
+                #0f1525;
+
+
+            box-shadow:
+
+                0 0 0 2px
+                rgba(70,105,190,.12),
+
+                inset
+                0 1px 3px
+                rgba(0,0,0,.5);
+
+        }
+
+
+        #av-account {
+
+            margin-bottom:
+                18px;
+
+        }
+
+
+        /* ============================================================
+           BANK DROPDOWN
+           FUNCTION TETAP
+        ============================================================ */
+
+        .av-bank-list {
+
+            display:
+                none;
+
+
+            position:
+                absolute;
+
+
+            top:
+                calc(100% + 6px);
+
+
+            left:
+                0;
+
+
+            right:
+                0;
+
+
+            max-height:
+                260px;
+
+
+            overflow-y:
+                auto;
+
+
+            background:
+                #0a0f1c;
+
+
+            border:
+                1px solid
+                #34415f;
+
+
+            border-radius:
+                9px;
+
+
+            box-shadow:
+
+                0 18px 35px
+                rgba(0,0,0,.75);
+
+
+            z-index:
+                1000;
+
+        }
+
+
+        .av-bank-list.show {
+
+            display:
+                block;
+
+        }
+
+
+        .av-bank-list::-webkit-scrollbar {
+
+            width:
+                4px;
+
+        }
+
+
+        .av-bank-list::-webkit-scrollbar-track {
+
+            background:
+                #080c16;
+
+        }
+
+
+        .av-bank-list::-webkit-scrollbar-thumb {
+
+            background:
+                #3f4f78;
+
+
+            border-radius:
+                10px;
+
+        }
+
+
+        .av-bank-item {
+
+            display:
+                flex;
+
+
+            align-items:
+                center;
+
+
+            justify-content:
+                space-between;
+
+
+            gap:
+                12px;
+
+
+            min-height:
+                44px;
+
+
+            box-sizing:
+                border-box;
+
+
+            padding:
+                10px 13px;
+
+
+            border-bottom:
+                1px solid
+                rgba(110,130,180,.10);
+
+
+            cursor:
+                pointer;
+
+
+            transition:
+                background .18s,
+                border-color .18s;
+
+        }
+
+
+        .av-bank-item:last-child {
+
+            border-bottom:
+                none;
+
+        }
+
+
+        .av-bank-item:hover {
+
+            background:
+                #151d31;
+
+
+            box-shadow:
+                inset
+                2px 0
+                #5b7fd3;
+
+        }
+
+
+        .av-bank-name {
+
+            color:
+                #f0f3fb;
+
+
+            font-size:
+                12px;
+
+
+            font-weight:
+                650;
+
+
+            overflow:
+                hidden;
+
+
+            text-overflow:
+                ellipsis;
+
+
+            white-space:
+                nowrap;
+
+        }
+
+
+        .av-bank-code {
+
+            flex-shrink:
+                0;
+
+
+            color:
+                #8999c8;
+
+
+            font-size:
+                10px;
+
+
+            font-weight:
+                600;
+
+
+            letter-spacing:
+                .4px;
+
+        }
+
+
+        .av-bank-empty {
+
+            padding:
+                18px;
+
+
+            text-align:
+                center;
+
+
+            color:
+                #7885a5;
+
+
+            font-size:
+                11px;
+
+        }
+
+
+        /* ============================================================
+           VALIDATE BUTTON
+        ============================================================ */
+
+        #av-validate {
+
+            width:
+                100%;
+
+
+            height:
+                46px;
+
+
+            border:
+                1px solid
+                rgba(100,125,195,.32);
+
+
+            border-radius:
+                9px;
+
+
+            background:
+
+                linear-gradient(
+                    110deg,
+
+                    #253253,
+
+                    #303d66,
+
+                    #34305d
+                );
+
+
+            color:
+                #ffffff;
+
+
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+
+            font-size:
+                13px;
+
+
+            font-weight:
+                800;
+
+
+            letter-spacing:
+                .7px;
+
+
+            cursor:
+                pointer;
+
+
+            transition:
+                .2s;
+
+
+            box-shadow:
+
+                0 5px 15px
+                rgba(0,0,0,.4),
+
+                inset
+                0 1px 0
+                rgba(255,255,255,.06);
+
+        }
+
+
+        #av-validate:hover {
+
+            background:
+
+                linear-gradient(
+                    110deg,
+
+                    #30446f,
+
+                    #3c4d7a,
+
+                    #403a70
+                );
+
+
+            border-color:
+                rgba(110,145,225,.55);
+
+
+            transform:
+                translateY(-1px);
+
+
+            box-shadow:
+
+                0 8px 18px
+                rgba(0,0,0,.45),
+
+                0 0 14px
+                rgba(70,110,210,.14);
+
+        }
+
+
+        #av-validate:active {
+
+            transform:
+                translateY(0);
+
+        }
+
+
+        #av-validate:disabled {
+
+            opacity:
+                .5;
+
+
+            cursor:
+                not-allowed;
+
+        }
+
+
+        /* ============================================================
+           RESULT PANEL
+        ============================================================ */
+
+        #av-result {
+
+            margin-top:
+                18px;
+
+
+            padding:
+                16px;
+
+
+            border:
+                1px solid
+                #273451;
+
+
+            border-radius:
+                10px;
+
+
+            background:
+                #0b101c;
+
+
+            box-sizing:
+                border-box;
+
+
+            box-shadow:
+
+                inset
+                0 1px 3px
+                rgba(0,0,0,.35);
+
+        }
+
+
+        .av-result-title {
+
+            margin-bottom:
+                10px;
+
+
+            font-size:
+                11px;
+
+
+            line-height:
+                14px;
+
+
+            font-weight:
+                800;
+
+
+            color:
+                #aab7df;
+
+
+            letter-spacing:
+                .8px;
+
+
+            text-transform:
+                uppercase;
+
+        }
+
+
+        /* ============================================================
+           READY
+        ============================================================ */
+
+        .av-ready {
+
+            font-size:
+                12px;
+
+
+            line-height:
+                18px;
+
+
+            color:
+                #7d8aa8;
+
+        }
+
+
+        /* ============================================================
+           LOADING
+        ============================================================ */
+
+        .av-loading {
+
+            display:
+                flex;
+
+
+            align-items:
+                center;
+
+
+            gap:
+                8px;
+
+
+            font-size:
+                12px;
+
+
+            color:
+                #b2bad0;
+
+        }
+
+
+        .av-loading-dot {
+
+            display:
+                inline-block;
+
+
+            color:
+                #7193e4;
+
+
+            animation:
+                avPulse
+                1s infinite;
+
+        }
+
+
+        @keyframes avPulse {
+
+            0%,
+            100% {
+                opacity:
+                    .35;
+            }
+
+            50% {
+                opacity:
+                    1;
+            }
+
+        }
+
+
+        /* ============================================================
+           SUCCESS
+        ============================================================ */
+
+        .av-success {
+
+            display:
+                flex;
+
+
+            align-items:
+                center;
+
+
+            gap:
+                7px;
+
+
+            font-size:
+                13px;
+
+
+            line-height:
+                18px;
+
+
+            font-weight:
+                800;
+
+
+            color:
+                #70e3a1;
+
+        }
+
+
+        .av-success-icon {
+
+            font-size:
+                15px;
+
+        }
+
+
+        .av-name-label {
+
+            margin-top:
+                15px;
+
+
+            font-size:
+                10px;
+
+
+            line-height:
+                13px;
+
+
+            font-weight:
+                800;
+
+
+            color:
+                #8795bd;
+
+
+            letter-spacing:
+                .8px;
+
+
+            text-transform:
+                uppercase;
+
+        }
+
+
+        .av-name {
+
+            margin-top:
+                5px;
+
+
+            font-size:
+                17px;
+
+
+            line-height:
+                23px;
+
+
+            font-weight:
+                800;
+
+
+            color:
+                #ffffff;
+
+
+            word-break:
+                break-word;
+
+        }
+
+
+        .av-bank-confirm {
+
+            display:
+                flex;
+
+
+            gap:
+                5px;
+
+
+            margin-top:
+                8px;
+
+
+            color:
+                #7d89a7;
+
+
+            font-size:
+                10px;
+
+
+            line-height:
+                15px;
+
+
+            word-break:
+                break-word;
+
+        }
+
+
+        /* ============================================================
+           ERROR
+        ============================================================ */
+
+        .av-error {
+
+            font-size:
+                13px;
+
+
+            line-height:
+                18px;
+
+
+            font-weight:
+                800;
+
+
+            color:
+                #ff7474;
+
+        }
+
+
+        .av-error-detail {
+
+            margin-top:
+                7px;
+
+
+            font-size:
+                11px;
+
+
+            line-height:
+                17px;
+
+
+            color:
+                #a1a9ba;
+
+
+            word-break:
+                break-word;
+
+        }
+
+
+        /* ============================================================
+           JSON
+        ============================================================ */
+
+        .av-json {
+
+            max-height:
+                180px;
+
+
+            overflow:
+                auto;
+
+
+            margin-top:
+                10px;
+
+
+            padding:
+                11px;
+
+
+            border-radius:
+                7px;
+
+
+            background:
+                #070b14;
+
+
+            border:
+                1px solid
+                #202b44;
+
+
+            color:
+                #9eadd5;
+
+
+            font-size:
+                10px;
+
+
+            line-height:
+                15px;
+
+
+            font-family:
+                "Cascadia Code",
+                "SFMono-Regular",
+                Consolas,
+                "Courier New",
+                monospace;
+
+
+            white-space:
+                pre-wrap;
+
+
+            word-break:
+                break-word;
+
+        }
+
+
+        .av-json::-webkit-scrollbar {
+
+            width:
+                4px;
+
+        }
+
+
+        .av-json::-webkit-scrollbar-thumb {
+
+            background:
+                #3f4f78;
+
+
+            border-radius:
+                10px;
+
+        }
+
+
+        /* ============================================================
+           CSS VARIABLES
+        ============================================================ */
+
+        #account-validator-panel {
+
+            --av-blue:
+                #7193e4;
+
+            --av-purple:
+                #7568c8;
+
+        }
+
+
+        /* ============================================================
+           RESPONSIVE
+        ============================================================ */
+
+        @media (max-width: 520px) {
+
+            #account-validator-panel {
+
+                width:
+                    calc(100vw - 30px);
+
+            }
+
+
+            .av-body {
+
+                padding:
+                    18px;
+
+            }
+
+
+            .av-title {
+
+                font-size:
+                    16px;
+
+            }
+
+        }
+
+    `;
+
+
+    document.head.appendChild(
+        style
+    );
+
+})();
+
+// ============================================================
+// ACCOUNT VALIDATOR BUTTON
+// OPEN ONLY WHEN BUTTON IS CLICKED
+// ============================================================
+
+function initAccountValidatorButton() {
+
+    const host =
+        document.getElementById("payHostUI");
+
+    const button =
+        host?.shadowRoot?.querySelector("#accountValidatorBtn");
+
+    if (!button) {
+
+        console.warn(
+            "[ACCOUNT VALIDATOR] Button tidak ditemukan."
+        );
+
+        return;
+
+    }
+
+
+    // Hindari event listener dobel
+    if (button.dataset.avBound === "1") {
+        return;
+    }
+
+    button.dataset.avBound = "1";
+
+
+    button.addEventListener("click", () => {
+
+        console.log(
+            "[ACCOUNT VALIDATOR] Opening..."
+        );
+
+
+        // Kalau panel sudah ada,
+        // jangan bikin panel kedua
+        const existing =
+            document.getElementById(
+                "account-validator-panel"
+            );
+
+
+        if (existing) {
+
+            existing.style.display = "block";
+
+            return;
+
+        }
+
+
+        createAccountValidator();
+
+    });
+
+}
+
+
+// ============================================================
+// WAIT UNTIL MAIN EL-CAMINO UI EXISTS
+// ============================================================
+
+(function waitForAccountValidatorButton() {
+
+    const interval =
+        setInterval(() => {
+
+            const host =
+                document.getElementById("payHostUI");
+
+            const button =
+                host?.shadowRoot?.querySelector(
+                    "#accountValidatorBtn"
+                );
+
+            if (button) {
+
+                clearInterval(interval);
+
+                initAccountValidatorButton();
+
+                console.log(
+                    "[ACCOUNT VALIDATOR] Button connected."
+                );
+
+            }
+
+        }, 300);
+
+})();
 
 // =========================
 // CLICKSTER CONTROL
