@@ -649,45 +649,52 @@ let style = document.createElement('style');
 }
 
 
-/* running light */
+/* =========================================================
+   TOP SWEEP
+   ::after
+========================================================= */
 
-.h::before{
+.h::after{
     content:"";
 
     position:absolute;
 
-    left:0;
-    bottom:0;
+    top:0;
+    left:-130%;
 
-    width:100%;
-    height:2px;
+    width:75%;
+    height:100%;
 
     background:
         linear-gradient(
-            90deg,
-            transparent 0%,
-            #5c9dff 20%,
-            #746cff 38%,
-            #a06fff 50%,
-            #62d5ff 62%,
-            #746cff 80%,
-            #5c9dff 100%
+            110deg,
+            transparent,
+            rgba(130,180,255,.25),
+            rgba(170,130,255,.30),
+            transparent
         );
 
-    background-size:220% 100%;
+    transform:skewX(-25deg);
 
-    animation:headerRunningLight 2.5s linear infinite;
-
-    box-shadow:
-        0 0 5px rgba(100,140,255,.8),
-        0 0 10px rgba(120,90,255,.45),
-        0 0 18px rgba(90,180,255,.2);
-
-    opacity:.9;
+    animation:
+        headerScan 3.2s linear infinite;
 
     pointer-events:none;
 
-    z-index:3;
+    z-index:1;
+}
+
+
+@keyframes caminoFullRunningLight{
+
+    0%{
+        background-position:200% 0;
+    }
+
+    100%{
+        background-position:-200% 0;
+    }
+
 }
 
 
@@ -3270,6 +3277,186 @@ input[type="checkbox"]{
     display:none;
 }
 
+/* =========================================================
+   HEADER MINIMIZE
+========================================================= */
+
+.camino-minimize-btn{
+    position:absolute;
+
+    right:12px;
+    top:50%;
+
+    transform:translateY(-50%);
+
+    width:32px;
+    height:32px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:0;
+
+    border:1px solid rgba(110,145,255,.20);
+    border-radius:8px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20,28,52,.90),
+            rgba(12,16,32,.90)
+        );
+
+    color:#a9c5ff;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size:22px;
+    font-weight:400;
+
+    line-height:1;
+
+    cursor:pointer;
+
+    z-index:60;
+
+    box-shadow:
+        0 0 8px rgba(70,120,255,.08),
+        inset 0 1px 0 rgba(255,255,255,.06);
+
+    transition:
+        transform .18s ease,
+        background .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease,
+        color .2s ease;
+}
+
+.camino-minimize-btn:hover{
+    transform:
+        translateY(-50%)
+        scale(1.06);
+
+    color:#fff;
+
+    border-color:
+        rgba(120,160,255,.55);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(35,48,82,.95),
+            rgba(18,24,48,.95)
+        );
+
+    box-shadow:
+        0 0 10px rgba(80,140,255,.20),
+        0 0 20px rgba(120,80,255,.10),
+        inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.camino-minimize-btn:active{
+    transform:
+        translateY(-50%)
+        scale(.94);
+}
+
+/* =========================================================
+   MINIMIZED PANEL
+   KEEP ORIGINAL WIDTH
+========================================================= */
+
+.p.camino-minimized{
+    height:58px !important;
+    min-height:58px !important;
+
+    /* JANGAN TENTUKAN WIDTH */
+    overflow:hidden !important;
+
+    border-radius:16px !important;
+
+    box-sizing:border-box !important;
+
+    border:1px solid rgba(120,145,255,.45) !important;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.55),
+        0 0 18px rgba(80,120,255,.12),
+        inset 0 0 20px rgba(70,110,255,.08) !important;
+}
+
+
+/* sembunyikan isi */
+.p.camino-minimized .camino-sidebar,
+.p.camino-minimized .camino-content{
+    display:none !important;
+}
+
+
+/* header tetap mengikuti lebar panel */
+.p.camino-minimized .h{
+    width:100% !important;
+
+    height:58px !important;
+    min-height:58px !important;
+
+    border-radius:16px !important;
+
+    overflow:hidden !important;
+
+    box-sizing:border-box !important;
+
+    border-bottom:none !important;
+}
+
+/* NORMAL */
+.p {
+    transition: none !important;
+}
+
+/* ISI HILANG SMOOTH */
+.p.camino-minimized .camino-sidebar,
+.p.camino-minimized .camino-content {
+    opacity: 0 !important;
+    pointer-events: none !important;
+
+    transition: opacity .25s ease !important;
+}
+
+/* MINIMIZE SMOOTH */
+.p.camino-minimized {
+    transition:
+        width .35s cubic-bezier(.22,1,.36,1),
+        height .35s cubic-bezier(.22,1,.36,1),
+        border-radius .3s ease !important;
+}
+
+.p.camino-minimized .h {
+    width: 100% !important;
+    height: 58px !important;
+    min-height: 58px !important;
+
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    border-bottom: none !important;
+}
+
+.p {
+    resize: both !important;
+
+    min-width: 500px !important;
+    min-height: 475px !important;
+
+    max-width: 1000px !important;
+    max-height: 800px !important;
+
+    transition: none !important;
+}
+
 `;
 
     let w = document.createElement('div');
@@ -3279,7 +3466,7 @@ w.innerHTML = `
 
     <span class="status-dot"></span>
 
-    <span>
+    <span class="camino-header-title">
         ElCamino-爱 Operation V1.3
     </span>
 
@@ -3289,6 +3476,14 @@ w.innerHTML = `
     >
         ⓘ
     </span>
+
+    <button
+        type="button"
+        id="caminoMinimizeBtn"
+        class="camino-minimize-btn"
+    >
+        −
+    </button>
 
 </div>
 
@@ -3397,27 +3592,15 @@ w.innerHTML = `
 
 
             <h3>
-                ⓘ BOX INFORMATION
+                ⓘ JADWAL BANK CUT OFF
             </h3>
 
 
             <div class="cutoff-content">
 
-                <b>
-                    <img
-                        class="logo"
-                        src="https://static.vecteezy.com/system/resources/thumbnails/021/616/845/small/banking-3d-render-icon-illustration-png.png"
-                    >
-                    BANK CUT OFF
-                </b>
-
-
-                <br><br>
-
-
                 <img
                     class="logo"
-                    src="https://static.vecteezy.com/system/resources/thumbnails/067/065/645/small_2x/dana-logo-square-rounded-dana-logo-free-download-dana-logo-free-png.png"
+                    src="https://d33egg70nrp50s.cloudfront.net/Images/bank-thumbnails/dana.webp?v=607200919"
                 >
                 DANA : 00.00 - 00.03
 
@@ -3427,7 +3610,7 @@ w.innerHTML = `
 
                 <img
                     class="logo"
-                    src="https://static.vecteezy.com/system/resources/thumbnails/067/065/651/small_2x/ovo-logo-square-rounded-ovo-logo-free-download-ovo-logo-free-png.png"
+                    src="https://d33egg70nrp50s.cloudfront.net/Images/bank-thumbnails/ovo.webp?v=607200919"
                 >
                 OVO : 00.00 - 00.03
 
@@ -3437,7 +3620,7 @@ w.innerHTML = `
 
                 <img
                     class="logo"
-                    src="https://static.vecteezy.com/system/resources/previews/067/065/676/non_2x/gopay-logo-square-rounded-gopay-logo-free-download-gopay-logo-free-png.png"
+                    src="https://d33egg70nrp50s.cloudfront.net/Images/bank-thumbnails/gopay.webp?v=607200919"
                 >
                 GOPAY : 00.00 - 00.04
 
@@ -3447,7 +3630,7 @@ w.innerHTML = `
 
                 <img
                     class="logo"
-                    src="https://static.vecteezy.com/system/resources/thumbnails/067/565/518/small_2x/bank-bca-square-rounded-logo-free-png.png"
+                    src="https://d33egg70nrp50s.cloudfront.net/Images/bank-thumbnails/bca.webp?v=607200919"
                 >
                 BCA : 00.00 - 00.05
 
@@ -3467,7 +3650,7 @@ w.innerHTML = `
 
                 <img
                     class="logo"
-                    src="https://static.vecteezy.com/system/resources/previews/067/565/455/non_2x/bank-syariah-indonesia-square-rounded-logo-transparent-without-background-free-png.png"
+                    src="https://d33egg70nrp50s.cloudfront.net/Images/bank-thumbnails/bsi.webp?v=607200919"
                 >
                 BSI : 00.00 - 00.15
 
@@ -3477,7 +3660,7 @@ w.innerHTML = `
 
                 <img
                     class="logo"
-                    src="https://static.vecteezy.com/system/resources/previews/067/565/533/non_2x/bank-jago-square-rounded-logo-transparent-without-background-free-png.png"
+                    src="https://d33egg70nrp50s.cloudfront.net/Images/bank-thumbnails/jago.webp?v=607200919"
                 >
                 JAGO : 00.00 - 00.15
 
@@ -3487,7 +3670,7 @@ w.innerHTML = `
 
                 <img
                     class="logo"
-                    src="https://static.vecteezy.com/system/resources/previews/067/565/453/non_2x/maybank-indonesia-square-rounded-logo-transparent-without-background-free-png.png"
+                    src="https://d33egg70nrp50s.cloudfront.net/Images/bank-thumbnails/maybank.webp?v=607200919"
                 >
                 MAYBANK : 00.00 - 00.15
 
@@ -3497,7 +3680,7 @@ w.innerHTML = `
 
                 <img
                     class="logo"
-                    src="https://static.vecteezy.com/system/resources/thumbnails/067/565/464/small_2x/permata-bank-square-rounded-logo-transparent-without-background-free-png.png"
+                    src="https://d33egg70nrp50s.cloudfront.net/Images/bank-thumbnails/permata.webp?v=607200919"
                 >
                 PERMATA : 00.00 - 00.15
 
@@ -3507,7 +3690,7 @@ w.innerHTML = `
 
                 <img
                     class="logo"
-                    src="https://static.vecteezy.com/system/resources/previews/055/553/741/non_2x/mandri-mobile-phone-app-logo-free-png.png"
+                    src="https://d33egg70nrp50s.cloudfront.net/Images/bank-thumbnails/mandiri.webp?v=607200919"
                 >
                 MANDIRI : 23.00 - 02.00
 
@@ -3517,7 +3700,7 @@ w.innerHTML = `
 
                 <img
                     class="logo"
-                    src="https://static.vecteezy.com/system/resources/thumbnails/067/565/461/small_2x/bank-bri-official-square-rounded-logo-free-png.png"
+                    src="https://d33egg70nrp50s.cloudfront.net/Images/bank-thumbnails/bri.webp?v=607200919"
                 >
                 BRI : 23.50 - 02.45
 
@@ -3527,7 +3710,7 @@ w.innerHTML = `
 
                 <img
                     class="logo"
-                    src="https://static.vecteezy.com/system/resources/thumbnails/067/565/468/small_2x/bank-bni-square-rounded-logo-free-png.png"
+                    src="https://d33egg70nrp50s.cloudfront.net/Images/bank-thumbnails/bni.webp?v=607200919"
                 >
                 BNI : 23.00 - 03.00
 
@@ -3790,6 +3973,31 @@ document.body.appendChild(host);
 
 const caminoTabs =
     w.querySelectorAll(".camino-tab");
+
+const caminoMinimizeBtn =
+    w.querySelector(
+        "#caminoMinimizeBtn"
+    );
+
+caminoMinimizeBtn?.addEventListener(
+    "click",
+    () => {
+
+        const panel =
+            w;
+
+        const minimized =
+            panel.classList.toggle(
+                "camino-minimized"
+            );
+
+        caminoMinimizeBtn.textContent =
+            minimized
+                ? "+"
+                : "−";
+
+    }
+);
 
     const caminoSidebar =
     w.querySelector(".camino-sidebar");
