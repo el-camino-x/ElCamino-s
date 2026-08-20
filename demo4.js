@@ -2880,6 +2880,68 @@ input[type="checkbox"]{
     opacity:.55;
 }
 
+.camino-clock{
+    margin-top:auto;
+
+    width:100%;
+
+    padding-top:12px;
+    padding-bottom:4px;
+
+    border-top:1px solid rgba(110,145,255,.14);
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    gap:4px;
+
+    box-sizing:border-box;
+}
+
+.camino-clock-time{
+    font-family:
+        "JetBrains Mono",
+        "Consolas",
+        monospace;
+
+    font-size:18px;
+
+    font-weight:900;
+
+    letter-spacing:1.5px;
+
+    color:#a8c6ff;
+
+    text-shadow:
+        0 0 6px rgba(90,160,255,.75),
+        0 0 15px rgba(120,80,255,.35);
+
+    white-space:nowrap;
+}
+
+.camino-clock-label{
+    font-size:8px;
+
+    font-weight:800;
+
+    letter-spacing:1.8px;
+
+    color:#66779f;
+
+    text-transform:uppercase;
+}
+
+.camino-sidebar.camino-compact .camino-clock-time{
+    font-size:11px;
+    letter-spacing:.5px;
+}
+
+.camino-sidebar.camino-compact .camino-clock-label{
+    display:none;
+}
+
 `;
 
     let w = document.createElement('div');
@@ -2958,6 +3020,16 @@ w.innerHTML = `
             ⓘ
         </span>
     </button>
+
+    <div class="camino-clock">
+        <span class="camino-clock-time" id="caminoClock">
+            00:00:00
+        </span>
+
+        <span class="camino-clock-label">
+            HANYA DI PRD
+        </span>
+    </div>
 
 </div>
 
@@ -3393,6 +3465,45 @@ const caminoTabs =
 
     const caminoSidebar =
     w.querySelector(".camino-sidebar");
+
+const caminoClock =
+    w.querySelector("#caminoClock");
+
+function updateCaminoClock(){
+
+    if (!caminoClock) {
+        return;
+    }
+
+    const now =
+        new Date();
+
+    const hours =
+        String(
+            now.getHours()
+        ).padStart(2, "0");
+
+    const minutes =
+        String(
+            now.getMinutes()
+        ).padStart(2, "0");
+
+    const seconds =
+        String(
+            now.getSeconds()
+        ).padStart(2, "0");
+
+    caminoClock.textContent =
+        `${hours}:${minutes}:${seconds}`;
+}
+
+updateCaminoClock();
+
+setInterval(
+    updateCaminoClock,
+    1000
+);
+
 
 const caminoContent =
     w.querySelector(".camino-content");
