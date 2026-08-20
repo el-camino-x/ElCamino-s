@@ -281,6 +281,10 @@ let style = document.createElement('style');
    TOP HEADER
 ========================================================= */
 
+/* =========================================================
+   CAMINO MUSIC PLAYING HEADER
+========================================================= */
+
 .h{
     position:relative;
 
@@ -295,29 +299,353 @@ let style = document.createElement('style');
 
     padding:0 15px;
 
-    overflow:visible;
+    overflow:hidden;
 
     color:#fff;
 
-    font-weight:900;
-    letter-spacing:1px;
+    font-family:
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size:20px;
+    font-weight:950;
+
+    letter-spacing:2px;
 
     background:
         linear-gradient(
             180deg,
-            rgba(12,16,32,.96),
-            rgba(6,9,20,.96)
+            rgba(12,16,32,.97),
+            rgba(6,9,20,.97)
         );
 
-    border-bottom:1px solid rgba(110,145,255,.20);
+    border-bottom:
+        1px solid rgba(110,145,255,.20);
 
     white-space:nowrap;
 
-    animation:headerFloat 4s ease-in-out infinite;
-
-    will-change:transform;
-
     z-index:20;
+
+    text-shadow:
+        0 0 5px rgba(100,160,255,.35),
+        0 0 12px rgba(130,90,255,.18);
+}
+
+
+/* =========================================================
+   HEADER TITLE
+========================================================= */
+
+.h > span:not(.status-dot):not(.header-info){
+    position:relative;
+    display:inline-block;
+
+    animation:
+        caminoMusicText 5.5s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   MUSIC GLOW
+========================================================= */
+
+.h > span:not(.status-dot):not(.header-info)::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:-10%;
+    right:-10%;
+
+    bottom:-8px;
+
+    height:16px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(95,170,255,.20),
+            rgba(130,90,255,.08) 45%,
+            transparent 75%
+        );
+
+    filter:blur(5px);
+
+    opacity:.45;
+
+    animation:
+        caminoMusicGlow 1.4s ease-in-out infinite;
+
+    pointer-events:none;
+}
+
+
+/* =========================================================
+   AUDIO EQUALIZER
+========================================================= */
+
+.h::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:50%;
+
+    bottom:0;
+
+    width:150px;
+
+    height:10px;
+
+    transform:
+        translateX(-50%);
+
+    background:
+
+        linear-gradient(
+            90deg,
+            transparent 0 8%,
+            rgba(92,157,255,.35) 8% 12%,
+            transparent 12% 16%,
+
+            rgba(116,108,255,.55) 16% 20%,
+            transparent 20% 24%,
+
+            rgba(160,111,255,.72) 24% 28%,
+            transparent 28% 32%,
+
+            rgba(98,213,255,.55) 32% 36%,
+            transparent 36% 40%,
+
+            rgba(160,111,255,.72) 40% 44%,
+            transparent 44% 48%,
+
+            rgba(98,213,255,.55) 48% 52%,
+            transparent 52% 56%,
+
+            rgba(160,111,255,.72) 56% 60%,
+            transparent 60% 64%,
+
+            rgba(116,108,255,.55) 64% 68%,
+            transparent 68% 72%,
+
+            rgba(92,157,255,.35) 72% 76%,
+            transparent 76% 100%
+        );
+
+    background-size:100% 100%;
+
+    opacity:.55;
+
+    filter:
+        drop-shadow(
+            0 0 4px rgba(100,150,255,.35)
+        );
+
+    animation:
+        caminoEqualizer 1s ease-in-out infinite alternate;
+
+    pointer-events:none;
+
+    z-index:2;
+}
+
+
+/* =========================================================
+   SUBTLE TOP SHINE
+========================================================= */
+
+.h::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:-30%;
+
+    width:35%;
+
+    height:1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(160,210,255,.28),
+            transparent
+        );
+
+    opacity:.35;
+
+    animation:
+        caminoMusicSweep 4s linear infinite;
+
+    pointer-events:none;
+
+    z-index:3;
+}
+
+
+/* =========================================================
+   HEADER FLOAT
+========================================================= */
+
+@keyframes caminoMusicText{
+
+    0%,100%{
+        transform:rotate(0deg);
+    }
+
+    25%{
+        transform:rotate(-0.7deg);
+    }
+
+    50%{
+        transform:rotate(0.7deg);
+    }
+
+    75%{
+        transform:rotate(-0.4deg);
+    }
+}
+
+
+/* =========================================================
+   GLOW PULSE
+========================================================= */
+
+@keyframes caminoMusicGlow{
+
+    0%,100%{
+        transform:scaleX(.82);
+
+        opacity:.22;
+    }
+
+    50%{
+        transform:scaleX(1.08);
+
+        opacity:.48;
+    }
+
+}
+
+
+/* =========================================================
+   EQUALIZER MOTION
+========================================================= */
+
+@keyframes caminoEqualizer{
+
+    0%{
+        transform:
+            translateX(-50%)
+            scaleY(.45);
+    }
+
+    25%{
+        transform:
+            translateX(-50%)
+            scaleY(.85);
+    }
+
+    50%{
+        transform:
+            translateX(-50%)
+            scaleY(.55);
+    }
+
+    75%{
+        transform:
+            translateX(-50%)
+            scaleY(1);
+    }
+
+    100%{
+        transform:
+            translateX(-50%)
+            scaleY(.65);
+    }
+
+}
+
+
+/* =========================================================
+   SWEEP
+========================================================= */
+
+@keyframes caminoMusicSweep{
+
+    0%{
+        left:-30%;
+        opacity:0;
+    }
+
+    20%{
+        opacity:.35;
+    }
+
+    50%{
+        opacity:.25;
+    }
+
+    100%{
+        left:120%;
+        opacity:0;
+    }
+
+}
+
+
+/* =========================================================
+   STATUS DOT HIDDEN
+========================================================= */
+
+.h .status-dot{
+    position:absolute;
+
+    width:1px;
+    height:1px;
+
+    opacity:0;
+
+    pointer-events:none;
+}
+
+
+/* =========================================================
+   INFO BUTTON
+========================================================= */
+
+.h .header-info{
+    position:absolute;
+
+    z-index:50;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+    .h > span:not(.status-dot):not(.header-info),
+    .h > span:not(.status-dot):not(.header-info)::before,
+    .h::before,
+    .h::after{
+
+        animation:none !important;
+
+    }
+
 }
 
 
