@@ -3496,7 +3496,7 @@ w.innerHTML = `
 
 <div class="camino-brand">
     <img
-        src="https://media.tenor.com/DKJvTPspsZYAAAAi/dark-gengar.gif"
+        src="https://media.tenor.com/aJ79h53uS8QAAAAi/anonalien.gif"
         alt="ELC"
         class="camino-brand-gif"
     >
