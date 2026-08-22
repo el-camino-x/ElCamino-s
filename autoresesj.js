@@ -4592,34 +4592,66 @@ async function caminoValidateAccount(bankCode, accountNumber) {
 
     try {
 
-        const response = await fetch(
-            API_BASE + '/api/v3/validate',
-            {
-                method: 'POST',
+        const url =
+            `${API_BASE}/api/v3/validate` +
+            `?code=${encodeURIComponent(bankCode)}` +
+            `&accountNumber=${encodeURIComponent(accountNumber)}`;
 
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-Key': API_KEY
-                },
-
-                body: JSON.stringify({
-                    bank_code: bankCode,
-                    account_number: accountNumber
-                })
-            }
+        console.log(
+            '[CAMINO VALIDATOR] REQUEST:',
+            url
         );
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+
+                    headers: {
+                        "X-API-Key": API_KEY,
+                        "X-Idempotency-Key":
+                            "elcamino-row-validator-" +
+                            Date.now()
+                    }
+                }
+            );
 
         console.log(
             '[CAMINO VALIDATOR] HTTP STATUS:',
             response.status
         );
 
-        const data = await response.json();
+        let data;
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch {
+
+            throw new Error(
+                `Response API tidak valid (HTTP ${response.status})`
+            );
+
+        }
 
         console.log(
             '[CAMINO VALIDATOR] API RESPONSE:',
             data
         );
+
+        if (!response.ok) {
+
+            throw new Error(
+                data?.message ||
+                data?.error ||
+                data?.error_code ||
+                `HTTP ${response.status}`
+            );
+
+        }
 
         return data;
 
@@ -4630,7 +4662,8 @@ async function caminoValidateAccount(bankCode, accountNumber) {
             error
         );
 
-        return null;
+        throw error;
+
     }
 }
 
