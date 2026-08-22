@@ -6347,19 +6347,14 @@ btn.addEventListener('click', () => {
         text
     );
 
-    /*
-     * ================================
-     * AMBIL NOMOR REKENING
-     * ================================
-     */
-
+    // Ambil nomor rekening dari bagian paling belakang
     const accountMatch =
         text.match(/(\d{6,20})$/);
 
     if (!accountMatch) {
 
         console.warn(
-            '[CAMINO VALIDATOR] Nomor rekening tidak ditemukan'
+            '[CAMINO VALIDATOR] ACCOUNT NUMBER tidak ditemukan'
         );
 
         return;
@@ -6368,39 +6363,20 @@ btn.addEventListener('click', () => {
     const accountNumber =
         accountMatch[1];
 
-    /*
-     * ================================
-     * AMBIL BANK
-     * ================================
-     *
-     * Bagian sebelum nomor rekening
-     */
-
+    // Buang nomor rekening dari text
     const beforeAccount =
         text
             .slice(0, accountMatch.index)
             .trim();
 
-    /*
-     * Ambil kata terakhir
-     * sebelum nomor rekening
-     */
-
+    // Ambil kata terakhir sebelum nomor rekening
     const bankMatch =
-        beforeAccount.match(
-            /([A-Za-z0-9]+)$/i
-        );
+        beforeAccount.match(/([A-Za-z0-9]+)$/);
 
     const bank =
         bankMatch
             ? bankMatch[1]
             : null;
-
-    /*
-     * ================================
-     * DEBUG
-     * ================================
-     */
 
     console.log(
         '[CAMINO VALIDATOR] BANK:',
