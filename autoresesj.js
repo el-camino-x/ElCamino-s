@@ -6286,6 +6286,157 @@ w.addEventListener(
 
 })();
 
+/* =========================================================
+   CAMINO VALIDATOR COLUMN
+   STEP 1 — INJECT VALIDATOR BUTTON
+========================================================= */
+
+(function initCaminoValidatorColumn() {
+
+    const VALIDATOR_CELL = 'camino-validator-cell';
+
+    function injectValidator(row) {
+
+        if (!row) return;
+
+        // Jangan inject dua kali
+        if (row.querySelector('.' + VALIDATOR_CELL)) {
+            return;
+        }
+
+        const td = document.createElement('td');
+
+        td.className = VALIDATOR_CELL;
+
+        td.innerHTML = `
+            <button
+                type="button"
+                class="camino-validator-btn"
+                title="Validate Account"
+            >
+                <i class="fa fa-search"></i>
+            </button>
+        `;
+
+const btn =
+    td.querySelector('.camino-validator-btn');
+
+btn.addEventListener('click', () => {
+
+    console.log(
+        '[CAMINO VALIDATOR] Button clicked'
+    );
+
+    const cells = row.querySelectorAll('td');
+
+    console.log(
+        '[CAMINO VALIDATOR] Total cells:',
+        cells.length
+    );
+
+    cells.forEach((cell, index) => {
+
+        console.log(
+            `[CAMINO VALIDATOR] CELL ${index}:`,
+            cell.innerText.trim()
+        );
+
+    });
+
+});
+
+
+        row.appendChild(td);
+    }
+
+    function scanValidatorRows() {
+
+        const rows = document.querySelectorAll(
+            'tbody tr[role="row"]'
+        );
+
+        rows.forEach(injectValidator);
+    }
+
+    // Initial scan
+    scanValidatorRows();
+
+    // Monitor perubahan table
+    const observer = new MutationObserver(() => {
+        scanValidatorRows();
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
+})();
+
+(function injectCaminoValidatorColumnCSS() {
+
+    if (document.getElementById('camino-validator-column-css')) {
+        return;
+    }
+
+    const style = document.createElement('style');
+
+    style.id = 'camino-validator-column-css';
+
+    style.textContent = `
+
+        .camino-validator-cell {
+            width:70px !important;
+            min-width:70px !important;
+            text-align:center !important;
+            vertical-align:middle !important;
+        }
+
+        .camino-validator-btn {
+            width:38px;
+            height:38px;
+
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+
+            border:1px solid rgba(0,245,255,.35);
+            border-radius:10px;
+
+            background:rgba(0,245,255,.08);
+            color:#00f5ff;
+
+            cursor:pointer;
+
+            font-size:16px;
+
+            transition:
+                transform .2s ease,
+                background .2s ease,
+                box-shadow .2s ease,
+                color .2s ease;
+        }
+
+        .camino-validator-btn:hover {
+            transform:translateY(-2px) scale(1.05);
+
+            background:rgba(0,245,255,.16);
+
+            box-shadow:
+                0 0 12px rgba(0,245,255,.35),
+                inset 0 0 8px rgba(0,245,255,.08);
+        }
+
+        .camino-validator-btn:active {
+            transform:scale(.92);
+        }
+
+    `;
+
+    document.head.appendChild(style);
+
+})();
+
 function initAccountValidatorButton() {
     const host =
         document.getElementById("payHostUI");
