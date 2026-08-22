@@ -6370,23 +6370,31 @@ btn.addEventListener('click', () => {
             .trim();
 
     // Ambil kata terakhir sebelum nomor rekening
-    const bankMatch =
-        beforeAccount.match(/([A-Za-z0-9]+)$/);
+      const bankMatch =
+          beforeAccount.match(/([A-Za-z0-9]+)$/);
 
-    const bank =
-        bankMatch
-            ? bankMatch[1]
-            : null;
+      const bank =
+          bankMatch
+              ? bankMatch[1]
+              : null;
 
-    console.log(
-        '[CAMINO VALIDATOR] BANK:',
-        bank
-    );
+      const bankCode =
+          getCaminoBankCode(bank);
 
-    console.log(
-        '[CAMINO VALIDATOR] ACCOUNT NUMBER:',
-        accountNumber
-    );
+      console.log(
+          '[CAMINO VALIDATOR] BANK:',
+          bank
+      );
+
+      console.log(
+          '[CAMINO VALIDATOR] BANK CODE:',
+          bankCode
+      );
+
+      console.log(
+          '[CAMINO VALIDATOR] ACCOUNT NUMBER:',
+          accountNumber
+      );
 
 });
 
@@ -6417,6 +6425,24 @@ btn.addEventListener('click', () => {
     });
 
 })();
+
+function getCaminoBankCode(bankName) {
+
+    if (!bankName) {
+        return null;
+    }
+
+    const found =
+        AV_BANK_LIST.find(
+            ([name]) =>
+                name.toUpperCase() ===
+                bankName.toUpperCase()
+        );
+
+    return found
+        ? found[1]
+        : null;
+}
 
 (function injectCaminoValidatorColumnCSS() {
 
