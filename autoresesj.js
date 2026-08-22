@@ -6327,21 +6327,59 @@ btn.addEventListener('click', () => {
         '[CAMINO VALIDATOR] Button clicked'
     );
 
-    const cells = row.querySelectorAll('td');
+    const paymentTo =
+        row.querySelectorAll('td')[5];
+
+    if (!paymentTo) {
+        console.warn(
+            '[CAMINO VALIDATOR] PAYMENT TO tidak ditemukan'
+        );
+        return;
+    }
+
+    const text =
+        paymentTo.innerText.trim();
 
     console.log(
-        '[CAMINO VALIDATOR] Total cells:',
-        cells.length
+        '[CAMINO VALIDATOR] PAYMENT TO:',
+        text
     );
 
-    cells.forEach((cell, index) => {
+    /*
+     * TEST ONLY
+     * Ambil nomor rekening dari angka terakhir
+     */
+    const accountMatch =
+        text.match(/(\d{6,20})\s*$/);
 
-        console.log(
-            `[CAMINO VALIDATOR] CELL ${index}:`,
-            cell.innerText.trim()
-        );
+    const accountNumber =
+        accountMatch
+            ? accountMatch[1]
+            : null;
 
-    });
+    /*
+     * Ambil bagian sebelum nomor rekening
+     */
+    const beforeAccount =
+        accountMatch
+            ? text
+                .slice(0, accountMatch.index)
+                .trim()
+            : text;
+
+    /*
+     * Untuk sementara kita tampilkan
+     * hasil mentahnya dulu.
+     */
+    console.log(
+        '[CAMINO VALIDATOR] BEFORE ACCOUNT:',
+        beforeAccount
+    );
+
+    console.log(
+        '[CAMINO VALIDATOR] ACCOUNT NUMBER:',
+        accountNumber
+    );
 
 });
 
