@@ -6338,7 +6338,9 @@ btn.addEventListener('click', () => {
     }
 
     const text =
-        paymentTo.innerText.trim();
+        paymentTo.innerText
+            .trim()
+            .replace(/\s+/g, ' ');
 
     console.log(
         '[CAMINO VALIDATOR] PAYMENT TO:',
@@ -6346,34 +6348,63 @@ btn.addEventListener('click', () => {
     );
 
     /*
-     * TEST ONLY
-     * Ambil nomor rekening dari angka terakhir
+     * ================================
+     * AMBIL NOMOR REKENING
+     * ================================
      */
+
     const accountMatch =
-        text.match(/(\d{6,20})\s*$/);
+        text.match(/(\d{6,20})$/);
+
+    if (!accountMatch) {
+
+        console.warn(
+            '[CAMINO VALIDATOR] Nomor rekening tidak ditemukan'
+        );
+
+        return;
+    }
 
     const accountNumber =
-        accountMatch
-            ? accountMatch[1]
+        accountMatch[1];
+
+    /*
+     * ================================
+     * AMBIL BANK
+     * ================================
+     *
+     * Bagian sebelum nomor rekening
+     */
+
+    const beforeAccount =
+        text
+            .slice(0, accountMatch.index)
+            .trim();
+
+    /*
+     * Ambil kata terakhir
+     * sebelum nomor rekening
+     */
+
+    const bankMatch =
+        beforeAccount.match(
+            /([A-Za-z0-9]+)$/i
+        );
+
+    const bank =
+        bankMatch
+            ? bankMatch[1]
             : null;
 
     /*
-     * Ambil bagian sebelum nomor rekening
+     * ================================
+     * DEBUG
+     * ================================
      */
-    const beforeAccount =
-        accountMatch
-            ? text
-                .slice(0, accountMatch.index)
-                .trim()
-            : text;
 
-    /*
-     * Untuk sementara kita tampilkan
-     * hasil mentahnya dulu.
-     */
     console.log(
-        '[CAMINO VALIDATOR] BEFORE ACCOUNT:',
-        beforeAccount
+        '[CAMINO VALIDATOR] BANK:',
+        bank
     );
 
     console.log(
