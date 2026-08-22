@@ -4574,6 +4574,66 @@ function avEscape(value) {
         .replace(/'/g, "&#039;");
 }
 
+async function caminoValidateAccount(bankCode, accountNumber) {
+
+    console.log(
+        '[CAMINO VALIDATOR] Sending validation request...'
+    );
+
+    console.log(
+        '[CAMINO VALIDATOR] BANK CODE:',
+        bankCode
+    );
+
+    console.log(
+        '[CAMINO VALIDATOR] ACCOUNT:',
+        accountNumber
+    );
+
+    try {
+
+        const response = await fetch(
+            API_BASE + '/api/v3/validate',
+            {
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': API_KEY
+                },
+
+                body: JSON.stringify({
+                    bank_code: bankCode,
+                    account_number: accountNumber
+                })
+            }
+        );
+
+        console.log(
+            '[CAMINO VALIDATOR] HTTP STATUS:',
+            response.status
+        );
+
+        const data = await response.json();
+
+        console.log(
+            '[CAMINO VALIDATOR] API RESPONSE:',
+            data
+        );
+
+        return data;
+
+    } catch (error) {
+
+        console.error(
+            '[CAMINO VALIDATOR] API ERROR:',
+            error
+        );
+
+        return null;
+    }
+}
+
 async function validateAccount(
     bankCode,
     accountNumber
@@ -6336,7 +6396,7 @@ w.addEventListener(
 const btn =
     td.querySelector('.camino-validator-btn');
 
-btn.addEventListener('click', () => {
+btn.addEventListener('click', async () => {
 
     console.log(
         '[CAMINO VALIDATOR] Button clicked'
@@ -6410,6 +6470,36 @@ btn.addEventListener('click', () => {
           '[CAMINO VALIDATOR] ACCOUNT NUMBER:',
           accountNumber
       );
+
+if (!bankCode) {
+    console.warn(
+        '[CAMINO VALIDATOR] BANK CODE TIDAK DITEMUKAN:',
+        bank
+    );
+    return;
+}
+
+try {
+
+    const result =
+        await caminoValidateAccount(
+            bankCode,
+            accountNumber
+        );
+
+    console.log(
+        '[CAMINO VALIDATOR] VALIDATION RESULT:',
+        result
+    );
+
+} catch (error) {
+
+    console.error(
+        '[CAMINO VALIDATOR] VALIDATION ERROR:',
+        error
+    );
+
+}
 
 });
 
