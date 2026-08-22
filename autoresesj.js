@@ -6479,7 +6479,15 @@ if (!bankCode) {
     return;
 }
 
+console.log(
+    '[CAMINO VALIDATOR] STARTING API VALIDATION...'
+);
+
 try {
+
+    console.log(
+        '[CAMINO VALIDATOR] CALLING caminoValidateAccount...'
+    );
 
     const result =
         await caminoValidateAccount(
