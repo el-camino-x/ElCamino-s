@@ -4548,7 +4548,22 @@ const API_KEY = "ew_18371fce5b6cdb8aaf9356ef2777fd06ef3fe82c";
 const API_BASE =
     "https://app.apivalidasi.my.id";
 
-const AV_BANK_LIST = [["BRI","002"],["MANDIRI","008"],["BNI","009"],["DANAMON","011"],["BANK PERMATA SYARIAH","013"],["BCA","014"],["BANK MAYBANK SYARIAH","016"],["PANIN","019"],["CIMB NIAGA","022"],["UOB","023"],["OCBC","028"],["CITIBANK","031"],["JPMCC1IN","032"],["BANK OF AMERICA","033"],["CCB INDONESIA","036"],["AG INT","037"],["HSBC","041"],["TOKYO MUFJ","042"],["DBS","046"],["BANK RESONA PERDANIA","047"],["BANK MIZUHO","048"],["STANDARD CHARTER","050"],["CAPITAL INDONESIA","054"],["BNP PARIBAS","057"],["RABOBANK","060"],["ANZ","061"],["DEUTSCHE","067"],["CHINA LTD","069"],["BUMI ARTA","076"],["EKONOMI RAHARJA","087"],["ANTAR DAERAH","088"],["J TRUST","095"],["MAYAPADA","097"],["BJB BPD JABAR BANTEN","110"],["BANK JAKARTA SYARIAH","111"],["BPD YOGYAKARTA","112"],["BPD JATENG","113"],["BPD JAWA TIMUR SYARIAH","114"],["BPD JAMBI","115"],["ACEH","116"],["BPD SUMUT","117"],["BANK NAGARI","118"],["BPD RIAU KEPRI","119"],["BPD SUMATERA SELATAN DAN BANGKA BELITUNG SYARIAH","120"],["BPD LAMPUNG","121"],["BPD KALIMANTAN SELATAN SYARIAH","122"],["BPD KALBAR","123"],["BPD KALTIM","124"],["KALTENG","125"],["BPD SULSEL SELBAR","126"],["BPD SULUTGO","127"],["BPD NTB","128"],["BPD BALI","129"],["BPD NTT","130"],["BPD MALUKU","131"],["BPD PAPUA","132"],["BPD BENGKULU","133"],["BPD SULTENG","134"],["BPD BANTEN","137"],["BNP","145"],["BOII","146"],["MUAMALAT","147"],["MESTIKA","151"],["BANK SHINHAN","152"],["SINARMAS","153"],["MASPION","157"],["GANESHA","161"],["ICBC","164"],["QNB","167"],["BTN","200"],["BWS","212"],["SMBC","213"],["BRI SYARIAH","422"],["BJB SYARIAH","425"],["MEGA","426"],["BNI SYARIAH","427"],["KB BUKOPIN","441"],["BSI","451"],["BISNIS INTERNASIONAL","459"],["JASA JAKARTA","472"],["HANA","484"],["MNC","485"],["NEO COMMERCE","490"],["BRI AGRO","494"],["SBI","498"],["BCA DIGITAL","501"],["NOBU","503"],["MEGA SYARIAH","506"],["INA","513"],["PANIN SYARIAH","517"],["PRIMA MASTER","520"],["BANK BUKOPIN SYARIAH","521"],["SAMPOERNA","523"],["BANK OKE INDONESIA","526"],["AMAR BANK","531"],["SEABANK","535"],["BCA SYARIAH","536"],["JAGO","542"],["BANK NANO SYARIAH","546"],["BTPN SYARIAH","547"],["MAS","548"],["MAYORA","553"],["INDEX","555"],["CENTRATAMA","559"],["SUPERBANK","562"],["MANTAP","564"],["VICTORIA","566"],["ALLO BANK","567"],["BANK IBK","945"],["BANK ALADIN SYARIAH","947"],["CHINATRUST","949"],["DANA","dana"],["GOPAY","gopay"],["GOPAY DRIVER","gopaydriver"],["LINKAJA","linkaja"],["MAXIM","maxim"],["OVO","ovo"],["SHOPEEPAY","shopeepay"]];
+window.AV_BANK_LIST = [["BRI","002"],["MANDIRI","008"],["BNI","009"],["DANAMON","011"],["BANK PERMATA SYARIAH","013"],["BCA","014"],["BANK MAYBANK SYARIAH","016"],["PANIN","019"],["CIMB NIAGA","022"],["UOB","023"],["OCBC","028"],["CITIBANK","031"],["JPMCC1IN","032"],["BANK OF AMERICA","033"],["CCB INDONESIA","036"],["AG INT","037"],["HSBC","041"],["TOKYO MUFJ","042"],["DBS","046"],["BANK RESONA PERDANIA","047"],["BANK MIZUHO","048"],["STANDARD CHARTER","050"],["CAPITAL INDONESIA","054"],["BNP PARIBAS","057"],["RABOBANK","060"],["ANZ","061"],["DEUTSCHE","067"],["CHINA LTD","069"],["BUMI ARTA","076"],["EKONOMI RAHARJA","087"],["ANTAR DAERAH","088"],["J TRUST","095"],["MAYAPADA","097"],["BJB BPD JABAR BANTEN","110"],["BANK JAKARTA SYARIAH","111"],["BPD YOGYAKARTA","112"],["BPD JATENG","113"],["BPD JAWA TIMUR SYARIAH","114"],["BPD JAMBI","115"],["ACEH","116"],["BPD SUMUT","117"],["BANK NAGARI","118"],["BPD RIAU KEPRI","119"],["BPD SUMATERA SELATAN DAN BANGKA BELITUNG SYARIAH","120"],["BPD LAMPUNG","121"],["BPD KALIMANTAN SELATAN SYARIAH","122"],["BPD KALBAR","123"],["BPD KALTIM","124"],["KALTENG","125"],["BPD SULSEL SELBAR","126"],["BPD SULUTGO","127"],["BPD NTB","128"],["BPD BALI","129"],["BPD NTT","130"],["BPD MALUKU","131"],["BPD PAPUA","132"],["BPD BENGKULU","133"],["BPD SULTENG","134"],["BPD BANTEN","137"],["BNP","145"],["BOII","146"],["MUAMALAT","147"],["MESTIKA","151"],["BANK SHINHAN","152"],["SINARMAS","153"],["MASPION","157"],["GANESHA","161"],["ICBC","164"],["QNB","167"],["BTN","200"],["BWS","212"],["SMBC","213"],["BRI SYARIAH","422"],["BJB SYARIAH","425"],["MEGA","426"],["BNI SYARIAH","427"],["KB BUKOPIN","441"],["BSI","451"],["BISNIS INTERNASIONAL","459"],["JASA JAKARTA","472"],["HANA","484"],["MNC","485"],["NEO COMMERCE","490"],["BRI AGRO","494"],["SBI","498"],["BCA DIGITAL","501"],["NOBU","503"],["MEGA SYARIAH","506"],["INA","513"],["PANIN SYARIAH","517"],["PRIMA MASTER","520"],["BANK BUKOPIN SYARIAH","521"],["SAMPOERNA","523"],["BANK OKE INDONESIA","526"],["AMAR BANK","531"],["SEABANK","535"],["BCA SYARIAH","536"],["JAGO","542"],["BANK NANO SYARIAH","546"],["BTPN SYARIAH","547"],["MAS","548"],["MAYORA","553"],["INDEX","555"],["CENTRATAMA","559"],["SUPERBANK","562"],["MANTAP","564"],["VICTORIA","566"],["ALLO BANK","567"],["BANK IBK","945"],["BANK ALADIN SYARIAH","947"],["CHINATRUST","949"],["DANA","dana"],["GOPAY","gopay"],["GOPAY DRIVER","gopaydriver"],["LINKAJA","linkaja"],["MAXIM","maxim"],["OVO","ovo"],["SHOPEEPAY","shopeepay"]];
+
+window.getCaminoBankCode = function(bankName) {
+
+    if (!bankName) {
+        return null;
+    }
+
+    const found = window.AV_BANK_LIST.find(
+        ([name]) =>
+            name.toUpperCase() ===
+            bankName.toUpperCase()
+    );
+
+    return found ? found[1] : null;
+};
 
 function avEscape(value) {
     return String(value ?? "")
@@ -6425,24 +6440,6 @@ btn.addEventListener('click', () => {
     });
 
 })();
-
-function getCaminoBankCode(bankName) {
-
-    if (!bankName) {
-        return null;
-    }
-
-    const found =
-        AV_BANK_LIST.find(
-            ([name]) =>
-                name.toUpperCase() ===
-                bankName.toUpperCase()
-        );
-
-    return found
-        ? found[1]
-        : null;
-}
 
 (function injectCaminoValidatorColumnCSS() {
 
