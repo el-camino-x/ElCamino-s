@@ -6826,6 +6826,7 @@ w.addEventListener(
 
         btn.innerHTML = `
             <i class="fa fa-search"></i>
+            <span>Validate</span>
         `;
 
 
@@ -6872,6 +6873,7 @@ w.addEventListener(
 
                 btn.innerHTML = `
                     <i class="fa fa-spinner fa-spin"></i>
+                    <span>Checking...</span>
                 `;
 
 
@@ -7026,21 +7028,22 @@ w.addEventListener(
                     // SUCCESS
                     // =================================================
 
-                    btn.innerHTML = `
-                        <i class="fa fa-check"></i>
-                    `;
+                        btn.innerHTML = `
+                            <i class="fa fa-check"></i>
+                            <span class="camino-validator-name">
+                                ${avEscape(accountName)}
+                            </span>
+                        `;
 
-                    btn.title =
-                        accountName;
+                        btn.title =
+                            accountName;
 
+                        btn.classList.add(
+                            'camino-validator-success'
+                        );
 
-                    btn.classList.add(
-                        'camino-validator-success'
-                    );
-
-
-                    btn.dataset.validated =
-                        '1';
+                        btn.dataset.validated =
+                            '1';
 
 
                 }
@@ -7615,6 +7618,26 @@ tbody
     flex-shrink: 0 !important;
 
 }
+
+.camino-validator-name {
+
+    display: block;
+
+    max-width: 150px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    letter-spacing: .2px;
+}
+
 
     `;
 
