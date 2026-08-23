@@ -6700,14 +6700,6 @@ function injectValidatorHeader(table) {
 
     if (!headerRow) return;
 
-    // Jangan inject 2x
-    if (
-        headerRow.querySelector(
-            '.camino-validator-header'
-        )
-    ) {
-        return;
-    }
 
     // =========================================
     // CARI HEADER AKSI
@@ -6719,16 +6711,56 @@ function injectValidatorHeader(table) {
         );
 
     const actionHeader =
-        headers.find(th =>
-            th.innerText
+        headers.find(th => {
+
+            return th.innerText
                 .trim()
                 .replace(/\s+/g, ' ')
-                .toUpperCase() === 'AKSI'
-        );
+                .toUpperCase() === 'AKSI';
+
+        });
 
     if (!actionHeader) {
         return;
     }
+
+
+    // =========================================
+    // CEK VALIDATOR YANG SUDAH ADA
+    // =========================================
+
+    const validatorHeaders =
+        Array.from(
+            headerRow.querySelectorAll(
+                '.camino-validator-header'
+            )
+        );
+
+
+    // =========================================
+    // HAPUS DUPLIKAT
+    // =========================================
+
+    if (validatorHeaders.length > 1) {
+
+        validatorHeaders
+            .slice(1)
+            .forEach(header => {
+                header.remove();
+            });
+    }
+
+
+    // =========================================
+    // KALAU SUDAH ADA → STOP
+    // =========================================
+
+    if (
+        validatorHeaders.length >= 1
+    ) {
+        return;
+    }
+
 
     // =========================================
     // BUAT HEADER VALIDATOR
@@ -6740,11 +6772,37 @@ function injectValidatorHeader(table) {
     th.className =
         'camino-validator-header';
 
+
+    // =========================================
+    // SAMAKAN STRUKTUR DENGAN AKSI
+    // =========================================
+
+    if (actionHeader.hasAttribute('style')) {
+
+        th.setAttribute(
+            'style',
+            actionHeader.getAttribute('style')
+        );
+
+    }
+
+
+    // Jangan copy class AKSI,
+    // karena bisa bikin CSS tabel kacau.
+    //
+    // Kita cuma gunakan class khusus Camino.
+
+
+    // =========================================
+    // ISI HEADER
+    // =========================================
+
     th.innerHTML = `
         <span class="camino-validator-header-title">
             VALIDATOR
         </span>
     `;
+
 
     // =========================================
     // TARUH TEPAT SETELAH AKSI
@@ -6753,6 +6811,11 @@ function injectValidatorHeader(table) {
     actionHeader.insertAdjacentElement(
         'afterend',
         th
+    );
+
+
+    console.log(
+        '[CAMINO VALIDATOR] VALIDATOR HEADER INJECTED'
     );
 }
 
