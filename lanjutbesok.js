@@ -6690,59 +6690,59 @@ function injectValidatorHeader(table) {
 
     if (!table) return;
 
-    const thead =
-        table.querySelector('thead');
-
+    const thead = table.querySelector('thead');
     if (!thead) return;
 
-    const headerRow =
-        thead.querySelector('tr');
-
-    if (!headerRow) return;
-
-
-    // =========================================
-    // CEK APAKAH SUDAH ADA
-    // =========================================
-
+    // Jangan inject 2x
     if (
-        headerRow.querySelector(
+        thead.querySelector(
             '.camino-validator-header'
         )
     ) {
         return;
     }
 
-
     // =========================================
-    // CARI HEADER AKSI
+    // CARI HEADER "AKSI"
     // =========================================
 
-    const headers =
-        Array.from(
-            headerRow.querySelectorAll('th')
-        );
+    const allHeaders =
+        thead.querySelectorAll('th');
 
-    const actionHeader =
-        headers.find(th => {
+    let actionHeader = null;
 
-            const text =
-                th.innerText
-                    .trim()
-                    .replace(/\s+/g, ' ')
-                    .toUpperCase();
+    allHeaders.forEach(th => {
 
-            return text === 'AKSI';
-        });
+        const text =
+            th.innerText
+                .trim()
+                .toUpperCase();
 
+        if (text === 'AKSI') {
+            actionHeader = th;
+        }
+    });
 
     if (!actionHeader) {
+
+        console.warn(
+            '[CAMINO VALIDATOR] Header AKSI tidak ditemukan'
+        );
+
         return;
     }
 
+    // =========================================
+    // PAKAI ROW YANG SAMA DENGAN AKSI
+    // =========================================
+
+    const headerRow =
+        actionHeader.closest('tr');
+
+    if (!headerRow) return;
 
     // =========================================
-    // BUAT 1 TH SAJA
+    // BUAT HEADER VALIDATOR
     // =========================================
 
     const th =
@@ -6751,6 +6751,24 @@ function injectValidatorHeader(table) {
     th.className =
         'camino-validator-header';
 
+    // Samakan atribut penting dengan AKSI
+    if (actionHeader.hasAttribute('style')) {
+        th.setAttribute(
+            'style',
+            actionHeader.getAttribute('style')
+        );
+    }
+
+    if (actionHeader.hasAttribute('class')) {
+        th.classList.add(
+            ...actionHeader.classList
+        );
+    }
+
+    // Pastikan class kita tetap ada
+    th.classList.add(
+        'camino-validator-header'
+    );
 
     th.innerHTML = `
         <span class="camino-validator-header-title">
@@ -6758,9 +6776,8 @@ function injectValidatorHeader(table) {
         </span>
     `;
 
-
     // =========================================
-    // TARUH SETELAH AKSI
+    // TARUH TEPAT SETELAH AKSI
     // =========================================
 
     actionHeader.insertAdjacentElement(
@@ -6768,9 +6785,8 @@ function injectValidatorHeader(table) {
         th
     );
 
-
     console.log(
-        '[CAMINO VALIDATOR] HEADER INJECTED'
+        '[CAMINO VALIDATOR] VALIDATOR header injected'
     );
 }
 
@@ -7089,63 +7105,19 @@ function injectValidatorHeader(table) {
 
 function scanValidatorRows() {
 
-    // =========================================
-    // 1. CARI TABLE
-    // =========================================
-
-    document
-        .querySelectorAll('table')
-        .forEach(table => {
-
-            // Header dicek TERPISAH
-            // dari row
-            injectValidatorHeader(table);
-
-        });
-
-
-    // =========================================
-    // 2. CARI ROW
-    // =========================================
-
     const rows =
         document.querySelectorAll(
-            'tbody tr'
+            'tbody tr[role="row"]'
         );
-
 
     rows.forEach(row => {
 
-        if (!row) return;
-
-
-        // =====================================
-        // PASTIKAN ADA CELL
-        // =====================================
-
-        const cells =
-            row.querySelectorAll('td');
-
-        if (!cells.length) {
-            return;
-        }
-
-
-        // =====================================
-        // PAYMENT TO
-        // =====================================
-
         const paymentTo =
-            cells[5];
+            row.querySelectorAll('td')[5];
 
         if (!paymentTo) {
             return;
         }
-
-
-        // =====================================
-        // PASTIKAN ADA TABLE
-        // =====================================
 
         const table =
             row.closest('table');
@@ -7154,13 +7126,11 @@ function scanValidatorRows() {
             return;
         }
 
+        // Header cuma di table ini
+        injectValidatorHeader(table);
 
-        // =====================================
-        // INJECT CELL
-        // =====================================
-
+        // Cell validator
         injectValidator(row);
-
     });
 }
 
@@ -7195,33 +7165,22 @@ function scanValidatorRows() {
    CAMINO TABLE VALIDATOR
    ========================================================= */
 
-/* =========================================================
-   CAMINO VALIDATOR COLUMN
-   ========================================================= */
-
-.camino-validator-cell,
-.camino-validator-header {
-
-    width: 260px !important;
-    min-width: 260px !important;
-    max-width: 260px !important;
-
-    box-sizing: border-box !important;
-}
-
 
 /* =========================================================
    CELL
    ========================================================= */
 
 .camino-validator-cell {
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
 
     padding: 10px 12px !important;
 
     text-align: center !important;
     vertical-align: middle !important;
 
-    white-space: normal !important;
+    box-sizing: border-box !important;
 }
 
 
@@ -7230,6 +7189,9 @@ function scanValidatorRows() {
    ========================================================= */
 
 .camino-validator-header {
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
 
     padding: 10px 12px !important;
 
@@ -7237,6 +7199,8 @@ function scanValidatorRows() {
     vertical-align: middle !important;
 
     white-space: nowrap !important;
+
+    box-sizing: border-box !important;
 }
 
 
@@ -7249,26 +7213,28 @@ function scanValidatorRows() {
     display: flex !important;
 
     width: 100% !important;
+    height: 100% !important;
 
     align-items: center !important;
     justify-content: center !important;
 
-    gap: 7px;
+    gap: 8px;
 
     white-space: nowrap !important;
 
-    font-size: 12px;
+    font-size: 13px !important;
 
-    font-weight: 800;
+    font-weight: 900 !important;
 
     line-height: 1;
 
-    letter-spacing: .7px;
+    letter-spacing: .8px;
 
     color: inherit;
 
-    box-sizing: border-box !important;
+    box-sizing: border-box;
 }
+
 
 /* =========================================================
    HEADER INDICATOR
@@ -7278,59 +7244,66 @@ function scanValidatorRows() {
 
     content: "";
 
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
 
-    flex: 0 0 5px;
+    flex: 0 0 6px;
 
     border-radius: 50%;
 
     background: #8d82ff;
 
     box-shadow:
-        0 0 7px #8d82ff,
-        0 0 14px
-        rgba(141, 130, 255, .35);
+        0 0 8px #8d82ff,
+        0 0 16px rgba(141, 130, 255, .4);
 }
 
 
-//* =========================================================
-   BUTTON — SEARCH
+/* =========================================================
+   BASE BUTTON
    ========================================================= */
 
 .camino-validator-btn {
+
     position: relative;
 
-    display: inline-flex;
+    display: inline-flex !important;
 
-    align-items: center;
-    justify-content: center;
+    align-items: center !important;
+    justify-content: center !important;
 
     gap: 10px;
 
-    width: 64px !important;
-    min-width: 64px !important;
-    height: 52px !important;
+    /*
+       CELL TETAP 260px
+       TOMBOL YANG DIBESARKAN
+    */
+    width: 58px !important;
+    min-width: 58px !important;
+    max-width: 100%;
+
+    height: 48px !important;
+    min-height: 48px !important;
 
     padding: 0 16px !important;
 
-    box-sizing: border-box;
+    box-sizing: border-box !important;
 
     border: 1px solid rgba(255, 255, 255, .14);
 
-    border-radius: 11px;
+    border-radius: 10px;
 
     background:
         linear-gradient(
             135deg,
-            #191c29,
-            #0d0f16
+            #191b28,
+            #0c0e15
         );
 
-    color: #d8d5ff;
+    color: #d9dcff;
 
-    font-size: 15px;
-    font-weight: 800;
+    font-size: 15px !important;
+    font-weight: 800 !important;
 
     letter-spacing: .5px;
 
@@ -7354,15 +7327,16 @@ function scanValidatorRows() {
    ========================================================= */
 
 .camino-validator-btn > i {
+
     flex: 0 0 auto;
 
-    width: 22px;
-    height: 22px;
+    width: 24px !important;
+    height: 24px !important;
 
-    display: inline-flex;
+    display: inline-flex !important;
 
-    align-items: center;
-    justify-content: center;
+    align-items: center !important;
+    justify-content: center !important;
 
     font-size: 21px !important;
 
@@ -7371,30 +7345,49 @@ function scanValidatorRows() {
 
 
 /* =========================================================
-   SEARCH HOVER
+   SEARCH BUTTON HOVER
    ========================================================= */
 
 .camino-validator-btn:hover:not(:disabled) {
 
     border-color:
-        rgba(141, 130, 255, .65);
+        rgba(130, 120, 255, .7);
 
     background:
         linear-gradient(
             135deg,
-            #22263a,
-            #111420
+            #24273a,
+            #11131d
         );
 
     box-shadow:
         0 0 0 1px
-        rgba(141, 130, 255, .10),
+        rgba(130, 120, 255, .10),
 
-        0 0 22px
-        rgba(100, 90, 255, .22);
+        0 0 20px
+        rgba(100, 90, 255, .20),
+
+        inset 0 0 15px
+        rgba(130, 120, 255, .04);
 
     transform:
-        translateY(-2px) scale(1.02);
+        translateY(-2px);
+}
+
+
+/* =========================================================
+   SEARCH ICON HOVER
+   ========================================================= */
+
+.camino-validator-btn:hover:not(:disabled) > i {
+
+    filter:
+        drop-shadow(
+            0 0 7px
+            rgba(150, 140, 255, .75)
+        );
+
+    transform: scale(1.08);
 }
 
 
@@ -7406,7 +7399,7 @@ function scanValidatorRows() {
 
     cursor: wait;
 
-    opacity: .95;
+    opacity: .9;
 }
 
 
@@ -7416,37 +7409,37 @@ function scanValidatorRows() {
 
 .camino-validator-btn:has(.fa-spinner) {
 
-    width: 64px !important;
-    min-width: 64px !important;
+    width: 58px !important;
+    min-width: 58px !important;
 
-    height: 52px !important;
+    height: 48px !important;
 
     padding: 0 !important;
 }
 
 
 /* =========================================================
-   LOADING ICON
+   LOADING SPINNER — BESAR & JELAS
    ========================================================= */
 
 .camino-validator-btn .fa-spinner {
 
-    width: 26px !important;
-    height: 26px !important;
+    width: 28px !important;
+    height: 28px !important;
 
-    display: inline-flex;
+    display: inline-flex !important;
 
-    align-items: center;
-    justify-content: center;
+    align-items: center !important;
+    justify-content: center !important;
 
     font-size: 26px !important;
 
-    color: #a79cff;
+    color: #a79cff !important;
 
     filter:
         drop-shadow(
-            0 0 7px
-            rgba(141, 130, 255, .75)
+            0 0 8px
+            rgba(141, 130, 255, .7)
         );
 }
 
@@ -7457,9 +7450,9 @@ function scanValidatorRows() {
 
 .camino-validator-btn.camino-validator-success {
 
-    width: 246px !important;
-    min-width: 246px !important;
-    max-width: 246px !important;
+    width: 236px !important;
+    min-width: 236px !important;
+    max-width: 236px !important;
 
     min-height: 82px !important;
     height: 82px !important;
@@ -7471,49 +7464,53 @@ function scanValidatorRows() {
 
     gap: 13px;
 
-    padding: 12px 15px !important;
+    padding:
+        10px 14px !important;
 
-    box-sizing: border-box;
+    box-sizing: border-box !important;
 
-    border-radius: 12px;
+    border-radius: 11px;
 
     cursor: default !important;
 
     background:
         linear-gradient(
             135deg,
-            #18221f,
-            #0d1513
+            #17231f,
+            #0c1411
         ) !important;
 
     border:
         1px solid
-        rgba(99, 240, 170, .38);
+        rgba(99, 240, 170, .38) !important;
 
     box-shadow:
         0 0 0 1px
         rgba(99, 240, 170, .05),
 
-        0 0 22px
-        rgba(99, 240, 170, .12);
+        0 0 20px
+        rgba(99, 240, 170, .12),
+
+        inset 0 0 18px
+        rgba(99, 240, 170, .025);
 }
 
 
 /* =========================================================
-   SUCCESS CHECK ICON
+   SUCCESS ICON
    ========================================================= */
 
-.camino-validator-btn.camino-validator-success i {
+.camino-validator-btn.camino-validator-success > i {
 
-    flex: 0 0 28px !important;
+    flex: 0 0 30px !important;
 
-    width: 28px !important;
-    height: 28px !important;
+    width: 30px !important;
+    height: 30px !important;
 
-    display: inline-flex;
+    display: flex !important;
 
-    align-items: center;
-    justify-content: center;
+    align-items: center !important;
+    justify-content: center !important;
 
     font-size: 25px !important;
 
@@ -7524,7 +7521,7 @@ function scanValidatorRows() {
         rgba(80, 255, 170, .65),
 
         0 0 18px
-        rgba(80, 255, 170, .25);
+        rgba(80, 255, 170, .3);
 }
 
 
@@ -7536,22 +7533,24 @@ function scanValidatorRows() {
 
     display: -webkit-box !important;
 
-    flex: 1 1 auto;
+    flex: 1 1 auto !important;
 
-    min-width: 0;
-    max-width: 100%;
+    min-width: 0 !important;
 
-    font-size: 21px !important;
+    width: auto !important;
+    max-width: 100% !important;
+
+    font-size: 20px !important;
 
     font-weight: 900 !important;
 
-    line-height: 24px !important;
+    line-height: 23px !important;
 
     letter-spacing: .35px;
 
     color: #ffffff !important;
 
-    text-align: left;
+    text-align: left !important;
 
     white-space: normal !important;
 
@@ -7562,13 +7561,17 @@ function scanValidatorRows() {
     -webkit-box-orient: vertical;
 
     /*
-       Maksimal 2 baris
+       Tetap maksimal 2 baris
     */
     -webkit-line-clamp: 2;
 
     word-break: normal !important;
 
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere !important;
+
+    text-shadow:
+        0 1px 8px
+        rgba(255, 255, 255, .08);
 }
 
 
@@ -7593,14 +7596,17 @@ function scanValidatorRows() {
     transform: none !important;
 
     border-color:
-        rgba(80, 255, 170, .45) !important;
+        rgba(80, 255, 170, .42) !important;
 
     box-shadow:
         0 0 0 1px
         rgba(80, 255, 170, .07),
 
-        0 0 24px
-        rgba(80, 255, 170, .13);
+        0 0 22px
+        rgba(80, 255, 170, .12),
+
+        inset 0 0 18px
+        rgba(80, 255, 170, .025);
 }
 
 
@@ -7610,28 +7616,25 @@ function scanValidatorRows() {
 
 .camino-validator-btn.camino-validator-error {
 
-    width: 125px !important;
-    min-width: 125px !important;
-    max-width: 125px !important;
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
 
-    height: 52px !important;
-
-    gap: 9px;
+    height: 48px !important;
 
     border-color:
-        rgba(255, 80, 100, .45);
+        rgba(255, 80, 100, .5);
 
     background:
         linear-gradient(
             135deg,
             rgba(75, 20, 28, .98),
-            rgba(35, 12, 17, .98)
+            rgba(35, 12, 17, .99)
         );
 
     color: #ff7d91;
 
-    font-size: 15px;
-    font-weight: 900;
+    font-size: 15px !important;
 }
 
 
@@ -7639,15 +7642,34 @@ function scanValidatorRows() {
    ERROR ICON
    ========================================================= */
 
-.camino-validator-btn.camino-validator-error i {
+.camino-validator-btn.camino-validator-error > i {
 
-    font-size: 21px !important;
+    width: 22px !important;
+    height: 22px !important;
+
+    font-size: 19px !important;
 
     color: #ff687f;
 
-    text-shadow:
-        0 0 8px
-        rgba(255, 80, 100, .55);
+    filter:
+        drop-shadow(
+            0 0 6px
+            rgba(255, 80, 100, .5)
+        );
+}
+
+
+/* =========================================================
+   ERROR TEXT
+   ========================================================= */
+
+.camino-validator-btn.camino-validator-error span {
+
+    font-size: 14px !important;
+
+    font-weight: 900 !important;
+
+    letter-spacing: .6px;
 }
 
     `;
