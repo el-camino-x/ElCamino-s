@@ -6690,12 +6690,19 @@ function injectValidatorHeader(table) {
 
     if (!table) return;
 
-    const thead = table.querySelector('thead');
+    const thead =
+        table.querySelector('thead');
+
     if (!thead) return;
+
+    const headerRow =
+        thead.querySelector('tr');
+
+    if (!headerRow) return;
 
     // Jangan inject 2x
     if (
-        thead.querySelector(
+        headerRow.querySelector(
             '.camino-validator-header'
         )
     ) {
@@ -6703,43 +6710,25 @@ function injectValidatorHeader(table) {
     }
 
     // =========================================
-    // CARI HEADER "AKSI"
+    // CARI HEADER AKSI
     // =========================================
 
-    const allHeaders =
-        thead.querySelectorAll('th');
-
-    let actionHeader = null;
-
-    allHeaders.forEach(th => {
-
-        const text =
-            th.innerText
-                .trim()
-                .toUpperCase();
-
-        if (text === 'AKSI') {
-            actionHeader = th;
-        }
-    });
-
-    if (!actionHeader) {
-
-        console.warn(
-            '[CAMINO VALIDATOR] Header AKSI tidak ditemukan'
+    const headers =
+        Array.from(
+            headerRow.querySelectorAll('th')
         );
 
+    const actionHeader =
+        headers.find(th =>
+            th.innerText
+                .trim()
+                .replace(/\s+/g, ' ')
+                .toUpperCase() === 'AKSI'
+        );
+
+    if (!actionHeader) {
         return;
     }
-
-    // =========================================
-    // PAKAI ROW YANG SAMA DENGAN AKSI
-    // =========================================
-
-    const headerRow =
-        actionHeader.closest('tr');
-
-    if (!headerRow) return;
 
     // =========================================
     // BUAT HEADER VALIDATOR
@@ -6750,25 +6739,6 @@ function injectValidatorHeader(table) {
 
     th.className =
         'camino-validator-header';
-
-    // Samakan atribut penting dengan AKSI
-    if (actionHeader.hasAttribute('style')) {
-        th.setAttribute(
-            'style',
-            actionHeader.getAttribute('style')
-        );
-    }
-
-    if (actionHeader.hasAttribute('class')) {
-        th.classList.add(
-            ...actionHeader.classList
-        );
-    }
-
-    // Pastikan class kita tetap ada
-    th.classList.add(
-        'camino-validator-header'
-    );
 
     th.innerHTML = `
         <span class="camino-validator-header-title">
@@ -6783,10 +6753,6 @@ function injectValidatorHeader(table) {
     actionHeader.insertAdjacentElement(
         'afterend',
         th
-    );
-
-    console.log(
-        '[CAMINO VALIDATOR] VALIDATOR header injected'
     );
 }
 
@@ -6827,15 +6793,24 @@ function injectValidatorHeader(table) {
             '.camino-validator-btn'
         );
 
+
+    // =========================================
+    // CLICK VALIDATOR
+    // =========================================
+
     btn.addEventListener('click', async () => {
 
         // =========================================
         // SUDAH BERHASIL DIVALIDASI
         // =========================================
-        if (btn.dataset.validated === "1") {
+
+        if (
+            btn.dataset.validated === "1"
+        ) {
             console.warn(
                 '[CAMINO VALIDATOR] ACCOUNT ALREADY VALIDATED'
             );
+
             return;
         }
 
@@ -6843,10 +6818,14 @@ function injectValidatorHeader(table) {
         // =========================================
         // BLOCK DOUBLE CLICK
         // =========================================
-        if (btn.dataset.validating === "1") {
+
+        if (
+            btn.dataset.validating === "1"
+        ) {
             console.warn(
                 '[CAMINO VALIDATOR] VALIDATION ALREADY RUNNING'
             );
+
             return;
         }
 
@@ -6854,21 +6833,25 @@ function injectValidatorHeader(table) {
         // =========================================
         // LOCK
         // =========================================
+
         btn.dataset.validating = "1";
         btn.disabled = true;
 
 
         // =========================================
-        // RESET ERROR STATE
+        // RESET STATE
         // =========================================
+
         btn.classList.remove(
-            'camino-validator-error'
+            'camino-validator-error',
+            'camino-validator-success'
         );
 
 
         // =========================================
         // LOADING
         // =========================================
+
         btn.innerHTML = `
             <i class="fa fa-spinner fa-spin"></i>
         `;
@@ -6879,6 +6862,7 @@ function injectValidatorHeader(table) {
             // =========================================
             // PAYMENT TO
             // =========================================
+
             const paymentTo =
                 row.querySelectorAll('td')[5];
 
@@ -6904,6 +6888,7 @@ function injectValidatorHeader(table) {
             // =========================================
             // ACCOUNT NUMBER
             // =========================================
+
             const accountMatch =
                 text.match(/(\d{6,20})$/);
 
@@ -6922,6 +6907,7 @@ function injectValidatorHeader(table) {
             // =========================================
             // BANK
             // =========================================
+
             const beforeAccount =
                 text
                     .slice(0, accountMatch.index)
@@ -6970,6 +6956,7 @@ function injectValidatorHeader(table) {
             // =========================================
             // API — SATU REQUEST
             // =========================================
+
             console.log(
                 '[CAMINO VALIDATOR] STARTING API VALIDATION...'
             );
@@ -6991,6 +6978,7 @@ function injectValidatorHeader(table) {
             // =========================================
             // HASIL API
             // =========================================
+
             const data =
                 result?.data || result;
 
@@ -7004,17 +6992,13 @@ function injectValidatorHeader(table) {
             // =========================================
             // SUCCESS
             // =========================================
+
             btn.innerHTML = `
                 <i class="fa fa-check"></i>
                 <span>
                     ${avEscape(accountName)}
                 </span>
             `;
-
-
-            btn.classList.remove(
-                'camino-validator-error'
-            );
 
 
             btn.classList.add(
@@ -7025,6 +7009,7 @@ function injectValidatorHeader(table) {
             // =========================================
             // PERMANENT LOCK
             // =========================================
+
             btn.dataset.validated = "1";
             btn.dataset.validating = "0";
 
@@ -7046,6 +7031,7 @@ function injectValidatorHeader(table) {
             // =========================================
             // ERROR
             // =========================================
+
             console.error(
                 '[CAMINO VALIDATOR] VALIDATION ERROR:',
                 error
@@ -7058,11 +7044,6 @@ function injectValidatorHeader(table) {
             `;
 
 
-            btn.classList.remove(
-                'camino-validator-success'
-            );
-
-
             btn.classList.add(
                 'camino-validator-error'
             );
@@ -7073,11 +7054,18 @@ function injectValidatorHeader(table) {
             // =========================================
             // REQUEST SELESAI
             // =========================================
+
             btn.dataset.validating = "0";
 
 
-            // Kalau SUKSES:
-            // tetap disabled.
+            /*
+             * SUCCESS
+             * → PERMANEN DISABLED
+             *
+             * ERROR
+             * → BISA RETRY
+             */
+
             if (
                 btn.dataset.validated === "1"
             ) {
@@ -7086,8 +7074,6 @@ function injectValidatorHeader(table) {
 
             } else {
 
-                // Kalau ERROR:
-                // boleh retry.
                 btn.disabled = false;
 
             }
@@ -7100,11 +7086,97 @@ function injectValidatorHeader(table) {
     });
 
 
-    row.appendChild(td);
+    // =========================================
+    // INSERT CELL SETELAH AKSI
+    // =========================================
+
+    const table =
+        row.closest('table');
+
+    if (!table) {
+        row.appendChild(td);
+        return;
+    }
+
+
+    const headerRow =
+        table.querySelector('thead tr');
+
+    if (!headerRow) {
+        row.appendChild(td);
+        return;
+    }
+
+
+    // =========================================
+    // CARI POSISI AKSI DARI HEADER
+    // =========================================
+
+    const headers =
+        Array.from(
+            headerRow.querySelectorAll('th')
+        );
+
+
+    const actionIndex =
+        headers.findIndex(th =>
+            th.innerText
+                .trim()
+                .replace(/\s+/g, ' ')
+                .toUpperCase() === 'AKSI'
+        );
+
+
+    // =========================================
+    // CARI CELL AKSI PADA ROW
+    // =========================================
+
+    const rowCells =
+        Array.from(
+            row.querySelectorAll('td')
+        );
+
+
+    const actionCell =
+        rowCells[actionIndex];
+
+
+    // =========================================
+    // INSERT VALIDATOR SETELAH AKSI
+    // =========================================
+
+    if (actionCell) {
+
+        actionCell.insertAdjacentElement(
+            'afterend',
+            td
+        );
+
+    } else {
+
+        // Fallback
+        row.appendChild(td);
+    }
 }
 
 function scanValidatorRows() {
 
+    // =========================================
+    // 1. CARI SEMUA TABLE
+    // =========================================
+    document
+        .querySelectorAll('table')
+        .forEach(table => {
+
+            // Header VALIDATOR selalu dicek
+            // walaupun belum ada data/row
+            injectValidatorHeader(table);
+        });
+
+
+    // =========================================
+    // 2. INJECT CELL VALIDATOR KE ROW
+    // =========================================
     const rows =
         document.querySelectorAll(
             'tbody tr[role="row"]'
@@ -7115,37 +7187,40 @@ function scanValidatorRows() {
         const paymentTo =
             row.querySelectorAll('td')[5];
 
+        // Kalau row bukan row yang kita cari,
+        // jangan inject cell
         if (!paymentTo) {
             return;
         }
 
-        const table =
-            row.closest('table');
-
-        if (!table) {
-            return;
-        }
-
-        // Header cuma di table ini
-        injectValidatorHeader(table);
-
-        // Cell validator
+        // Inject cell validator
         injectValidator(row);
     });
 }
 
-    // Initial scan
-    scanValidatorRows();
 
-    // Monitor perubahan table
-    const observer = new MutationObserver(() => {
+// =========================================
+// INITIAL SCAN
+// =========================================
+
+scanValidatorRows();
+
+
+// =========================================
+// MONITOR TABLE
+// =========================================
+
+const observer =
+    new MutationObserver(() => {
+
         scanValidatorRows();
+
     });
 
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
+observer.observe(document.body, {
+    childList: true,
+    subtree: true
+});
 
 })();
 
