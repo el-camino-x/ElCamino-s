@@ -5325,39 +5325,88 @@ w.addEventListener(
     );
     validateButton.onclick =
         async () => {
+
+            // =========================================
+            // BLOCK DOUBLE CLICK / DOUBLE REQUEST
+            // =========================================
+
+            if (validationInProgress) {
+
+                console.log(
+                    "[CAMINO VALIDATOR] Validation already running."
+                );
+
+                return;
+            }
+
+
+            // =========================================
+            // GET INPUT
+            // =========================================
+
             const bankCode =
-                bankValue.value;
+                bankValue.value.trim();
+
             const bankName =
-                bankSearch.value
-                    .trim();
+                bankSearch.value.trim();
+
             const accountNumber =
-                accountInput.value
-                    .trim();
-            if (
-                !bankCode
-            ) {
+                accountInput.value.trim();
+
+
+            // =========================================
+            // BASIC VALIDATION
+            // =========================================
+
+            if (!bankCode) {
+
                 statusBox.innerHTML = `
                     <div class="av-error">
                         ✕ PILIH BANK TERLEBIH DAHULU
                     </div>
                 `;
+
                 return;
             }
-            if (
-                !accountNumber
-            ) {
+
+
+            if (!accountNumber) {
+
                 statusBox.innerHTML = `
                     <div class="av-error">
                         ✕ NOMOR REKENING KOSONG
                     </div>
                 `;
+
                 accountInput.focus();
+
                 return;
             }
+
+
+            // =========================================
+            // LOCK
+            // =========================================
+
+            validationInProgress = true;
+
             validateButton.disabled =
                 true;
-            validateButton.textContent =
-                "CHECKING...";
+
+            validateButton.classList.add(
+                "is-loading"
+            );
+
+
+            // =========================================
+            // LOADING
+            // =========================================
+
+            validateButton.innerHTML = `
+                <span class="av-spinner"></span>
+                VALIDATING...
+            `;
+
             statusBox.innerHTML = `
                 <div class="av-loading">
                     <span class="av-loading-dot">
@@ -5367,95 +5416,164 @@ w.addEventListener(
                     ON CHECKING...
                 </div>
             `;
+
+
             try {
+
+                console.log(
+                    "[CAMINO VALIDATOR] MANUAL VALIDATION START"
+                );
+
+                console.log(
+                    "[CAMINO VALIDATOR] BANK:",
+                    bankName
+                );
+
+                console.log(
+                    "[CAMINO VALIDATOR] BANK CODE:",
+                    bankCode
+                );
+
+                console.log(
+                    "[CAMINO VALIDATOR] ACCOUNT:",
+                    accountNumber
+                );
+
+
+                // =========================================
+                // API
+                // SATU REQUEST SAJA
+                // =========================================
+
                 const result =
-                    await validateAccount(
+                    await caminoValidateAccount(
                         bankCode,
                         accountNumber
                     );
+
+
                 console.log(
-                    "[ACCOUNT VALIDATOR] RESULT:",
+                    "[CAMINO VALIDATOR] RESULT:",
                     result
                 );
+
+
+                // =========================================
+                // RESPONSE DATA
+                // =========================================
+
+                const data =
+                    result?.data ||
+                    result ||
+                    {};
+
+
                 const name =
-                    result?.data?.account_name ||
-                    result?.data?.nama ||
-                    result?.account_name ||
-                    result?.nama ||
-                    result?.data?.accountName ||
-                    result?.accountName;
-                if (
-                    result?.success &&
-                    name
-                ) {
-                    statusBox.innerHTML = `
-                        <div class="av-success">
-                            <span class="av-success-icon">
-                                ✓
-                            </span>
-                            ACCOUNT VALID
-                        </div>
-                        <div class="av-name-label">
-                            ACCOUNT NAME
-                        </div>
-                        <div class="av-name">
-                            ${avEscape(name)}
-                        </div>
-                        <div class="av-bank-confirm">
-                            ${avEscape(bankName)}
-                            <span>•</span>
-                            ${avEscape(accountNumber)}
-                        </div>
-                    `;
-                }
-                else if (
-                    result?.success
-                ) {
-                    statusBox.innerHTML = `
-                        <div class="av-success">
-                            ✓ REQUEST SUCCESS
-                        </div>
-                        <pre class="av-json">${avEscape(
-                            JSON.stringify(
-                                result,
-                                null,
-                                2
-                            )
-                        )}</pre>
-                    `;
-                }
-                else {
-                    throw new Error(
-                        result?.message ||
-                        "Validasi gagal"
-                    );
-                }
-            }
-            catch (
-                error
-            ) {
-                console.error(
-                    "[ACCOUNT VALIDATOR]",
-                    error
-                );
+                    data?.account_name ||
+                    data?.accountName ||
+                    data?.nama ||
+                    "-";
+
+
+                const returnedAccount =
+                    data?.account_number ||
+                    data?.accountNumber ||
+                    accountNumber;
+
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+
                 statusBox.innerHTML = `
-                    <div class="av-error">
-                        ✕ VALIDATION ERROR
-                    </div>
-                    <div class="av-error-detail">
-                        ${avEscape(
-                            error.message
-                        )}
+                    <div class="av-success">
+
+                        <div class="av-success-title">
+                            ✓ ACCOUNT VALID
+                        </div>
+
+                        <div class="av-result-row">
+                            <span>BANK</span>
+                            <strong>
+                                ${avEscape(bankName)}
+                            </strong>
+                        </div>
+
+                        <div class="av-result-row">
+                            <span>ACCOUNT</span>
+                            <strong>
+                                ${avEscape(
+                                    returnedAccount
+                                )}
+                            </strong>
+                        </div>
+
+                        <div class="av-result-row">
+                            <span>NAME</span>
+                            <strong>
+                                ${avEscape(name)}
+                            </strong>
+                        </div>
+
                     </div>
                 `;
-            }
-            finally {
+
+
+            } catch (
+                error
+            ) {
+
+                console.error(
+                    "[CAMINO VALIDATOR] MANUAL VALIDATION ERROR:",
+                    error
+                );
+
+
+                statusBox.innerHTML = `
+                    <div class="av-error">
+
+                        <div class="av-error-title">
+                            ✕ VALIDATION FAILED
+                        </div>
+
+                        <div class="av-error-message">
+                            ${avEscape(
+                                error?.message ||
+                                "Terjadi kesalahan saat validasi"
+                            )}
+                        </div>
+
+                    </div>
+                `;
+
+
+            } finally {
+
+                // =========================================
+                // UNLOCK
+                // =========================================
+
+                validationInProgress = false;
+
                 validateButton.disabled =
                     false;
-                validateButton.textContent =
+
+                validateButton.classList.remove(
+                    "is-loading"
+                );
+
+                validateButton.innerHTML =
                     "VALIDATE";
+
+
+                console.log(
+                    "[CAMINO VALIDATOR] MANUAL VALIDATION FINISHED"
+                );
+
             }
+
         };
+
     accountInput.addEventListener(
         "keydown",
         event => {
@@ -6673,10 +6791,7 @@ w.addEventListener(
 
 })();
 
-/* =========================================================
-   CAMINO VALIDATOR COLUMN
-   STEP 1 — INJECT VALIDATOR BUTTON
-========================================================= */
+
 
 (function initCaminoValidator() {
 
@@ -6688,10 +6803,6 @@ w.addEventListener(
     let scanTimer = null;
 
 
-    // =========================================================
-    // GET TABLE
-    // =========================================================
-
     function getTable() {
 
         return document.getElementById(
@@ -6699,26 +6810,6 @@ w.addEventListener(
         );
 
     }
-
-
-    // =========================================================
-    // GET ACTION CELL
-    //
-    // DOM ASLI:
-    //
-    // 0 checkbox
-    // 1 No
-    // 2 tanggal
-    // 3 tiket
-    // 4 username
-    // 5 payment to
-    // 6 amount
-    // 7 grup
-    // 8 balance
-    // 9 payment from
-    // 10 aksi
-    //
-    // =========================================================
 
     function getActionCell(row) {
 
@@ -6930,10 +7021,6 @@ w.addEventListener(
                         accountMatch[1];
 
 
-                    // =================================================
-                    // TEXT BEFORE ACCOUNT
-                    // =================================================
-
                     const beforeAccount =
                         text
                             .slice(
@@ -6942,21 +7029,89 @@ w.addEventListener(
                             )
                             .trim();
 
+                    let bank = null;
 
-                    // =================================================
-                    // BANK
-                    // =================================================
+                    const normalizedBeforeAccount =
+                        beforeAccount
+                            .toUpperCase()
+                            .replace(/\s+/g, " ")
+                            .trim();
 
-                    const bankMatch =
-                        beforeAccount.match(
-                            /([A-Za-z0-9]+)$/
-                        );
+                    const matchedBank =
+                        window.AV_BANK_LIST
+                            .slice()
+                            .sort(
+                                (a, b) =>
+                                    b[0].length -
+                                    a[0].length
+                            )
+                            .find(
+                                ([bankName]) => {
+
+                                    const normalizedBankName =
+                                        bankName
+                                            .toUpperCase()
+                                            .replace(
+                                                /\s+/g,
+                                                " "
+                                            )
+                                            .trim();
 
 
-                    const bank =
-                        bankMatch
-                            ? bankMatch[1]
-                            : null;
+                                    if (
+                                        normalizedBeforeAccount.endsWith(
+                                            normalizedBankName
+                                        )
+                                    ) {
+                                        return true;
+                                    }
+
+
+                                    const compactBefore =
+                                        normalizedBeforeAccount.replace(
+                                            /\s+/g,
+                                            ""
+                                        );
+
+                                    const compactBank =
+                                        normalizedBankName.replace(
+                                            /\s+/g,
+                                            ""
+                                        );
+
+
+                                    return compactBefore.endsWith(
+                                        compactBank
+                                    );
+
+                                }
+                            );
+
+
+                    if (
+                        matchedBank
+                    ) {
+
+                        bank =
+                            matchedBank[0];
+
+                    }
+
+
+                    else {
+
+                        const bankMatch =
+                            beforeAccount.match(
+                                /([A-Za-z0-9]+)$/
+                            );
+
+
+                        bank =
+                            bankMatch
+                                ? bankMatch[1]
+                                : null;
+
+                    }
 
 
                     const bankCode =
@@ -6990,10 +7145,6 @@ w.addEventListener(
                     }
 
 
-                    // =================================================
-                    // API
-                    // =================================================
-
                     const result =
                         await caminoValidateAccount(
                             bankCode,
@@ -7007,9 +7158,6 @@ w.addEventListener(
                     );
 
 
-                    // =================================================
-                    // RESULT
-                    // =================================================
 
                     const data =
                         result?.data ||
@@ -7023,10 +7171,6 @@ w.addEventListener(
                         data?.nama ||
                         'VALID';
 
-
-                    // =================================================
-                    // SUCCESS
-                    // =================================================
 
                     btn.innerHTML = `
                         <i class="fa fa-check"></i>
@@ -7105,14 +7249,6 @@ w.addEventListener(
             }
         );
 
-
-        // =====================================================
-        // APPEND KE ACTION CELL
-        //
-        // BUKAN append <td> baru.
-        // Jadi jumlah kolom DataTables TETAP.
-        // =====================================================
-
         const container =
             actionCell.querySelector(
                 '.btn-container'
@@ -7136,15 +7272,6 @@ w.addEventListener(
 
     }
 
-
-    // =========================================================
-    // HEADER
-    //
-    // KITA TIDAK MEMBUAT TH.
-    //
-    // Header "VALIDATOR" ditampilkan menggunakan CSS
-    // pada header Aksi.
-    // =========================================================
 
     function markHeader() {
 
@@ -7210,9 +7337,6 @@ w.addEventListener(
     }
 
 
-    // =========================================================
-    // SCAN
-    // =========================================================
 
     function scan() {
 
@@ -7246,10 +7370,6 @@ w.addEventListener(
     }
 
 
-    // =========================================================
-    // DEBOUNCE
-    // =========================================================
-
     function scheduleScan() {
 
         if (scanTimer) {
@@ -7274,13 +7394,6 @@ w.addEventListener(
 
     }
 
-
-    // =========================================================
-    // DATATABLE REDRAW DETECTOR
-    //
-    // Hanya listen perubahan TBODY.
-    // Tidak menyentuh header.
-    // =========================================================
 
     function observe() {
 
@@ -7387,7 +7500,8 @@ w.addEventListener(
 
 /* =========================================================
    CAMINO VALIDATOR
-   DARK PREMIUM / DATATABLES SAFE
+   LARGE PREMIUM / 2-LINE ACCOUNT NAME
+   DATATABLES SAFE
    ========================================================= */
 
 
@@ -7397,23 +7511,30 @@ w.addEventListener(
 
 .camino-validator-btn {
 
-    width: 200px !important;
-    height: 32px !important;
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+
+    height: 54px !important;
+    min-height: 54px !important;
 
     margin-left: 6px !important;
-    padding: 6px 10px !important;
+
+    padding: 7px 12px !important;
 
     display: inline-flex !important;
+
     align-items: center !important;
     justify-content: center !important;
 
-    gap: 7px !important;
+    gap: 10px !important;
 
     box-sizing: border-box !important;
 
-    border: 1px solid rgba(105, 130, 180, .35) !important;
+    border:
+        1px solid rgba(105, 130, 180, .40) !important;
 
-    border-radius: 7px !important;
+    border-radius: 9px !important;
 
     background:
         linear-gradient(
@@ -7423,25 +7544,23 @@ w.addEventListener(
             #0c111a 100%
         ) !important;
 
-    color: #b9c8e8 !important;
+    color: #dce7ff !important;
 
     font-family: inherit !important;
 
-    font-size: 14px !important;
-    font-weight: 700 !important;
+    font-size: 19px !important;
+    font-weight: 800 !important;
 
-    line-height: 18px !important;
+    line-height: 22px !important;
 
-    white-space: nowrap !important;
+    white-space: normal !important;
 
     overflow: hidden !important;
 
-    text-overflow: ellipsis !important;
-
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.07),
+        inset 0 1px 0 rgba(255,255,255,.08),
         inset 0 -1px 0 rgba(0,0,0,.45),
-        0 2px 6px rgba(0,0,0,.45) !important;
+        0 3px 8px rgba(0,0,0,.48) !important;
 
     cursor: pointer !important;
 
@@ -7457,9 +7576,6 @@ w.addEventListener(
 }
 
 
-/* =========================================================
-   ICON
-   ========================================================= */
 
 .camino-validator-btn i {
 
@@ -7470,55 +7586,61 @@ w.addEventListener(
 
     flex: 0 0 auto !important;
 
-    width: 15px !important;
-    height: 15px !important;
+    width: 21px !important;
+    height: 21px !important;
 
-    font-size: 13px !important;
+    font-size: 18px !important;
 
     line-height: 1 !important;
 }
 
 
-/* =========================================================
-   ACCOUNT NAME
-   ========================================================= */
 
 .camino-validator-name {
 
-    display: block !important;
+    display: -webkit-box !important;
+
+    flex: 1 1 auto !important;
 
     min-width: 0 !important;
 
-    max-width: 155px !important;
+    width: auto !important;
+
+    max-width: 175px !important;
 
     overflow: hidden !important;
 
-    text-overflow: ellipsis !important;
+    text-overflow: clip !important;
 
-    white-space: nowrap !important;
+    white-space: normal !important;
+
+    word-break: normal !important;
+
+    overflow-wrap: anywhere !important;
+
+    line-height: 21px !important;
+
+    font-size: 19px !important;
+
+    font-weight: 850 !important;
+
+    letter-spacing: .15px !important;
 
     color: inherit !important;
 
-    font-size: 13px !important;
+    -webkit-box-orient: vertical !important;
 
-    font-weight: 700 !important;
-
-    line-height: 18px !important;
-
-    letter-spacing: .2px !important;
+    -webkit-line-clamp: 2 !important;
 }
 
 
-/* =========================================================
-   HOVER
-   ========================================================= */
-
 .camino-validator-btn:hover {
 
-    transform: translateY(-1px) !important;
+    transform:
+        translateY(-1px) !important;
 
     border-color:
-        rgba(125, 155, 215, .65) !important;
+        rgba(125, 155, 215, .72) !important;
 
     background:
         linear-gradient(
@@ -7528,18 +7650,14 @@ w.addEventListener(
             #101722 100%
         ) !important;
 
-    color: #e5edff !important;
+    color: #f2f6ff !important;
 
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.09),
-        0 4px 12px rgba(0,0,0,.55),
-        0 0 10px rgba(90,120,190,.12) !important;
+        inset 0 1px 0 rgba(255,255,255,.10),
+        0 5px 14px rgba(0,0,0,.55),
+        0 0 12px rgba(90,120,190,.15) !important;
 }
 
-
-/* =========================================================
-   ACTIVE / CLICK
-   ========================================================= */
 
 .camino-validator-btn:active {
 
@@ -7553,30 +7671,18 @@ w.addEventListener(
 }
 
 
-/* =========================================================
-   DISABLED / LOADING
-   ========================================================= */
-
 .camino-validator-btn:disabled {
-
     cursor: wait !important;
-
-    opacity: .85 !important;
-
+    opacity: .88 !important;
     transform: none !important;
-
     pointer-events: none !important;
 }
 
 
-/* =========================================================
-   LOADING STATE
-   ========================================================= */
-
 .camino-validator-btn.camino-validator-loading {
 
     border-color:
-        rgba(80, 170, 255, .5) !important;
+        rgba(80, 170, 255, .55) !important;
 
     background:
         linear-gradient(
@@ -7591,13 +7697,9 @@ w.addEventListener(
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,.06),
         0 3px 10px rgba(0,0,0,.5),
-        0 0 12px rgba(70,160,255,.12) !important;
+        0 0 14px rgba(70,160,255,.15) !important;
 }
 
-
-/* =========================================================
-   LOADING SPINNER
-   ========================================================= */
 
 .camino-validator-btn.camino-validator-loading i {
 
@@ -7620,14 +7722,10 @@ w.addEventListener(
 }
 
 
-/* =========================================================
-   SUCCESS
-   ========================================================= */
-
 .camino-validator-btn.camino-validator-success {
 
     border-color:
-        rgba(72, 220, 145, .45) !important;
+        rgba(72, 220, 145, .48) !important;
 
     background:
         linear-gradient(
@@ -7642,31 +7740,23 @@ w.addEventListener(
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,.06),
         0 3px 9px rgba(0,0,0,.45),
-        0 0 10px rgba(72,220,145,.08) !important;
+        0 0 12px rgba(72,220,145,.10) !important;
 }
 
-
-/* =========================================================
-   SUCCESS ICON
-   ========================================================= */
 
 .camino-validator-btn.camino-validator-success i {
 
     color: #72e6a5 !important;
 
     text-shadow:
-        0 0 6px rgba(72,220,145,.25) !important;
+        0 0 7px rgba(72,220,145,.30) !important;
 }
 
-
-/* =========================================================
-   SUCCESS HOVER
-   ========================================================= */
 
 .camino-validator-btn.camino-validator-success:hover {
 
     border-color:
-        rgba(90, 240, 160, .7) !important;
+        rgba(90, 240, 160, .72) !important;
 
     background:
         linear-gradient(
@@ -7676,23 +7766,19 @@ w.addEventListener(
             #0d1915 100%
         ) !important;
 
-    color: #9affc2 !important;
+    color: #a2ffca !important;
 
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,.08),
         0 5px 14px rgba(0,0,0,.5),
-        0 0 14px rgba(72,220,145,.14) !important;
+        0 0 16px rgba(72,220,145,.16) !important;
 }
 
-
-/* =========================================================
-   ERROR
-   ========================================================= */
 
 .camino-validator-btn.camino-validator-error {
 
     border-color:
-        rgba(255, 80, 100, .45) !important;
+        rgba(255, 80, 100, .48) !important;
 
     background:
         linear-gradient(
@@ -7707,19 +7793,12 @@ w.addEventListener(
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,.05),
         0 3px 9px rgba(0,0,0,.45),
-        0 0 10px rgba(255,70,90,.08) !important;
+        0 0 12px rgba(255,70,90,.10) !important;
 }
 
-
-/* =========================================================
-   ERROR HOVER
-   ========================================================= */
-
 .camino-validator-btn.camino-validator-error:hover {
-
     border-color:
-        rgba(255, 100, 120, .7) !important;
-
+        rgba(255, 100, 120, .72) !important;
     background:
         linear-gradient(
             145deg,
@@ -7727,134 +7806,207 @@ w.addEventListener(
             #27151c 55%,
             #180d12 100%
         ) !important;
-
     color: #ff9aa5 !important;
 }
 
-
-/* =========================================================
-   ACTION HEADER
-   ========================================================= */
-
 .camino-action-header
 .DataTables_sort_wrapper {
-
     display: flex !important;
-
     align-items: center !important;
-
     justify-content: center !important;
-
     gap: 8px !important;
 }
 
-
-/* =========================================================
-   VISUAL HEADER LABEL
-   ========================================================= */
-
 .camino-action-header
 .DataTables_sort_wrapper::after {
-
     content: "VALIDATOR";
-
-    font-size: 11px !important;
-
-    font-weight: 700 !important;
-
-    letter-spacing: .08em !important;
-
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: .10em !important;
     color: #00f5ff !important;
-
-    opacity: .9 !important;
+    opacity: .95 !important;
+    text-shadow:
+        0 0 8px rgba(0,245,255,.25) !important;
 }
-
-
-/* =========================================================
-   ACTION CELL
-   ========================================================= */
 
 #withdrawal-pending-table
 tbody
 td.gridview.sticky-action-revamp.right {
-
     white-space: nowrap !important;
+    overflow: visible !important;
 }
-
-
-/* =========================================================
-   PREVENT DATATABLES FROM SHRINKING BUTTON
-   ========================================================= */
 
 #withdrawal-pending-table
 tbody
 .camino-validator-btn {
-
     flex-shrink: 0 !important;
-
-    min-width: 200px !important;
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+    height: 54px !important;
+    min-height: 54px !important;
 }
-
-
-/* =========================================================
-   NAME INSIDE BUTTON
-   ========================================================= */
 
 #withdrawal-pending-table
 .camino-validator-btn
 .camino-validator-name {
-
-    display: block !important;
-
+    display: -webkit-box !important;
+    flex: 1 1 auto !important;
     min-width: 0 !important;
-
-    max-width: 155px !important;
-
+    max-width: 175px !important;
     overflow: hidden !important;
-
-    text-overflow: ellipsis !important;
-
-    white-space: nowrap !important;
-
-    font-size: 13px !important;
-
-    font-weight: 700 !important;
-
-    line-height: 18px !important;
-
-    letter-spacing: .2px !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+    font-size: 19px !important;
+    font-weight: 850 !important;
+    line-height: 21px !important;
+    letter-spacing: .15px !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
 }
-
-
-/* =========================================================
-   OPTIONAL: KEEP ACTION ITEMS ALIGNED
-   ========================================================= */
 
 #withdrawal-pending-table
 .action-btn-container {
-
     display: flex !important;
-
     align-items: center !important;
-
-    gap: 4px !important;
+    gap: 5px !important;
+    overflow: visible !important;
 }
-
-
-/* =========================================================
-   OPTIONAL: BUTTON DOES NOT BREAK TABLE ROW
-   ========================================================= */
 
 #withdrawal-pending-table
 .camino-validator-btn {
-
     vertical-align: middle !important;
-
     margin-top: 0 !important;
-
     margin-bottom: 0 !important;
 }
 
+@media (max-width: 1200px) {
+    .camino-validator-btn {
+        width: 195px !important;
+        min-width: 195px !important;
+        max-width: 195px !important;
+        height: 52px !important;
+        min-height: 52px !important;
+    }
+
+    .camino-validator-name {
+        max-width: 150px !important;
+        font-size: 17px !important;
+        line-height: 19px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .camino-validator-btn,
+    .camino-validator-btn.camino-validator-loading i {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+#withdrawal-pending-table
+tbody
+.new-approve-btn,
+#withdrawal-pending-table
+tbody
+.reject-btn,
+#withdrawal-pending-table
+tbody
+.approve-btn {
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+    box-sizing: border-box !important;
+    padding: 7px 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    border-radius: 9px !important;
+    font-size: 19px !important;
+    font-weight: 800 !important;
+    line-height: 22px !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+}
+
+#withdrawal-pending-table
+tbody
+.new-approve-btn i,
+#withdrawal-pending-table
+tbody
+.reject-btn i,
+#withdrawal-pending-table
+tbody
+.approve-btn i {
+    width: 21px !important;
+    height: 21px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    font-size: 18px !important;
+    line-height: 1 !important;
+}
+
+#withdrawal-pending-table
+tbody
+.new-approve-btn span,
+#withdrawal-pending-table
+tbody
+.reject-btn span,
+#withdrawal-pending-table
+tbody
+.approve-btn span {
+    font-size: 19px !important;
+    font-weight: 850 !important;
+    line-height: 22px !important;
+    white-space: nowrap !important;
+}
+
+
+#withdrawal-pending-table
+tbody
+.btn-container,
+#withdrawal-pending-table
+tbody
+.action-btn-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    overflow: visible !important;
+}
+
+
+#withdrawal-pending-table
+tbody
+.camino-validator-btn,
+#withdrawal-pending-table
+tbody
+.new-approve-btn,
+#withdrawal-pending-table
+tbody
+.reject-btn,
+#withdrawal-pending-table
+tbody
+.approve-btn {
+
+    height: 54px !important;
+    min-height: 54px !important;
+
+    border-radius: 9px !important;
+
+    font-size: 19px !important;
+    font-weight: 800 !important;
+
+    box-sizing: border-box !important;
+}
 
     `;
 
