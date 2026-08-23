@@ -5151,15 +5151,13 @@ w.addEventListener(
                 );
                 const name =
                     result?.data?.account_name ||
-                    result?.data?.nama ||
-                    result?.account_name ||
-                    result?.nama ||
                     result?.data?.accountName ||
+                    result?.account_name ||
                     result?.accountName;
                 if (
-                    result?.success &&
-                    name
-                ) {
+    result?.status === true &&
+    name
+) {
                     statusBox.innerHTML = `
                         <div class="av-success">
                             <span class="av-success-icon">
@@ -5181,7 +5179,7 @@ w.addEventListener(
                     `;
                 }
                 else if (
-                    result?.success
+                        result?.status === true
                 ) {
                     statusBox.innerHTML = `
                         <div class="av-success">
