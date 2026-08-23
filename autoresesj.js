@@ -4574,66 +4574,96 @@ function avEscape(value) {
         .replace(/'/g, "&#039;");
 }
 
-async function validateAccount(bankCode, accountNumber) {
-
-    if (!bankCode) {
-        throw new Error("BANK TIDAK DIDUKUNG");
-    }
-
-    if (!accountNumber) {
-        throw new Error("NOMOR REKENING KOSONG");
-    }
-
-    const url =
-        `${API_BASE}/api/v3/validate` +
-        `?code=${encodeURIComponent(bankCode)}` +
-        `&accountNumber=${encodeURIComponent(accountNumber)}`;
-
-    console.log("[ACCOUNT VALIDATOR V3] REQUEST:", url);
-
-    const response = await fetch(url, {
-        method: "GET",
-        headers: {
-            "X-API-Key": API_KEY,
-            "X-Idempotency-Key":
-                "elcamino-validator-" + Date.now()
-        }
-    });
-
-    let data;
-
-    try {
-        data = await response.json();
-    } catch {
-        throw new Error(
-            `Response API tidak valid (HTTP ${response.status})`
-        );
-    }
+async function caminoValidateAccount(bankCode, accountNumber) {
 
     console.log(
-        "[ACCOUNT VALIDATOR V3] RESPONSE:",
-        response.status,
-        data
+        '[CAMINO VALIDATOR] Sending validation request...'
     );
 
-    if (!response.ok) {
-        throw new Error(
-            data?.message ||
-            data?.error ||
-            data?.error_code ||
-            `HTTP ${response.status}`
-        );
-    }
+    console.log(
+        '[CAMINO VALIDATOR] BANK CODE:',
+        bankCode
+    );
 
-    if (data?.success === false || data?.status === false) {
-        throw new Error(
-            data?.message ||
-            data?.error ||
-            "Validasi gagal"
-        );
-    }
+    console.log(
+        '[CAMINO VALIDATOR] ACCOUNT:',
+        accountNumber
+    );
 
-    return data;
+    const url =
+        `${API_BASE}/api/cek` +
+        `?code=${encodeURIComponent(bankCode)}` +
+        `&nomor=${encodeURIComponent(accountNumber)}`;
+
+    console.log(
+        '[CAMINO VALIDATOR] REQUEST:',
+        url
+    );
+
+    try {
+
+        const response = await fetch(url, {
+            method: "GET",
+
+            headers: {
+                "X-API-Key": API_KEY,
+                "X-Idempotency-Key":
+                    "elcamino-row-validator-" +
+                    crypto.randomUUID()
+            }
+        });
+
+        console.log(
+            '[CAMINO VALIDATOR] HTTP STATUS:',
+            response.status
+        );
+
+        let data;
+
+        try {
+            data = await response.json();
+        } catch {
+            throw new Error(
+                `Response API tidak valid (HTTP ${response.status})`
+            );
+        }
+
+        console.log(
+            '[CAMINO VALIDATOR] API RESPONSE:',
+            data
+        );
+
+        if (!response.ok) {
+
+            throw new Error(
+                data?.message ||
+                data?.error ||
+                data?.error_code ||
+                `HTTP ${response.status}`
+            );
+        }
+
+        if (data?.success === false) {
+
+            throw new Error(
+                data?.message ||
+                data?.error ||
+                data?.error_code ||
+                "Validasi gagal"
+            );
+        }
+
+        return data;
+
+    } catch (error) {
+
+        console.error(
+            '[CAMINO VALIDATOR] API ERROR:',
+            error
+        );
+
+        throw error;
+    }
 }
 
 async function validateAccount(bankCode, accountNumber) {
@@ -5151,13 +5181,15 @@ w.addEventListener(
                 );
                 const name =
                     result?.data?.account_name ||
-                    result?.data?.accountName ||
+                    result?.data?.nama ||
                     result?.account_name ||
+                    result?.nama ||
+                    result?.data?.accountName ||
                     result?.accountName;
                 if (
-    result?.status === true &&
-    name
-) {
+                    result?.success &&
+                    name
+                ) {
                     statusBox.innerHTML = `
                         <div class="av-success">
                             <span class="av-success-icon">
@@ -5179,7 +5211,7 @@ w.addEventListener(
                     `;
                 }
                 else if (
-                        result?.status === true
+                    result?.success
                 ) {
                     statusBox.innerHTML = `
                         <div class="av-success">
