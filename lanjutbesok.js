@@ -6948,27 +6948,37 @@ w.addEventListener(
     row.appendChild(td);
 }
 
-    function scanValidatorRows() {
+function scanValidatorRows() {
 
-        // =========================================
-        // INJECT HEADER
-        // =========================================
-        document
-            .querySelectorAll('table')
-            .forEach(table => {
-                injectValidatorHeader(table);
-            });
+    const rows = document.querySelectorAll(
+        'tbody tr[role="row"]'
+    );
 
-        // =========================================
-        // INJECT VALIDATOR COLUMN
-        // =========================================
-        const rows = document.querySelectorAll(
-            'tbody tr[role="row"]'
-        );
+    rows.forEach(row => {
 
-        rows.forEach(injectValidator);
-    }
+        // Pastikan row ini memang row yang mau divalidasi
+        const paymentTo =
+            row.querySelectorAll('td')[5];
 
+        if (!paymentTo) {
+            return;
+        }
+
+        // Ambil table tempat row ini berada
+        const table =
+            row.closest('table');
+
+        if (!table) {
+            return;
+        }
+
+        // Inject HEADER hanya ke table validator
+        injectValidatorHeader(table);
+
+        // Inject tombol validator ke row
+        injectValidator(row);
+    });
+}
     // Initial scan
     scanValidatorRows();
 
