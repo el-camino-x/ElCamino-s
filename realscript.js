@@ -8294,41 +8294,113 @@ function highlightBlockedRows() {
     const isBlocked = BLOCK_ID.some(
       id => id.toString().trim().toLowerCase() === idUser.toLowerCase()
     );
-    if (isBlocked) {
-      tds.forEach(td => {
-        td.style.setProperty('background', 'rgba(138,130,250,.25)', 'important');
-        td.style.setProperty('background-image', 'none', 'important');
-        td.style.setProperty('color', '#111', 'important');
-        td.style.setProperty('font-weight', '500', 'important');
-        td.style.setProperty('text-shadow', 'none', 'important');
-        td.style.setProperty('box-shadow', 'none', 'important');
-        td.style.setProperty('border-color', 'rgba(0,0,0,.05)', 'important');
-        td.querySelectorAll('*').forEach(el => {
-          el.style.setProperty('color', 'inherit', 'important');
-          el.style.setProperty('text-shadow', 'none', 'important');
-        });
-      });
-      tr.style.setProperty('background', 'rgba(138,130,250,.25)', 'important');
-      tr.style.setProperty('background-image', 'none', 'important');
-      tr.dataset.caminoBlocked = 'true';
-    } else if (tr.dataset.caminoBlocked === 'true') {
-      tds.forEach(td => {
-        td.style.removeProperty('background');
-        td.style.removeProperty('background-image');
-        td.style.removeProperty('color');
-        td.style.removeProperty('font-weight');
-        td.style.removeProperty('text-shadow');
-        td.style.removeProperty('box-shadow');
-        td.style.removeProperty('border-color');
-        td.querySelectorAll('*').forEach(el => {
-          el.style.removeProperty('color');
-          el.style.removeProperty('text-shadow');
-        });
-      });
-      tr.style.removeProperty('background');
-      tr.style.removeProperty('background-image');
-      delete tr.dataset.caminoBlocked;
+if (isBlocked) {
+  tds.forEach((td, index) => {
+
+    // 🔒 JANGAN SENTUH KOLOM AKSI / VALIDATOR
+    if (index === 10) {
+      return;
     }
+
+    td.style.setProperty(
+      'background',
+      'rgba(138,130,250,.25)',
+      'important'
+    );
+
+    td.style.setProperty(
+      'background-image',
+      'none',
+      'important'
+    );
+
+    td.style.setProperty(
+      'color',
+      '#111',
+      'important'
+    );
+
+    td.style.setProperty(
+      'font-weight',
+      '500',
+      'important'
+    );
+
+    td.style.setProperty(
+      'text-shadow',
+      'none',
+      'important'
+    );
+
+    td.style.setProperty(
+      'box-shadow',
+      'none',
+      'important'
+    );
+
+    td.style.setProperty(
+      'border-color',
+      'rgba(0,0,0,.05)',
+      'important'
+    );
+
+    td.querySelectorAll('*').forEach(el => {
+      el.style.setProperty(
+        'color',
+        'inherit',
+        'important'
+      );
+
+      el.style.setProperty(
+        'text-shadow',
+        'none',
+        'important'
+      );
+    });
+  });
+
+  tr.style.setProperty(
+    'background',
+    'rgba(138,130,250,.25)',
+    'important'
+  );
+
+  tr.style.setProperty(
+    'background-image',
+    'none',
+    'important'
+  );
+
+  tr.dataset.caminoBlocked = 'true';
+
+} else if (tr.dataset.caminoBlocked === 'true') {
+
+  tds.forEach((td, index) => {
+
+    // 🔒 JANGAN HAPUS STYLE VALIDATOR
+    if (index === 10) {
+      return;
+    }
+
+    td.style.removeProperty('background');
+    td.style.removeProperty('background-image');
+    td.style.removeProperty('color');
+    td.style.removeProperty('font-weight');
+    td.style.removeProperty('text-shadow');
+    td.style.removeProperty('box-shadow');
+    td.style.removeProperty('border-color');
+
+    td.querySelectorAll('*').forEach(el => {
+      el.style.removeProperty('color');
+      el.style.removeProperty('text-shadow');
+    });
+  });
+
+  tr.style.removeProperty('background');
+  tr.style.removeProperty('background-image');
+
+  delete tr.dataset.caminoBlocked;
+}
   });
 }
 let caminoHighlightTimer = null;
