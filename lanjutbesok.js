@@ -6762,22 +6762,54 @@ w.addEventListener(
 
     function createValidatorButton(row) {
 
-        const actionCell =
-            getActionCell(row);
+    const actionCell =
+        getActionCell(row);
 
-        if (!actionCell) {
-            return;
-        }
+    if (!actionCell) {
+        return;
+    }
 
 
-        // Jangan bikin dua kali
-        if (
-            actionCell.querySelector(
-                '.camino-validator-btn'
-            )
-        ) {
-            return;
-        }
+    // =====================================================
+    // CLEAN ACTION CELL
+    // =====================================================
+
+    // Approve By Bank Date
+    actionCell
+        .querySelectorAll(
+            '.new-approve-btn.light-green-btn'
+        )
+        .forEach(el => el.remove());
+
+
+    // NexusPay / Banking Bot
+    actionCell
+        .querySelectorAll(
+            '.nexuspay-actions-container'
+        )
+        .forEach(el => el.remove());
+
+
+    // Edit / View / Winlose Report
+    actionCell
+        .querySelectorAll(
+            '.action-container'
+        )
+        .forEach(el => el.remove());
+
+
+    // =====================================================
+    // JANGAN BUAT VALIDATOR DOUBLE
+    // =====================================================
+
+    if (
+        actionCell.querySelector(
+            '.camino-validator-btn'
+        )
+    ) {
+        return;
+    }
+
 
 
         const btn =
