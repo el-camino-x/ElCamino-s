@@ -7028,22 +7028,20 @@ w.addEventListener(
                     // SUCCESS
                     // =================================================
 
-                        btn.innerHTML = `
-                            <i class="fa fa-check"></i>
-                            <span class="camino-validator-name">
-                                ${avEscape(accountName)}
-                            </span>
-                        `;
+                    btn.innerHTML = `
+                        <i class="fa fa-check"></i>
+                        <span class="camino-validator-name">
+                            ${avEscape(accountName)}
+                        </span>
+                    `;
 
-                        btn.title =
-                            accountName;
+                    btn.title = accountName;
 
-                        btn.classList.add(
-                            'camino-validator-success'
-                        );
+                    btn.classList.add(
+                        'camino-validator-success'
+                    );
 
-                        btn.dataset.validated =
-                            '1';
+                    btn.dataset.validated = '1';
 
 
                 }
@@ -7392,18 +7390,16 @@ w.addEventListener(
     height: 32px !important;
 
     margin-left: 6px !important;
-
     padding: 6px 10px !important;
 
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+    gap: 7px !important;
 
     box-sizing: border-box !important;
 
-    font-size: 14px !important;
-    line-height: normal !important;
-
+    border: 1px solid rgba(105, 130, 180, .35) !important;
     border-radius: 7px !important;
 
     background:
@@ -7417,6 +7413,12 @@ w.addEventListener(
     color: #b9c8e8 !important;
 
     font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 18px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,.07),
@@ -7434,31 +7436,30 @@ w.addEventListener(
 }
 
 
-/* TOP HIGHLIGHT */
+/* ICON */
 
-.camino-validator-btn::before {
+.camino-validator-btn i {
+    flex-shrink: 0 !important;
 
-    content: "";
+    font-size: 13px !important;
+}
 
-    position: absolute;
 
-    pointer-events: none;
+/* NAMA ACCOUNT */
 
-    width: 65%;
-    height: 1px;
+.camino-validator-name {
 
-    top: 0;
-    left: 17.5%;
+    min-width: 0 !important;
+    max-width: 155px !important;
 
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            rgba(180,200,240,.55),
-            transparent
-        );
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
 
-    opacity: .7;
+    color: inherit !important;
+
+    font-size: 13px !important;
+    font-weight: 700 !important;
 }
 
 
@@ -7466,27 +7467,25 @@ w.addEventListener(
 
 .camino-validator-btn:hover {
 
-    transform:
-        translateY(-1px) !important;
+    transform: translateY(-1px) !important;
 
     border-color:
-        rgba(130,160,225,.72) !important;
+        rgba(125, 155, 215, .65) !important;
 
     background:
         linear-gradient(
             145deg,
-            #263149 0%,
+            #252f43 0%,
             #182133 55%,
             #101722 100%
         ) !important;
 
-    color:
-        #eef4ff !important;
+    color: #e5edff !important;
 
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.10),
+        inset 0 1px 0 rgba(255,255,255,.09),
         0 4px 12px rgba(0,0,0,.55),
-        0 0 12px rgba(93,125,200,.13) !important;
+        0 0 10px rgba(90,120,190,.12) !important;
 }
 
 
@@ -7494,63 +7493,95 @@ w.addEventListener(
 
 .camino-validator-btn:active {
 
-    transform:
-        translateY(1px)
-        scale(.97) !important;
+    transform: translateY(0) scale(.97) !important;
 
     box-shadow:
-        inset 0 2px 5px rgba(0,0,0,.4),
-        0 1px 3px rgba(0,0,0,.4) !important;
+        inset 0 2px 5px rgba(0,0,0,.45),
+        0 2px 5px rgba(0,0,0,.4) !important;
 }
 
 
-/* =========================
-   VALID
-   ========================= */
+/* LOADING */
+
+.camino-validator-btn:disabled {
+
+    cursor: wait !important;
+
+    opacity: .85 !important;
+
+    transform: none !important;
+}
+
+
+/* SUCCESS */
 
 .camino-validator-btn.camino-validator-success {
 
-    color: #8ff0bd !important;
-
     border-color:
-        rgba(91,205,145,.42) !important;
+        rgba(72, 220, 145, .45) !important;
 
     background:
         linear-gradient(
             145deg,
-            #182b25,
-            #101d19
+            #172a25 0%,
+            #10201c 55%,
+            #0b1613 100%
         ) !important;
 
+    color: #72e6a5 !important;
+
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.05),
-        0 2px 8px rgba(0,0,0,.45),
-        0 0 10px rgba(65,190,125,.10) !important;
+        inset 0 1px 0 rgba(255,255,255,.06),
+        0 3px 9px rgba(0,0,0,.45),
+        0 0 10px rgba(72,220,145,.08) !important;
 }
 
 
-/* =========================
-   ERROR
-   ========================= */
+/* SUCCESS HOVER */
 
-.camino-validator-btn.camino-validator-error {
-
-    color: #ff9a9a !important;
+.camino-validator-btn.camino-validator-success:hover {
 
     border-color:
-        rgba(220,90,100,.42) !important;
+        rgba(90, 240, 160, .7) !important;
 
     background:
         linear-gradient(
             145deg,
-            #2b1b21,
-            #1c1116
+            #1d342d 0%,
+            #142821 55%,
+            #0d1915 100%
         ) !important;
 
+    color: #9affc2 !important;
+
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.04),
-        0 2px 8px rgba(0,0,0,.45),
-        0 0 10px rgba(220,70,80,.08) !important;
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 5px 14px rgba(0,0,0,.5),
+        0 0 14px rgba(72,220,145,.14) !important;
+}
+
+
+/* ERROR */
+
+.camino-validator-btn.camino-validator-error {
+
+    border-color:
+        rgba(255, 80, 100, .45) !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            #301b22 0%,
+            #211319 55%,
+            #140d11 100%
+        ) !important;
+
+    color: #ff777f !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 3px 9px rgba(0,0,0,.45),
+        0 0 10px rgba(255,70,90,.08) !important;
 }
 
 
