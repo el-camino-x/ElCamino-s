@@ -4574,19 +4574,34 @@ function avEscape(value) {
         .replace(/'/g, "&#039;");
 }
 
-async function caminoValidateAccount(bankCode, accountNumber) {
+async function caminoValidateAccount(
+    bankCode,
+    accountNumber
+) {
+
+    if (!bankCode) {
+        throw new Error(
+            "BANK CODE TIDAK DITEMUKAN"
+        );
+    }
+
+    if (!accountNumber) {
+        throw new Error(
+            "NOMOR REKENING TIDAK DITEMUKAN"
+        );
+    }
 
     console.log(
-        '[CAMINO VALIDATOR] Sending validation request...'
+        "[CAMINO VALIDATOR] Sending validation request..."
     );
 
     console.log(
-        '[CAMINO VALIDATOR] BANK CODE:',
+        "[CAMINO VALIDATOR] BANK CODE:",
         bankCode
     );
 
     console.log(
-        '[CAMINO VALIDATOR] ACCOUNT:',
+        "[CAMINO VALIDATOR] ACCOUNT:",
         accountNumber
     );
 
@@ -4596,40 +4611,48 @@ async function caminoValidateAccount(bankCode, accountNumber) {
         `&nomor=${encodeURIComponent(accountNumber)}`;
 
     console.log(
-        '[CAMINO VALIDATOR] REQUEST:',
+        "[CAMINO VALIDATOR] REQUEST:",
         url
     );
 
     try {
 
-        const response = await fetch(url, {
-            method: "GET",
+        const response = await fetch(
+            url,
+            {
+                method: "GET",
 
-            headers: {
-                "X-API-Key": API_KEY,
-                "X-Idempotency-Key":
-                    "elcamino-row-validator-" +
-                    crypto.randomUUID()
+                headers: {
+                    "X-API-Key": API_KEY,
+
+                    "X-Idempotency-Key":
+                        "elcamino-row-validator-" +
+                        crypto.randomUUID()
+                }
             }
-        });
+        );
 
         console.log(
-            '[CAMINO VALIDATOR] HTTP STATUS:',
+            "[CAMINO VALIDATOR] HTTP STATUS:",
             response.status
         );
 
         let data;
 
         try {
-            data = await response.json();
+
+            data =
+                await response.json();
+
         } catch {
+
             throw new Error(
                 `Response API tidak valid (HTTP ${response.status})`
             );
         }
 
         console.log(
-            '[CAMINO VALIDATOR] API RESPONSE:',
+            "[CAMINO VALIDATOR] API RESPONSE:",
             data
         );
 
@@ -4643,7 +4666,10 @@ async function caminoValidateAccount(bankCode, accountNumber) {
             );
         }
 
-        if (data?.success === false) {
+        if (
+            data?.success === false ||
+            data?.status === false
+        ) {
 
             throw new Error(
                 data?.message ||
@@ -4658,7 +4684,7 @@ async function caminoValidateAccount(bankCode, accountNumber) {
     } catch (error) {
 
         console.error(
-            '[CAMINO VALIDATOR] API ERROR:',
+            "[CAMINO VALIDATOR] API ERROR:",
             error
         );
 
@@ -4787,6 +4813,8 @@ async function validateAccount(bankCode, accountNumber) {
 
 function createAccountValidator() {
 
+    let validationInProgress = false;
+    
     const existingPanel =
         w.querySelector(
             "#account-validator-panel"
@@ -4913,6 +4941,176 @@ function createAccountValidator() {
         panel.querySelector(
             "#av-status"
         );
+
+validateButton.addEventListener("click", async () => {
+
+    // =========================================
+    // BLOCK DOUBLE CLICK
+    // =========================================
+    if (validationInProgress) {
+        console.log(
+            "[CAMINO VALIDATOR] Validation already running."
+        );
+        return;
+    }
+
+    // LOCK
+    validationInProgress = true;
+
+    // DISABLE BUTTON
+    validateButton.disabled = true;
+    validateButton.classList.add("is-loading");
+
+    const originalText =
+        validateButton.innerHTML;
+
+    try {
+
+        const bankCode =
+            bankValue.value.trim();
+
+        const accountNumber =
+            accountInput.value.trim();
+
+        // =========================================
+        // BASIC VALIDATION
+        // =========================================
+
+        if (!bankCode) {
+            throw new Error(
+                "SILAKAN PILIH BANK / E-WALLET"
+            );
+        }
+
+        if (!accountNumber) {
+            throw new Error(
+                "NOMOR REKENING KOSONG"
+            );
+        }
+
+        // =========================================
+        // LOADING
+        // =========================================
+
+        validateButton.innerHTML = `
+            <span class="av-spinner"></span>
+            VALIDATING...
+        `;
+
+        statusBox.innerHTML = `
+            <div class="av-loading">
+                VALIDATING ACCOUNT...
+            </div>
+        `;
+
+        console.log(
+            "[CAMINO VALIDATOR] Starting validation..."
+        );
+
+        // =========================================
+        // API — CUMA SEKALI
+        // =========================================
+
+        const result =
+            await caminoValidateAccount(
+                bankCode,
+                accountNumber
+            );
+
+        console.log(
+            "[CAMINO VALIDATOR] VALIDATION RESULT:",
+            result
+        );
+
+        // =========================================
+        // SUCCESS
+        // =========================================
+
+        const data =
+            result?.data || result;
+
+        statusBox.innerHTML = `
+            <div class="av-success">
+
+                <div class="av-success-title">
+                    ✓ ACCOUNT VALID
+                </div>
+
+                <div class="av-result-row">
+                    <span>BANK</span>
+                    <strong>
+                        ${avEscape(bankSearch.value)}
+                    </strong>
+                </div>
+
+                <div class="av-result-row">
+                    <span>ACCOUNT</span>
+                    <strong>
+                        ${avEscape(
+                            data?.account_number ||
+                            accountNumber
+                        )}
+                    </strong>
+                </div>
+
+                <div class="av-result-row">
+                    <span>NAME</span>
+                    <strong>
+                        ${avEscape(
+                            data?.account_name || "-"
+                        )}
+                    </strong>
+                </div>
+
+            </div>
+        `;
+
+    } catch (error) {
+
+        console.error(
+            "[CAMINO VALIDATOR] VALIDATION ERROR:",
+            error
+        );
+
+        statusBox.innerHTML = `
+            <div class="av-error">
+
+                <div class="av-error-title">
+                    ✕ VALIDATION FAILED
+                </div>
+
+                <div class="av-error-message">
+                    ${avEscape(
+                        error?.message ||
+                        "Terjadi kesalahan saat validasi"
+                    )}
+                </div>
+
+            </div>
+        `;
+
+    } finally {
+
+        // =========================================
+        // UNLOCK SETELAH REQUEST SELESAI
+        // =========================================
+
+        validationInProgress = false;
+
+        validateButton.disabled = false;
+
+        validateButton.classList.remove(
+            "is-loading"
+        );
+
+        validateButton.innerHTML =
+            originalText;
+
+        console.log(
+            "[CAMINO VALIDATOR] Validation finished."
+        );
+    }
+});
 
     function renderBankList(
         keyword = ""
@@ -6478,6 +6676,16 @@ const btn =
 
 btn.addEventListener('click', async () => {
 
+    if (btn.dataset.validating === "1") {
+        console.warn(
+            '[CAMINO VALIDATOR] VALIDATION ALREADY RUNNING'
+        );
+        return;
+    }
+
+    btn.dataset.validating = "1";
+    btn.disabled = true;
+
     console.log(
         '[CAMINO VALIDATOR] Button clicked'
     );
@@ -6587,9 +6795,14 @@ try {
         error
     );
 
+} finally {
+
+    btn.dataset.validating = "0";
+    btn.disabled = false;
+
 }
 
-});
+})
 
 
         row.appendChild(td);
