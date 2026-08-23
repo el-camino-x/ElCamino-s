@@ -6826,6 +6826,7 @@ w.addEventListener(
 
         btn.innerHTML = `
             <i class="fa fa-search"></i>
+            <span>Validate</span>
         `;
 
 
@@ -6872,6 +6873,7 @@ w.addEventListener(
 
                 btn.innerHTML = `
                     <i class="fa fa-spinner fa-spin"></i>
+                    <span>Checking...</span>
                 `;
 
 
@@ -7028,19 +7030,24 @@ w.addEventListener(
 
                     btn.innerHTML = `
                         <i class="fa fa-check"></i>
+                        <span class="camino-validator-name">
+                            ${avEscape(accountName)}
+                        </span>
                     `;
 
-                    btn.title =
-                        accountName;
+                    console.log(
+                        '[CAMINO VALIDATOR] BUTTON NAME:',
+                        accountName,
+                        btn.innerHTML
+                    );
 
+                    btn.title = accountName;
 
                     btn.classList.add(
                         'camino-validator-success'
                     );
 
-
-                    btn.dataset.validated =
-                        '1';
+                    btn.dataset.validated = '1';
 
 
                 }
@@ -7380,104 +7387,376 @@ w.addEventListener(
 
 /* =========================================================
    CAMINO VALIDATOR
-   NON-DESTRUCTIVE DATATABLES MODE
+   LARGE PREMIUM / 2-LINE ACCOUNT NAME
+   DATATABLES SAFE
+   ========================================================= */
+
+
+/* =========================================================
+   MAIN BUTTON
    ========================================================= */
 
 .camino-validator-btn {
 
-    width: 34px !important;
-    height: 34px !important;
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+
+    height: 54px !important;
+    min-height: 54px !important;
 
     margin-left: 6px !important;
+
+    padding: 7px 12px !important;
 
     display: inline-flex !important;
 
     align-items: center !important;
     justify-content: center !important;
 
-    padding: 0 !important;
+    gap: 10px !important;
 
-    border: 1px solid rgba(0,245,255,.35) !important;
+    box-sizing: border-box !important;
+
+    border:
+        1px solid rgba(105, 130, 180, .40) !important;
+
     border-radius: 9px !important;
 
-    background: rgba(0,245,255,.08) !important;
+    background:
+        linear-gradient(
+            145deg,
+            #1b2231 0%,
+            #111722 55%,
+            #0c111a 100%
+        ) !important;
 
-    color: #00f5ff !important;
+    color: #dce7ff !important;
+
+    font-family: inherit !important;
+
+    font-size: 19px !important;
+    font-weight: 800 !important;
+
+    line-height: 22px !important;
+
+    white-space: normal !important;
+
+    overflow: hidden !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        inset 0 -1px 0 rgba(0,0,0,.45),
+        0 3px 8px rgba(0,0,0,.48) !important;
 
     cursor: pointer !important;
-
-    font-size: 14px !important;
 
     vertical-align: middle !important;
 
     transition:
         transform .18s ease,
-        background .18s ease,
-        box-shadow .18s ease,
-        color .18s ease !important;
+        border-color .22s ease,
+        background .22s ease,
+        color .22s ease,
+        box-shadow .22s ease,
+        opacity .22s ease !important;
 }
 
+
+/* =========================================================
+   ICON
+   ========================================================= */
+
+.camino-validator-btn i {
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    flex: 0 0 auto !important;
+
+    width: 21px !important;
+    height: 21px !important;
+
+    font-size: 18px !important;
+
+    line-height: 1 !important;
+}
+
+
+/* =========================================================
+   ACCOUNT NAME
+   ========================================================= */
+
+.camino-validator-name {
+
+    display: -webkit-box !important;
+
+    flex: 1 1 auto !important;
+
+    min-width: 0 !important;
+
+    width: auto !important;
+
+    max-width: 175px !important;
+
+    overflow: hidden !important;
+
+    text-overflow: clip !important;
+
+    white-space: normal !important;
+
+    word-break: normal !important;
+
+    overflow-wrap: anywhere !important;
+
+    line-height: 21px !important;
+
+    font-size: 19px !important;
+
+    font-weight: 850 !important;
+
+    letter-spacing: .15px !important;
+
+    color: inherit !important;
+
+    -webkit-box-orient: vertical !important;
+
+    -webkit-line-clamp: 2 !important;
+}
+
+
+/* =========================================================
+   HOVER
+   ========================================================= */
 
 .camino-validator-btn:hover {
 
-    transform: translateY(-1px) scale(1.04) !important;
+    transform:
+        translateY(-1px) !important;
+
+    border-color:
+        rgba(125, 155, 215, .72) !important;
 
     background:
-        rgba(0,245,255,.16) !important;
+        linear-gradient(
+            145deg,
+            #252f43 0%,
+            #182133 55%,
+            #101722 100%
+        ) !important;
+
+    color: #f2f6ff !important;
 
     box-shadow:
-        0 0 12px rgba(0,245,255,.35),
-        inset 0 0 8px rgba(0,245,255,.08) !important;
-
+        inset 0 1px 0 rgba(255,255,255,.10),
+        0 5px 14px rgba(0,0,0,.55),
+        0 0 12px rgba(90,120,190,.15) !important;
 }
 
+
+/* =========================================================
+   ACTIVE
+   ========================================================= */
 
 .camino-validator-btn:active {
 
-    transform: scale(.92) !important;
+    transform:
+        translateY(0)
+        scale(.97) !important;
 
+    box-shadow:
+        inset 0 2px 5px rgba(0,0,0,.45),
+        0 2px 5px rgba(0,0,0,.4) !important;
 }
 
+
+/* =========================================================
+   DISABLED
+   ========================================================= */
 
 .camino-validator-btn:disabled {
 
-    cursor: default !important;
+    cursor: wait !important;
 
+    opacity: .88 !important;
+
+    transform: none !important;
+
+    pointer-events: none !important;
 }
 
 
-.camino-validator-btn.camino-validator-success {
+/* =========================================================
+   LOADING
+   ========================================================= */
 
-    color: #49ff9b !important;
+.camino-validator-btn.camino-validator-loading {
 
     border-color:
-        rgba(73,255,155,.45) !important;
+        rgba(80, 170, 255, .55) !important;
 
     background:
-        rgba(73,255,155,.08) !important;
+        linear-gradient(
+            145deg,
+            #19283a 0%,
+            #111d2c 55%,
+            #0b131f 100%
+        ) !important;
 
+    color: #8ecbff !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.06),
+        0 3px 10px rgba(0,0,0,.5),
+        0 0 14px rgba(70,160,255,.15) !important;
 }
 
 
-.camino-validator-btn.camino-validator-error {
+/* =========================================================
+   LOADING SPINNER
+   ========================================================= */
 
-    color: #ff4d67 !important;
+.camino-validator-btn.camino-validator-loading i {
 
-    border-color:
-        rgba(255,77,103,.45) !important;
+    animation:
+        camino-validator-spin
+        .8s linear infinite !important;
+}
 
-    background:
-        rgba(255,77,103,.08) !important;
+
+@keyframes camino-validator-spin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 
 }
 
 
 /* =========================================================
-   HEADER
+   SUCCESS
+   ========================================================= */
+
+.camino-validator-btn.camino-validator-success {
+
+    border-color:
+        rgba(72, 220, 145, .48) !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            #172a25 0%,
+            #10201c 55%,
+            #0b1613 100%
+        ) !important;
+
+    color: #72e6a5 !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.06),
+        0 3px 9px rgba(0,0,0,.45),
+        0 0 12px rgba(72,220,145,.10) !important;
+}
+
+
+/* =========================================================
+   SUCCESS ICON
+   ========================================================= */
+
+.camino-validator-btn.camino-validator-success i {
+
+    color: #72e6a5 !important;
+
+    text-shadow:
+        0 0 7px rgba(72,220,145,.30) !important;
+}
+
+
+/* =========================================================
+   SUCCESS HOVER
+   ========================================================= */
+
+.camino-validator-btn.camino-validator-success:hover {
+
+    border-color:
+        rgba(90, 240, 160, .72) !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            #1d342d 0%,
+            #142821 55%,
+            #0d1915 100%
+        ) !important;
+
+    color: #a2ffca !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 5px 14px rgba(0,0,0,.5),
+        0 0 16px rgba(72,220,145,.16) !important;
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.camino-validator-btn.camino-validator-error {
+
+    border-color:
+        rgba(255, 80, 100, .48) !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            #301b22 0%,
+            #211319 55%,
+            #140d11 100%
+        ) !important;
+
+    color: #ff777f !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 3px 9px rgba(0,0,0,.45),
+        0 0 12px rgba(255,70,90,.10) !important;
+}
+
+
+/* =========================================================
+   ERROR HOVER
+   ========================================================= */
+
+.camino-validator-btn.camino-validator-error:hover {
+
+    border-color:
+        rgba(255, 100, 120, .72) !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            #3a2028 0%,
+            #27151c 55%,
+            #180d12 100%
+        ) !important;
+
+    color: #ff9aa5 !important;
+}
+
+
+/* =========================================================
+   ACTION HEADER
    ========================================================= */
 
 .camino-action-header
-    .DataTables_sort_wrapper {
+.DataTables_sort_wrapper {
 
     display: flex !important;
 
@@ -7486,30 +7765,30 @@ w.addEventListener(
     justify-content: center !important;
 
     gap: 8px !important;
-
 }
 
 
-/*
- * Tidak membuat TH baru.
- * Hanya menampilkan label visual.
- */
+/* =========================================================
+   VALIDATOR HEADER
+   ========================================================= */
 
 .camino-action-header
-    .DataTables_sort_wrapper::after {
+.DataTables_sort_wrapper::after {
 
     content: "VALIDATOR";
 
-    font-size: 11px;
+    font-size: 12px !important;
 
-    font-weight: 700;
+    font-weight: 800 !important;
 
-    letter-spacing: .08em;
+    letter-spacing: .10em !important;
 
-    color: #00f5ff;
+    color: #00f5ff !important;
 
-    opacity: .9;
+    opacity: .95 !important;
 
+    text-shadow:
+        0 0 8px rgba(0,245,255,.25) !important;
 }
 
 
@@ -7523,11 +7802,13 @@ td.gridview.sticky-action-revamp.right {
 
     white-space: nowrap !important;
 
+    overflow: visible !important;
 }
 
 
-/* Jangan biarkan button mengubah layout
-   secara brutal ketika DataTables redraw */
+/* =========================================================
+   BUTTON INSIDE TABLE
+   ========================================================= */
 
 #withdrawal-pending-table
 tbody
@@ -7535,6 +7816,289 @@ tbody
 
     flex-shrink: 0 !important;
 
+    width: 220px !important;
+
+    min-width: 220px !important;
+
+    max-width: 220px !important;
+
+    height: 54px !important;
+
+    min-height: 54px !important;
+}
+
+
+/* =========================================================
+   NAME INSIDE BUTTON
+   ========================================================= */
+
+#withdrawal-pending-table
+.camino-validator-btn
+.camino-validator-name {
+
+    display: -webkit-box !important;
+
+    flex: 1 1 auto !important;
+
+    min-width: 0 !important;
+
+    max-width: 175px !important;
+
+    overflow: hidden !important;
+
+    text-overflow: clip !important;
+
+    white-space: normal !important;
+
+    word-break: normal !important;
+
+    overflow-wrap: anywhere !important;
+
+    font-size: 19px !important;
+
+    font-weight: 850 !important;
+
+    line-height: 21px !important;
+
+    letter-spacing: .15px !important;
+
+    -webkit-box-orient: vertical !important;
+
+    -webkit-line-clamp: 2 !important;
+}
+
+
+/* =========================================================
+   ACTION CONTAINER
+   ========================================================= */
+
+#withdrawal-pending-table
+.action-btn-container {
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    gap: 5px !important;
+
+    overflow: visible !important;
+}
+
+
+/* =========================================================
+   BUTTON ALIGNMENT
+   ========================================================= */
+
+#withdrawal-pending-table
+.camino-validator-btn {
+
+    vertical-align: middle !important;
+
+    margin-top: 0 !important;
+
+    margin-bottom: 0 !important;
+}
+
+
+/* =========================================================
+   MOBILE / SMALL TABLE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .camino-validator-btn {
+
+        width: 195px !important;
+
+        min-width: 195px !important;
+
+        max-width: 195px !important;
+
+        height: 52px !important;
+
+        min-height: 52px !important;
+
+    }
+
+    .camino-validator-name {
+
+        max-width: 150px !important;
+
+        font-size: 17px !important;
+
+        line-height: 19px !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .camino-validator-btn,
+    .camino-validator-btn.camino-validator-loading i {
+
+        animation: none !important;
+
+        transition: none !important;
+    }
+
+}
+
+/* =========================================================
+   CAMINO — APPROVE / REJECT BUTTON SIZE
+   FORCE SAME SIZE AS VALIDATOR
+   ========================================================= */
+
+#withdrawal-pending-table
+tbody
+.new-approve-btn,
+#withdrawal-pending-table
+tbody
+.reject-btn,
+#withdrawal-pending-table
+tbody
+.approve-btn {
+
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+
+    box-sizing: border-box !important;
+
+    padding: 7px 12px !important;
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 10px !important;
+
+    border-radius: 9px !important;
+
+    font-size: 19px !important;
+    font-weight: 800 !important;
+
+    line-height: 22px !important;
+
+    white-space: nowrap !important;
+
+    vertical-align: middle !important;
+}
+
+
+/* =========================================================
+   ICON APPROVE / REJECT
+   ========================================================= */
+
+#withdrawal-pending-table
+tbody
+.new-approve-btn i,
+#withdrawal-pending-table
+tbody
+.reject-btn i,
+#withdrawal-pending-table
+tbody
+.approve-btn i {
+
+    width: 21px !important;
+    height: 21px !important;
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    flex: 0 0 auto !important;
+
+    font-size: 18px !important;
+
+    line-height: 1 !important;
+}
+
+
+/* =========================================================
+   TEXT APPROVE / REJECT
+   ========================================================= */
+
+#withdrawal-pending-table
+tbody
+.new-approve-btn span,
+#withdrawal-pending-table
+tbody
+.reject-btn span,
+#withdrawal-pending-table
+tbody
+.approve-btn span {
+
+    font-size: 19px !important;
+
+    font-weight: 850 !important;
+
+    line-height: 22px !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   ACTION CONTAINER
+   ========================================================= */
+
+#withdrawal-pending-table
+tbody
+.btn-container,
+#withdrawal-pending-table
+tbody
+.action-btn-container {
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    gap: 6px !important;
+
+    overflow: visible !important;
+}
+
+
+/* =========================================================
+   KEEP ALL ACTION BUTTONS SAME HEIGHT
+   ========================================================= */
+
+#withdrawal-pending-table
+tbody
+.camino-validator-btn,
+#withdrawal-pending-table
+tbody
+.new-approve-btn,
+#withdrawal-pending-table
+tbody
+.reject-btn,
+#withdrawal-pending-table
+tbody
+.approve-btn {
+
+    height: 54px !important;
+    min-height: 54px !important;
+
+    border-radius: 9px !important;
+
+    font-size: 19px !important;
+    font-weight: 800 !important;
+
+    box-sizing: border-box !important;
 }
 
     `;
