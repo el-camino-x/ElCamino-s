@@ -6695,41 +6695,16 @@ function injectValidatorHeader(table) {
 
     if (!thead) return;
 
-    // Ambil SEMUA header row
-    const headerRows =
-        thead.querySelectorAll('tr');
+    const headerRow =
+        thead.querySelector('tr');
 
-    if (!headerRows.length) return;
+    if (!headerRow) return;
 
-    // Cari row header yang benar-benar berisi
-    // kolom "AKSI"
-    let headerRow = null;
 
-    headerRows.forEach(row => {
+    // =========================================
+    // CEK APAKAH SUDAH ADA
+    // =========================================
 
-        const text =
-            row.innerText
-                .trim()
-                .replace(/\s+/g, ' ')
-                .toUpperCase();
-
-        if (
-            text.includes('AKSI') &&
-            text.includes('PAYMENT TO')
-        ) {
-            headerRow = row;
-        }
-
-    });
-
-    if (!headerRow) {
-        console.warn(
-            '[CAMINO VALIDATOR] HEADER ROW TIDAK DITEMUKAN'
-        );
-        return;
-    }
-
-    // Jangan inject dua kali
     if (
         headerRow.querySelector(
             '.camino-validator-header'
@@ -6738,12 +6713,44 @@ function injectValidatorHeader(table) {
         return;
     }
 
-    // Buat TH
+
+    // =========================================
+    // CARI HEADER AKSI
+    // =========================================
+
+    const headers =
+        Array.from(
+            headerRow.querySelectorAll('th')
+        );
+
+    const actionHeader =
+        headers.find(th => {
+
+            const text =
+                th.innerText
+                    .trim()
+                    .replace(/\s+/g, ' ')
+                    .toUpperCase();
+
+            return text === 'AKSI';
+        });
+
+
+    if (!actionHeader) {
+        return;
+    }
+
+
+    // =========================================
+    // BUAT 1 TH SAJA
+    // =========================================
+
     const th =
         document.createElement('th');
 
     th.className =
         'camino-validator-header';
+
 
     th.innerHTML = `
         <span class="camino-validator-header-title">
@@ -6751,28 +6758,20 @@ function injectValidatorHeader(table) {
         </span>
     `;
 
-    // Masukkan setelah AKSI
-    const actionHeader =
-        Array.from(
-            headerRow.children
-        ).find(cell =>
-            cell.innerText
-                .trim()
-                .toUpperCase() === 'AKSI'
-        );
 
-    if (actionHeader) {
+    // =========================================
+    // TARUH SETELAH AKSI
+    // =========================================
 
-        actionHeader.insertAdjacentElement(
-            'afterend',
-            th
-        );
+    actionHeader.insertAdjacentElement(
+        'afterend',
+        th
+    );
 
-    } else {
 
-        // fallback
-        headerRow.appendChild(th);
-    }
+    console.log(
+        '[CAMINO VALIDATOR] HEADER INJECTED'
+    );
 }
 
 
@@ -7090,19 +7089,63 @@ function injectValidatorHeader(table) {
 
 function scanValidatorRows() {
 
+    // =========================================
+    // 1. CARI TABLE
+    // =========================================
+
+    document
+        .querySelectorAll('table')
+        .forEach(table => {
+
+            // Header dicek TERPISAH
+            // dari row
+            injectValidatorHeader(table);
+
+        });
+
+
+    // =========================================
+    // 2. CARI ROW
+    // =========================================
+
     const rows =
         document.querySelectorAll(
-            'tbody tr[role="row"]'
+            'tbody tr'
         );
+
 
     rows.forEach(row => {
 
+        if (!row) return;
+
+
+        // =====================================
+        // PASTIKAN ADA CELL
+        // =====================================
+
+        const cells =
+            row.querySelectorAll('td');
+
+        if (!cells.length) {
+            return;
+        }
+
+
+        // =====================================
+        // PAYMENT TO
+        // =====================================
+
         const paymentTo =
-            row.querySelectorAll('td')[5];
+            cells[5];
 
         if (!paymentTo) {
             return;
         }
+
+
+        // =====================================
+        // PASTIKAN ADA TABLE
+        // =====================================
 
         const table =
             row.closest('table');
@@ -7111,11 +7154,13 @@ function scanValidatorRows() {
             return;
         }
 
-        // Header cuma di table ini
-        injectValidatorHeader(table);
 
-        // Cell validator
+        // =====================================
+        // INJECT CELL
+        // =====================================
+
         injectValidator(row);
+
     });
 }
 
@@ -7151,22 +7196,32 @@ function scanValidatorRows() {
    ========================================================= */
 
 /* =========================================================
+   CAMINO VALIDATOR COLUMN
+   ========================================================= */
+
+.camino-validator-cell,
+.camino-validator-header {
+
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
    CELL
    ========================================================= */
 
 .camino-validator-cell {
-    width: 210px !important;
-    min-width: 210px !important;
-    max-width: 210px !important;
 
-    padding: 7px 10px !important;
+    padding: 10px 12px !important;
 
     text-align: center !important;
     vertical-align: middle !important;
 
     white-space: normal !important;
-
-    box-sizing: border-box !important;
 }
 
 
@@ -7175,48 +7230,58 @@ function scanValidatorRows() {
    ========================================================= */
 
 .camino-validator-header {
-    width: 210px !important;
-    min-width: 210px !important;
-    max-width: 210px !important;
 
-    padding: 9px 10px !important;
+    padding: 10px 12px !important;
 
     text-align: center !important;
     vertical-align: middle !important;
 
     white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   HEADER CONTENT
+   ========================================================= */
+
+.camino-validator-header-title {
+
+    display: flex !important;
+
+    width: 100% !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 7px;
+
+    white-space: nowrap !important;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    line-height: 1;
+
+    letter-spacing: .7px;
+
+    color: inherit;
 
     box-sizing: border-box !important;
 }
 
-.camino-validator-header-title {
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 7px;
-
-    white-space: nowrap;
-
-    color: #cfd3ff;
-
-    font-size: 11px;
-    font-weight: 800;
-
-    letter-spacing: 1px;
-}
-
-
-/* Header indicator */
+/* =========================================================
+   HEADER INDICATOR
+   ========================================================= */
 
 .camino-validator-header-title::before {
+
     content: "";
 
     width: 5px;
     height: 5px;
 
-    flex: 0 0 auto;
+    flex: 0 0 5px;
 
     border-radius: 50%;
 
@@ -7224,7 +7289,8 @@ function scanValidatorRows() {
 
     box-shadow:
         0 0 7px #8d82ff,
-        0 0 14px rgba(141, 130, 255, .35);
+        0 0 14px
+        rgba(141, 130, 255, .35);
 }
 
 
@@ -7376,11 +7442,11 @@ function scanValidatorRows() {
 
 .camino-validator-btn.camino-validator-success {
 
-    width: 210px !important;
-    min-width: 210px !important;
-    max-width: 210px !important;
+    width: 236px !important;
+    min-width: 236px !important;
+    max-width: 236px !important;
 
-    min-height: 56px !important;
+    min-height: 62px !important;
     height: auto !important;
 
     display: flex !important;
@@ -7388,35 +7454,15 @@ function scanValidatorRows() {
     align-items: center !important;
     justify-content: flex-start !important;
 
-    gap: 10px;
+    gap: 11px;
 
-    padding: 8px 12px !important;
+    padding: 9px 13px !important;
 
     box-sizing: border-box;
 
-    border-radius: 9px;
-
-    white-space: normal !important;
+    border-radius: 10px;
 
     cursor: default !important;
-
-    background:
-        linear-gradient(
-            135deg,
-            #171c27,
-            #0d1119
-        ) !important;
-
-    border:
-        1px solid
-        rgba(99, 240, 170, .30);
-
-    box-shadow:
-        0 0 0 1px
-        rgba(99, 240, 170, .04),
-
-        0 0 16px
-        rgba(99, 240, 170, .08);
 }
 
 
@@ -7426,23 +7472,14 @@ function scanValidatorRows() {
 
 .camino-validator-btn.camino-validator-success i {
 
-    flex: 0 0 20px;
+    flex: 0 0 22px;
 
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
 
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    font-size: 17px !important;
+    font-size: 18px !important;
 
     color: #63f0aa !important;
-
-    text-shadow:
-        0 0 8px
-        rgba(80, 255, 170, .65);
 }
 
 
@@ -7456,21 +7493,16 @@ function scanValidatorRows() {
 
     flex: 1 1 auto;
 
-    width: auto !important;
-
     min-width: 0;
 
-    max-width: none !important;
-
-    font-size: 15px !important;
-
+    font-size: 16px !important;
     font-weight: 800 !important;
 
-    line-height: 18px !important;
+    line-height: 19px !important;
 
-    letter-spacing: .25px;
+    letter-spacing: .3px;
 
-    color: #ffffff !important;
+    color: #fff !important;
 
     text-align: left;
 
@@ -7481,14 +7513,9 @@ function scanValidatorRows() {
     text-overflow: clip !important;
 
     -webkit-box-orient: vertical;
-
-    /*
-       Maksimal 2 baris
-    */
     -webkit-line-clamp: 2;
 
     word-break: normal !important;
-
     overflow-wrap: anywhere;
 }
 
