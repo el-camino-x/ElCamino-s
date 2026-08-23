@@ -7385,20 +7385,22 @@ w.addEventListener(
 
 .camino-validator-btn {
 
-    width: 42px !important;
-    height: 34px !important;
+    width: 200px !important;
+    height: 32px !important;
 
     margin-left: 6px !important;
+
+    padding: 6px 10px !important;
 
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
 
-    padding: 0 !important;
-
     box-sizing: border-box !important;
 
-    border: 1px solid rgba(126, 151, 205, .38) !important;
+    font-size: 14px !important;
+    line-height: normal !important;
+
     border-radius: 7px !important;
 
     background:
