@@ -6996,51 +6996,242 @@ w.addEventListener(
 
     style.textContent = `
 
-        .camino-validator-cell {
-            width:70px !important;
-            min-width:70px !important;
-            text-align:center !important;
-            vertical-align:middle !important;
-        }
+/* =========================================================
+   CAMINO TABLE VALIDATOR
+   ========================================================= */
 
-        .camino-validator-btn {
-            width:38px;
-            height:38px;
+.camino-validator-cell {
+    min-width: 190px !important;
+    width: 190px !important;
 
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
+    padding: 6px 10px !important;
 
-            border:1px solid rgba(0,245,255,.35);
-            border-radius:10px;
+    text-align: center;
+    vertical-align: middle;
 
-            background:rgba(0,245,255,.08);
-            color:#00f5ff;
+    white-space: normal !important;
+}
 
-            cursor:pointer;
 
-            font-size:16px;
+.camino-validator-btn {
+    position: relative;
 
-            transition:
-                transform .2s ease,
-                background .2s ease,
-                box-shadow .2s ease,
-                color .2s ease;
-        }
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
 
-        .camino-validator-btn:hover {
-            transform:translateY(-2px) scale(1.05);
+    min-width: 42px;
+    height: 34px;
 
-            background:rgba(0,245,255,.16);
+    padding: 0 12px;
 
-            box-shadow:
-                0 0 12px rgba(0,245,255,.35),
-                inset 0 0 8px rgba(0,245,255,.08);
-        }
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
 
-        .camino-validator-btn:active {
-            transform:scale(.92);
-        }
+    background: linear-gradient(
+        135deg,
+        #171923,
+        #0d0f15
+    );
+
+    color: #cfd3ff;
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+
+    cursor: pointer;
+
+    transition:
+        width .25s ease,
+        min-width .25s ease,
+        background .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease,
+        transform .15s ease;
+
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.camino-validator-btn i {
+    flex: 0 0 auto;
+
+    width: 14px;
+    height: 14px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 13px;
+}
+
+/* Hover */
+
+.camino-validator-btn:hover:not(:disabled) {
+    border-color: rgba(130, 120, 255, .55);
+
+    background: linear-gradient(
+        135deg,
+        #1d2030,
+        #11131c
+    );
+
+    box-shadow:
+        0 0 0 1px rgba(130, 120, 255, .08),
+        0 0 18px rgba(100, 90, 255, .16);
+
+    transform: translateY(-1px);
+}
+
+/* Disabled / loading */
+
+.camino-validator-btn:disabled {
+    cursor: wait;
+    opacity: .9;
+}
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.camino-validator-btn:has(.fa-spinner) {
+    min-width: 42px;
+    width: 42px;
+
+    padding: 0;
+}
+
+.camino-validator-btn .fa-spinner {
+    font-size: 14px;
+}
+
+/* =========================================================
+   SUCCESS
+   ========================================================= */
+
+.camino-validator-btn.camino-validator-success {
+    width: 170px;
+    min-width: 170px;
+    max-width: 170px;
+
+    min-height: 38px;
+
+    justify-content: flex-start;
+
+    padding: 6px 10px;
+
+    white-space: normal;
+}
+
+/* Check icon */
+
+.camino-validator-btn.camino-validator-success
+i {
+    color: #63f0aa;
+
+    text-shadow:
+        0 0 8px rgba(80, 255, 170, .5);
+}
+
+/* Nama rekening */
+
+.camino-validator-btn.camino-validator-success span {
+    display: -webkit-box;
+
+    width: 135px;
+    max-width: 135px;
+
+    white-space: normal;
+
+    overflow: hidden;
+
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+
+    line-height: 15px;
+
+    text-align: left;
+
+    word-break: normal;
+    overflow-wrap: break-word;
+}
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.camino-validator-btn.camino-validator-error {
+    min-width: 90px;
+
+    border-color: rgba(255, 80, 100, .4);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(75, 20, 28, .95),
+            rgba(35, 12, 17, .98)
+        );
+
+    color: #ff7d91;
+}
+
+.camino-validator-btn.camino-validator-error i {
+    color: #ff687f;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.camino-validator-header {
+    min-width: 120px;
+
+    padding: 9px 12px !important;
+
+    text-align: center;
+    vertical-align: middle;
+
+    white-space: nowrap;
+
+    color: #aeb3ff;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    background: rgba(15, 17, 25, .95);
+
+    border-bottom:
+        1px solid rgba(130, 120, 255, .2);
+}
+
+.camino-validator-header-title {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+}
+
+/* Header glow */
+
+.camino-validator-header-title::before {
+    content: "";
+
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: #8d82ff;
+
+    box-shadow:
+        0 0 7px #8d82ff;
+}
 
     `;
 
