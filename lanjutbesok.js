@@ -6682,14 +6682,19 @@ w.addEventListener(
 
     'use strict';
 
+    const VALIDATOR_CELL_CLASS = 'camino-validator-cell';
+    const VALIDATOR_HEADER_CLASS = 'camino-validator-header';
+
     const TABLE_ID = 'withdrawal-pending-table';
-    const VALIDATOR_CELL = 'camino-validator-cell';
-    const VALIDATOR_HEADER = 'camino-validator-header';
 
-    /* =========================================================
-       FIND REAL DATATABLE
-       ========================================================= */
+    let scanTimer = null;
+    let observer = null;
+    let isScanning = false;
 
+
+    // =========================================================
+    // GET REAL DATATABLE BODY TABLE
+    // =========================================================
     function getMainTable() {
 
         const table =
@@ -6703,396 +6708,328 @@ w.addEventListener(
     }
 
 
-    /* =========================================================
-       FIND REAL VISIBLE HEADER
-       
-       IMPORTANT:
-       DataTables membuat header clone:
-       
-       .dataTables_scrollHead
-            └── table
-                 └── thead
-       
-       Jangan inject ke #withdrawal-pending-table thead
-       karena itu adalah hidden sizing header.
-       ========================================================= */
-
-    function getVisibleHeaderRow() {
-
-        const mainTable =
-            getMainTable();
+    // =========================================================
+    // GET VISIBLE DATATABLE HEADER CLONE
+    //
+    // DataTables structure:
+    //
+    // .dataTables_scroll
+    //   ├── .dataTables_scrollHead
+    //   │     └── table   <-- VISIBLE HEADER
+    //   │
+    //   └── .dataTables_scrollBody
+    //         └── table   <-- REAL TABLE
+    //
+    // Jangan cari semua table secara global.
+    // =========================================================
+    function getVisibleHeaderTable(mainTable) {
 
         if (!mainTable) {
             return null;
         }
 
-        const scrollWrapper =
-            mainTable.closest(
-                '.dataTables_scroll'
-            );
+        const scroll =
+            mainTable.closest('.dataTables_scroll');
 
-        if (!scrollWrapper) {
-            return null;
-        }
-
-        const scrollHead =
-            scrollWrapper.querySelector(
-                '.dataTables_scrollHead'
-            );
-
-        if (!scrollHead) {
+        if (!scroll) {
             return null;
         }
 
         const headerTable =
-            scrollHead.querySelector(
-                'table'
+            scroll.querySelector(
+                '.dataTables_scrollHead table'
             );
 
-        if (!headerTable) {
+        return headerTable || null;
+    }
+
+
+    // =========================================================
+    // GET REAL HEADER TABLE
+    // =========================================================
+    function getBodyHeaderTable(mainTable) {
+
+        if (!mainTable) {
             return null;
         }
 
-        const headerRow =
-            headerTable.querySelector(
-                'thead > tr'
-            );
-
-        return headerRow || null;
+        return mainTable;
     }
 
 
-    /* =========================================================
-       INJECT HEADER — VISIBLE HEADER ONLY
-       ========================================================= */
+    // =========================================================
+    // REMOVE OLD CAMINO HEADER
+    //
+    // Ini penting kalau script versi lama sudah pernah jalan.
+    // Kita bersihkan SEMUA header validator lama terlebih dahulu.
+    // =========================================================
+    function cleanupOldHeaders() {
 
-    function injectValidatorHeader() {
-
-        const headerRow =
-            getVisibleHeaderRow();
-
-        if (!headerRow) {
-            return;
-        }
-
-
-        /* -----------------------------------------
-           HARD GUARD
-           ----------------------------------------- */
-
-        if (
-            headerRow.querySelector(
-                '.' + VALIDATOR_HEADER
+        document
+            .querySelectorAll(
+                'th.' + VALIDATOR_HEADER_CLASS
             )
-        ) {
-            return;
-        }
-
-
-        /* -----------------------------------------
-           CEK BERDASARKAN data-column-index
-           Supaya tidak salah header.
-           ----------------------------------------- */
-
-        const existingValidator =
-            Array.from(
-                headerRow.children
-            ).find(
-                cell =>
-                    cell.dataset &&
-                    cell.dataset.caminoValidator === '1'
-            );
-
-        if (existingValidator) {
-            return;
-        }
-
-
-        /* -----------------------------------------
-           CARI HEADER AKSI
-           ----------------------------------------- */
-
-        const actionHeader =
-            Array.from(
-                headerRow.children
-            ).find(
-                cell =>
-                    cell.getAttribute(
-                        'data-column-index'
-                    ) === '17'
-                    ||
-                    cell.innerText
-                        ?.trim()
-                        .toUpperCase() === 'AKSI'
-            );
-
-
-        /* -----------------------------------------
-           BUAT HEADER
-           ----------------------------------------- */
-
-        const th =
-            document.createElement('th');
-
-        th.className =
-            VALIDATOR_HEADER;
-
-        th.dataset.caminoValidator =
-            '1';
-
-        th.setAttribute(
-            'data-column-index',
-            'camino-validator'
-        );
-
-        th.setAttribute(
-            'aria-label',
-            'VALIDATOR'
-        );
-
-        th.innerHTML = `
-            <div class="DataTables_sort_wrapper">
-                <span class="camino-validator-header-title">
-                    VALIDATOR
-                </span>
-                <span class="DataTables_sort_icon"></span>
-            </div>
-        `;
-
-
-        /* -----------------------------------------
-           INSERT SETELAH AKSI
-           ----------------------------------------- */
-
-        if (actionHeader) {
-
-            actionHeader.insertAdjacentElement(
-                'afterend',
-                th
-            );
-
-        } else {
-
-            /*
-             * Fallback hanya kalau Aksi benar-benar
-             * tidak ditemukan.
-             */
-            headerRow.appendChild(th);
-        }
-
-
-        console.log(
-            '[CAMINO VALIDATOR] HEADER INJECTED'
-        );
+            .forEach(th => {
+                th.remove();
+            });
     }
 
 
-    /* =========================================================
-       EXTRACT PAYMENT DATA
-       ========================================================= */
-
-    function getPaymentData(row) {
+    // =========================================================
+    // REMOVE OLD CELLS DARI ROW YANG SUDAH TIDAK VALID
+    //
+    // Tidak menghapus cell yang benar.
+    // Hanya memastikan 1 row = 1 validator.
+    // =========================================================
+    function cleanupDuplicateCells(row) {
 
         if (!row) {
-            throw new Error(
-                'ROW TIDAK DITEMUKAN'
-            );
+            return;
         }
-
-
-        /*
-         * Berdasarkan DOM yang lu kasih:
-         *
-         * td[0] checkbox
-         * td[1] No
-         * td[2] Tanggal
-         * td[3] Nomor Tiket
-         * td[4] Nama Pengguna
-         * td[5] Payment To
-         *
-         * Jadi td[5] memang BENAR.
-         */
 
         const cells =
             row.querySelectorAll(
-                ':scope > td'
+                'td.' + VALIDATOR_CELL_CLASS
             );
 
-        const paymentTo =
-            cells[5];
-
-        if (!paymentTo) {
-            throw new Error(
-                'PAYMENT TO TIDAK DITEMUKAN'
-            );
+        if (cells.length <= 1) {
+            return;
         }
 
+        // Simpan yang pertama
+        cells.forEach((cell, index) => {
 
-        const text =
-            paymentTo.innerText
-                .replace(/\s+/g, ' ')
-                .trim();
+            if (index > 0) {
+                cell.remove();
+            }
 
-
-        console.log(
-            '[CAMINO VALIDATOR] PAYMENT TO:',
-            text
-        );
-
-
-        /* -----------------------------------------
-           ACCOUNT NUMBER
-           ----------------------------------------- */
-
-        const accountMatch =
-            text.match(
-                /(\d{6,20})(?:\s*)$/
-            );
-
-        if (!accountMatch) {
-            throw new Error(
-                'ACCOUNT NUMBER TIDAK DITEMUKAN'
-            );
-        }
-
-
-        const accountNumber =
-            accountMatch[1];
-
-
-        /* -----------------------------------------
-           TEXT SEBELUM ACCOUNT
-           ----------------------------------------- */
-
-        const beforeAccount =
-            text
-                .slice(
-                    0,
-                    accountMatch.index
-                )
-                .trim();
-
-
-        /* -----------------------------------------
-           BANK = WORD TERAKHIR
-           ----------------------------------------- */
-
-        const bankMatch =
-            beforeAccount.match(
-                /([A-Za-z0-9]+)\s*$/
-            );
-
-        const bank =
-            bankMatch
-                ? bankMatch[1]
-                : null;
-
-
-        const bankCode =
-            getCaminoBankCode(bank);
-
-
-        console.log(
-            '[CAMINO VALIDATOR] BANK:',
-            bank
-        );
-
-        console.log(
-            '[CAMINO VALIDATOR] BANK CODE:',
-            bankCode
-        );
-
-        console.log(
-            '[CAMINO VALIDATOR] ACCOUNT NUMBER:',
-            accountNumber
-        );
-
-
-        if (!bankCode) {
-            throw new Error(
-                `BANK CODE TIDAK DITEMUKAN: ${bank || '-'}`
-            );
-        }
-
-
-        return {
-            bank,
-            bankCode,
-            accountNumber
-        };
+        });
     }
 
 
-    /* =========================================================
-       INJECT VALIDATOR CELL
-       ========================================================= */
+    // =========================================================
+    // INJECT HEADER
+    //
+    // HANYA:
+    // 1. visible header
+    // 2. hidden body header
+    //
+    // Keduanya harus punya jumlah kolom sama supaya
+    // DataTables tidak rusak alignment-nya.
+    // =========================================================
+    function injectHeader() {
 
-    function injectValidator(row) {
+        const mainTable =
+            getMainTable();
+
+        if (!mainTable) {
+            return;
+        }
+
+
+        // -----------------------------------------------------
+        // VISIBLE HEADER
+        // -----------------------------------------------------
+        const visibleHeaderTable =
+            getVisibleHeaderTable(mainTable);
+
+        if (visibleHeaderTable) {
+
+            const visibleThead =
+                visibleHeaderTable.querySelector('thead');
+
+            const visibleRow =
+                visibleThead?.querySelector('tr');
+
+            if (visibleRow) {
+
+                // Hapus duplikat jika ada
+                const headers =
+                    visibleRow.querySelectorAll(
+                        'th.' + VALIDATOR_HEADER_CLASS
+                    );
+
+                headers.forEach((th, index) => {
+
+                    if (index > 0) {
+                        th.remove();
+                    }
+
+                });
+
+
+                // Kalau belum ada, buat
+                if (
+                    !visibleRow.querySelector(
+                        'th.' + VALIDATOR_HEADER_CLASS
+                    )
+                ) {
+
+                    const th =
+                        document.createElement('th');
+
+                    th.className =
+                        VALIDATOR_HEADER_CLASS +
+                        ' no-sort';
+
+                    th.setAttribute(
+                        'data-camino-validator',
+                        '1'
+                    );
+
+                    th.innerHTML = `
+                        <div class="DataTables_sort_wrapper">
+                            <span class="camino-validator-header-title">
+                                VALIDATOR
+                            </span>
+                            <span class="DataTables_sort_icon"></span>
+                        </div>
+                    `;
+
+                    visibleRow.appendChild(th);
+                }
+            }
+        }
+
+
+        // -----------------------------------------------------
+        // REAL / HIDDEN BODY HEADER
+        //
+        // Header ini tinggi 0 milik DataTables.
+        // Harus ikut punya TH agar jumlah kolom sama.
+        // Tapi tidak akan terlihat.
+        // -----------------------------------------------------
+        const bodyHeaderTable =
+            getBodyHeaderTable(mainTable);
+
+        const bodyThead =
+            bodyHeaderTable.querySelector('thead');
+
+        const bodyRow =
+            bodyThead?.querySelector('tr');
+
+        if (bodyRow) {
+
+            const headers =
+                bodyRow.querySelectorAll(
+                    'th.' + VALIDATOR_HEADER_CLASS
+                );
+
+            headers.forEach((th, index) => {
+
+                if (index > 0) {
+                    th.remove();
+                }
+
+            });
+
+
+            if (
+                !bodyRow.querySelector(
+                    'th.' + VALIDATOR_HEADER_CLASS
+                )
+            ) {
+
+                const th =
+                    document.createElement('th');
+
+                th.className =
+                    VALIDATOR_HEADER_CLASS +
+                    ' no-sort';
+
+                th.setAttribute(
+                    'data-camino-validator',
+                    '1'
+                );
+
+                th.innerHTML = `
+                    <div class="dataTables_sizing">
+                        <div style="height:0;overflow:hidden;">
+                            VALIDATOR
+                        </div>
+                    </div>
+                `;
+
+                bodyRow.appendChild(th);
+            }
+        }
+    }
+
+
+    // =========================================================
+    // PAYMENT TO
+    //
+    // DOM LU:
+    //
+    // 0 checkbox
+    // 1 No
+    // 2 tanggal
+    // 3 tiket
+    // 4 username
+    // 5 Payment To
+    //
+    // Jadi index 5 BENAR.
+    // =========================================================
+    function getPaymentTo(row) {
+
+        if (!row) {
+            return null;
+        }
+
+        const cells =
+            row.querySelectorAll(':scope > td');
+
+        return cells[5] || null;
+    }
+
+
+    // =========================================================
+    // CREATE VALIDATOR BUTTON
+    // =========================================================
+    function createValidatorCell(row) {
 
         if (!row) {
             return;
         }
 
-
-        /* -----------------------------------------
-           HANYA ROW DARI TABLE YANG KITA MAU
-           ----------------------------------------- */
-
-        const table =
-            row.closest(
-                '#' + TABLE_ID
-            );
-
-        if (!table) {
-            return;
-        }
+        cleanupDuplicateCells(row);
 
 
-        /* -----------------------------------------
-           JANGAN INJECT KE ROW YANG BUKAN DATA
-           ----------------------------------------- */
-
-        if (
-            !row.matches(
-                'tbody > tr[role="row"]'
-            )
-        ) {
-            return;
-        }
-
-
-        /* -----------------------------------------
-           HARD DUPLICATE PROTECTION
-           ----------------------------------------- */
-
+        // Sudah ada = jangan bikin lagi
         if (
             row.querySelector(
-                ':scope > td.' +
-                VALIDATOR_CELL
+                'td.' + VALIDATOR_CELL_CLASS
             )
         ) {
             return;
         }
 
 
-        /* -----------------------------------------
-           CREATE CELL
-           ----------------------------------------- */
+        const paymentTo =
+            getPaymentTo(row);
+
+        if (!paymentTo) {
+            return;
+        }
+
 
         const td =
             document.createElement('td');
 
         td.className =
-            VALIDATOR_CELL;
+            VALIDATOR_CELL_CLASS;
 
-        td.dataset.caminoValidator =
-            '1';
+        td.setAttribute(
+            'data-camino-validator',
+            '1'
+        );
 
         td.innerHTML = `
             <button
                 type="button"
                 class="camino-validator-btn"
                 title="Validate Account"
+                data-validating="0"
             >
                 <i class="fa fa-search"></i>
             </button>
@@ -7105,48 +7042,40 @@ w.addEventListener(
             );
 
 
-        /* =====================================================
-           BUTTON CLICK
-           ===================================================== */
-
+        // =====================================================
+        // BUTTON CLICK
+        // =====================================================
         btn.addEventListener(
             'click',
             async function () {
 
-                /* -----------------------------------------
-                   DOUBLE CLICK PROTECTION
-                   ----------------------------------------- */
-
+                // -------------------------------------------------
+                // DOUBLE REQUEST PROTECTION
+                // -------------------------------------------------
                 if (
                     btn.dataset.validating === '1'
                 ) {
-                    console.warn(
-                        '[CAMINO VALIDATOR] VALIDATION ALREADY RUNNING'
-                    );
                     return;
                 }
 
 
-                /* -----------------------------------------
-                   LOCK
-                   ----------------------------------------- */
+                btn.dataset.validating =
+                    '1';
 
-                btn.dataset.validating = '1';
-                btn.disabled = true;
+                btn.disabled =
+                    true;
 
 
-                /* -----------------------------------------
-                   SAVE ORIGINAL HTML
-                   ----------------------------------------- */
-
+                // -------------------------------------------------
+                // SAVE ORIGINAL CONTENT
+                // -------------------------------------------------
                 const originalHTML =
                     btn.innerHTML;
 
 
-                /* -----------------------------------------
-                   LOADING
-                   ----------------------------------------- */
-
+                // -------------------------------------------------
+                // LOADING
+                // -------------------------------------------------
                 btn.innerHTML = `
                     <i class="fa fa-spinner fa-spin"></i>
                 `;
@@ -7154,26 +7083,110 @@ w.addEventListener(
 
                 try {
 
-                    /* -------------------------------------
-                       EXTRACT PAYMENT DATA
-                       ------------------------------------- */
+                    // =================================================
+                    // GET PAYMENT TO
+                    // =================================================
+                    const currentPaymentTo =
+                        getPaymentTo(row);
 
-                    const {
-                        bank,
-                        bankCode,
-                        accountNumber
-                    } =
-                        getPaymentData(row);
+                    if (!currentPaymentTo) {
+                        throw new Error(
+                            'PAYMENT TO TIDAK DITEMUKAN'
+                        );
+                    }
 
 
-                    /* -------------------------------------
-                       API
-                       ------------------------------------- */
+                    const text =
+                        currentPaymentTo.innerText
+                            .trim()
+                            .replace(/\s+/g, ' ');
+
 
                     console.log(
-                        '[CAMINO VALIDATOR] STARTING API VALIDATION...'
+                        '[CAMINO VALIDATOR] PAYMENT TO:',
+                        text
                     );
 
+
+                    // =================================================
+                    // ACCOUNT NUMBER
+                    // =================================================
+                    const accountMatch =
+                        text.match(
+                            /(\d{6,20})$/
+                        );
+
+
+                    if (!accountMatch) {
+                        throw new Error(
+                            'ACCOUNT NUMBER TIDAK DITEMUKAN'
+                        );
+                    }
+
+
+                    const accountNumber =
+                        accountMatch[1];
+
+
+                    // =================================================
+                    // TEXT BEFORE ACCOUNT
+                    // =================================================
+                    const beforeAccount =
+                        text
+                            .slice(
+                                0,
+                                accountMatch.index
+                            )
+                            .trim();
+
+
+                    // =================================================
+                    // BANK
+                    // =================================================
+                    const bankMatch =
+                        beforeAccount.match(
+                            /([A-Za-z0-9]+)$/
+                        );
+
+
+                    const bank =
+                        bankMatch
+                            ? bankMatch[1]
+                            : null;
+
+
+                    const bankCode =
+                        window.getCaminoBankCode
+                            ? window.getCaminoBankCode(bank)
+                            : null;
+
+
+                    console.log(
+                        '[CAMINO VALIDATOR] BANK:',
+                        bank
+                    );
+
+                    console.log(
+                        '[CAMINO VALIDATOR] BANK CODE:',
+                        bankCode
+                    );
+
+                    console.log(
+                        '[CAMINO VALIDATOR] ACCOUNT:',
+                        accountNumber
+                    );
+
+
+                    if (!bankCode) {
+                        throw new Error(
+                            `BANK CODE TIDAK DITEMUKAN: ${bank || '-'}`
+                        );
+                    }
+
+
+                    // =================================================
+                    // API
+                    // =================================================
                     const result =
                         await caminoValidateAccount(
                             bankCode,
@@ -7182,18 +7195,18 @@ w.addEventListener(
 
 
                     console.log(
-                        '[CAMINO VALIDATOR] VALIDATION RESULT:',
+                        '[CAMINO VALIDATOR] RESULT:',
                         result
                     );
 
 
-                    /* -------------------------------------
-                       RESULT DATA
-                       ------------------------------------- */
-
+                    // =================================================
+                    // RESULT
+                    // =================================================
                     const data =
                         result?.data ||
-                        result;
+                        result ||
+                        {};
 
 
                     const accountName =
@@ -7203,10 +7216,9 @@ w.addEventListener(
                         'VALID';
 
 
-                    /* -------------------------------------
-                       SUCCESS
-                       ------------------------------------- */
-
+                    // =================================================
+                    // SUCCESS
+                    // =================================================
                     btn.innerHTML = `
                         <i class="fa fa-check"></i>
                         <span>
@@ -7219,45 +7231,26 @@ w.addEventListener(
                         'camino-validator-error'
                     );
 
-
                     btn.classList.add(
                         'camino-validator-success'
                     );
 
 
-                    /* -------------------------------------
-                       PERMANENT SUCCESS LOCK
-                       ------------------------------------- */
-
+                    // Permanent lock
                     btn.dataset.validated =
                         '1';
 
-                    console.log(
-                        '[CAMINO VALIDATOR] SUCCESS:',
-                        {
-                            bank,
-                            bankCode,
-                            accountNumber,
-                            accountName
-                        }
-                    );
-
-
-                } catch (error) {
-
-                    /* -------------------------------------
-                       ERROR
-                       ------------------------------------- */
+                }
+                catch (error) {
 
                     console.error(
-                        '[CAMINO VALIDATOR] VALIDATION ERROR:',
+                        '[CAMINO VALIDATOR] ERROR:',
                         error
                     );
 
 
                     btn.innerHTML = `
                         <i class="fa fa-times"></i>
-                        <span>ERROR</span>
                     `;
 
 
@@ -7265,608 +7258,350 @@ w.addEventListener(
                         'camino-validator-success'
                     );
 
-
                     btn.classList.add(
                         'camino-validator-error'
                     );
 
 
-                } finally {
+                    // Error boleh retry
+                    btn.dataset.validated =
+                        '0';
 
-                    /* -------------------------------------
-                       SELALU UNLOCK DI SINI
-                       
-                       Ini penting supaya tidak stuck
-                       loading kalau extraction/API error.
-                       ------------------------------------- */
+                }
+                finally {
 
                     btn.dataset.validating =
                         '0';
 
 
+                    // Kalau sukses:
+                    // tetap disabled.
                     if (
-                        btn.dataset.validated === '1'
+                        btn.dataset.validated ===
+                        '1'
                     ) {
 
-                        btn.disabled = true;
+                        btn.disabled =
+                            true;
 
-                    } else {
+                    }
+                    else {
 
-                        btn.disabled = false;
+                        btn.disabled =
+                            false;
+
                     }
 
-
-                    console.log(
-                        '[CAMINO VALIDATOR] Validation finished.'
-                    );
                 }
 
             }
         );
 
 
-        /* -----------------------------------------
-           APPEND CELL PALING AKHIR
-           ----------------------------------------- */
-
+        // =====================================================
+        // APPEND PALING AKHIR
+        // =====================================================
         row.appendChild(td);
     }
 
 
-    /* =========================================================
-       SCAN ROWS
-       ========================================================= */
-
+    // =========================================================
+    // SCAN ROWS
+    // =========================================================
     function scanValidatorRows() {
 
+        if (isScanning) {
+            return;
+        }
+
+        isScanning = true;
+
+
+        try {
+
+            const table =
+                getMainTable();
+
+            if (!table) {
+                return;
+            }
+
+
+            // -----------------------------------------------
+            // Header
+            // -----------------------------------------------
+            injectHeader();
+
+
+            // -----------------------------------------------
+            // Body rows
+            // -----------------------------------------------
+            const rows =
+                table.querySelectorAll(
+                    'tbody > tr[role="row"]'
+                );
+
+
+            rows.forEach(row => {
+
+                createValidatorCell(row);
+
+            });
+
+        }
+        finally {
+
+            isScanning =
+                false;
+
+        }
+    }
+
+
+    // =========================================================
+    // DEBOUNCED SCAN
+    //
+    // JANGAN scan setiap mutation.
+    // DataTables melakukan banyak mutation saat search,
+    // sorting, refresh, pagination.
+    // =========================================================
+    function scheduleScan() {
+
+        if (scanTimer) {
+            clearTimeout(scanTimer);
+        }
+
+        scanTimer =
+            setTimeout(() => {
+
+                scanTimer =
+                    null;
+
+                scanValidatorRows();
+
+            }, 100);
+    }
+
+
+    // =========================================================
+    // START
+    // =========================================================
+    function start() {
+
+        // Bersihkan hasil inject dari script lama
+        cleanupOldHeaders();
+
+
+        // Tunggu DataTables selesai membuat DOM
+        scheduleScan();
+
+
+        // -----------------------------------------------------
+        // Observer hanya observe container table
+        // BUKAN seluruh document.body
+        // -----------------------------------------------------
         const table =
             getMainTable();
 
         if (!table) {
-            return;
-        }
 
-
-        const tbody =
-            table.querySelector(
-                'tbody'
+            // Table mungkin belum dibuat
+            setTimeout(
+                start,
+                500
             );
 
-        if (!tbody) {
             return;
         }
 
 
-        const rows =
-            tbody.querySelectorAll(
-                ':scope > tr[role="row"]'
+        const scrollContainer =
+            table.closest(
+                '.dataTables_scroll'
             );
 
 
-        rows.forEach(
-            injectValidator
-        );
+        const observeTarget =
+            scrollContainer ||
+            table.parentElement;
 
 
-        /*
-         * Header hanya di-inject ke
-         * DataTables SCROLL HEAD.
-         */
-        injectValidatorHeader();
-    }
-
-
-    /* =========================================================
-       SAFE OBSERVER
-       
-       Jangan setiap mutation langsung scan brutal.
-       DataTables melakukan banyak mutation ketika refresh.
-       ========================================================= */
-
-    let scanScheduled = false;
-
-    function scheduleScan() {
-
-        if (scanScheduled) {
+        if (!observeTarget) {
             return;
         }
 
-        scanScheduled = true;
 
-        requestAnimationFrame(
-            () => {
+        observer =
+            new MutationObserver(
+                function (mutations) {
 
-                scanScheduled = false;
-
-                scanValidatorRows();
-            }
-        );
-    }
-
-
-    /* =========================================================
-       INITIAL SCAN
-       ========================================================= */
-
-    scheduleScan();
-
-
-    /* =========================================================
-       DATATABLE MUTATION OBSERVER
-       ========================================================= */
-
-    const observer =
-        new MutationObserver(
-            mutations => {
-
-                let relevant =
-                    false;
-
-
-                for (
-                    const mutation
-                    of mutations
-                ) {
-
-                    if (
-                        mutation.type !==
-                        'childList'
-                    ) {
-                        continue;
-                    }
-
-
-                    /*
-                     * Kita hanya peduli perubahan
-                     * di area DataTables.
-                     */
-
-                    const target =
-                        mutation.target;
-
-
-                    if (
-                        target &&
-                        (
-                            target.closest?.(
-                                '.dataTables_scroll'
-                            )
-                        )
-                    ) {
-
-                        relevant = true;
-                        break;
-                    }
+                    let relevant =
+                        false;
 
 
                     for (
-                        const node
-                        of mutation.addedNodes
+                        const mutation
+                        of mutations
                     ) {
 
                         if (
-                            node.nodeType !==
-                            Node.ELEMENT_NODE
+                            mutation.type !==
+                            'childList'
                         ) {
                             continue;
                         }
 
 
-                        if (
-                            node.matches?.(
-                                '.dataTables_scroll, .dataTables_scroll *'
-                            )
-                            ||
-                            node.querySelector?.(
-                                '.dataTables_scroll'
-                            )
+                        // Jangan trigger scan hanya karena
+                        // kita sendiri menambahkan validator.
+                        for (
+                            const node
+                            of mutation.addedNodes
                         ) {
 
-                            relevant = true;
+                            if (
+                                node.nodeType !==
+                                Node.ELEMENT_NODE
+                            ) {
+                                continue;
+                            }
+
+
+                            if (
+                                node.matches?.(
+                                    'tr'
+                                ) ||
+                                node.querySelector?.(
+                                    'tr'
+                                )
+                            ) {
+
+                                relevant =
+                                    true;
+
+                                break;
+                            }
+
+                        }
+
+
+                        if (relevant) {
                             break;
                         }
+
                     }
 
 
                     if (relevant) {
-                        break;
+                        scheduleScan();
                     }
+
                 }
+            );
 
 
-                if (relevant) {
-                    scheduleScan();
-                }
+        observer.observe(
+            observeTarget,
+            {
+                childList: true,
+                subtree: true
             }
         );
-
-
-    observer.observe(
-        document.body,
-        {
-            childList: true,
-            subtree: true
-        }
-    );
-
-
-    /* =========================================================
-       EXTRA: HANDLE DATATABLES REDRAW
-       
-       Kalau DataTables refresh/reload, header clone
-       bisa dibuat ulang. Kita scan lagi setelah DOM settle.
-       ========================================================= */
-
-    document.addEventListener(
-        'draw.dt',
-        () => {
-            scheduleScan();
-        }
-    );
-
-
-    console.log(
-        '[CAMINO VALIDATOR] Column system initialized.'
-    );
-
-})();
-
-
-/* =============================================================
-   CAMINO VALIDATOR CSS
-   ============================================================= */
-
-(function injectCaminoValidatorColumnCSS() {
-
-    if (
-        document.getElementById(
-            'camino-validator-column-css'
-        )
-    ) {
-        return;
     }
 
 
-    const style =
-        document.createElement(
-            'style'
-        );
+    // =========================================================
+    // WAIT UNTIL DATATABLE EXISTS
+    // =========================================================
+    function waitForTable() {
 
-    style.id =
-        'camino-validator-column-css';
+        const table =
+            document.getElementById(
+                TABLE_ID
+            );
 
+
+        if (!table) {
+
+            setTimeout(
+                waitForTable,
+                500
+            );
+
+            return;
+        }
+
+
+        start();
+    }
+
+
+    waitForTable();
+
+
+})();
+
+(function injectCaminoValidatorColumnCSS() {
+
+    if (document.getElementById('camino-validator-column-css')) {
+        return;
+    }
+
+    const style = document.createElement('style');
+
+    style.id = 'camino-validator-column-css';
 
     style.textContent = `
 
-        /* =========================================
-           VALIDATOR CELL
-           ========================================= */
-
         .camino-validator-cell {
-
-            width: 70px !important;
-            min-width: 70px !important;
-            max-width: 70px !important;
-
-            padding: 8px 10px !important;
-
-            text-align: center !important;
-            vertical-align: middle !important;
-
-            box-sizing: border-box !important;
+            width:70px !important;
+            min-width:70px !important;
+            text-align:center !important;
+            vertical-align:middle !important;
         }
-
-
-        /* =========================================
-           VALIDATOR HEADER
-
-           HARUS SAMA DENGAN CELL
-           ========================================= */
-
-        .camino-validator-header {
-
-            width: 70px !important;
-            min-width: 70px !important;
-            max-width: 70px !important;
-
-            padding: 8px 10px !important;
-
-            text-align: center !important;
-            vertical-align: middle !important;
-
-            white-space: nowrap !important;
-
-            box-sizing: border-box !important;
-        }
-
-
-        .camino-validator-header-title {
-
-            display: flex !important;
-
-            align-items: center !important;
-            justify-content: center !important;
-
-            gap: 6px;
-
-            width: 100% !important;
-
-            font-size: 11px;
-
-            font-weight: 800;
-
-            line-height: 1;
-
-            letter-spacing: .5px;
-
-            white-space: nowrap !important;
-        }
-
-
-        .camino-validator-header-title::before {
-
-            content: "";
-
-            width: 5px;
-            height: 5px;
-
-            flex: 0 0 5px;
-
-            border-radius: 50%;
-
-            background: #8d82ff;
-
-            box-shadow:
-                0 0 7px #8d82ff,
-                0 0 14px
-                rgba(141,130,255,.35);
-        }
-
-
-        /* =========================================
-           BUTTON
-           ========================================= */
 
         .camino-validator-btn {
+            width:38px;
+            height:38px;
 
-            position: relative;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
 
-            width: 42px !important;
-            min-width: 42px !important;
-            max-width: 42px !important;
+            border:1px solid rgba(0,245,255,.35);
+            border-radius:10px;
 
-            height: 34px !important;
+            background:rgba(0,245,255,.08);
+            color:#00f5ff;
 
-            padding: 0 !important;
+            cursor:pointer;
 
-            display: inline-flex !important;
-
-            align-items: center;
-            justify-content: center;
-
-            border: 1px solid
-                rgba(255,255,255,.12);
-
-            border-radius: 8px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #171923,
-                    #0d0f15
-                );
-
-            color: #cfd3ff;
-
-            font-size: 12px;
-
-            cursor: pointer;
-
-            overflow: hidden;
-
-            box-sizing: border-box !important;
+            font-size:16px;
 
             transition:
-                background .25s ease,
-                border-color .25s ease,
-                box-shadow .25s ease,
-                transform .15s ease;
+                transform .2s ease,
+                background .2s ease,
+                box-shadow .2s ease,
+                color .2s ease;
         }
 
+        .camino-validator-btn:hover {
+            transform:translateY(-2px) scale(1.05);
 
-        .camino-validator-btn i {
-
-            width: 14px;
-            height: 14px;
-
-            display: inline-flex;
-
-            align-items: center;
-            justify-content: center;
-
-            font-size: 13px;
-        }
-
-
-        .camino-validator-btn:hover:not(:disabled) {
-
-            border-color:
-                rgba(130,120,255,.55);
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #1d2030,
-                    #11131c
-                );
+            background:rgba(0,245,255,.16);
 
             box-shadow:
-                0 0 0 1px
-                rgba(130,120,255,.08),
-
-                0 0 18px
-                rgba(100,90,255,.16);
-
-            transform:
-                translateY(-1px);
+                0 0 12px rgba(0,245,255,.35),
+                inset 0 0 8px rgba(0,245,255,.08);
         }
 
-
-        .camino-validator-btn:active:not(:disabled) {
-
-            transform:
-                scale(.94);
-        }
-
-
-        /* =========================================
-           LOADING
-           ========================================= */
-
-        .camino-validator-btn:disabled {
-
-            cursor: wait;
-        }
-
-
-        .camino-validator-btn
-        .fa-spinner {
-
-            color: #a79cff;
-
-            filter:
-                drop-shadow(
-                    0 0 6px
-                    rgba(141,130,255,.55)
-                );
-        }
-
-
-        /* =========================================
-           SUCCESS
-           ========================================= */
-
-        .camino-validator-btn.camino-validator-success {
-
-            width: 236px !important;
-            min-width: 236px !important;
-            max-width: 236px !important;
-
-            height: auto !important;
-            min-height: 62px !important;
-
-            justify-content: flex-start !important;
-
-            gap: 11px;
-
-            padding: 9px 13px !important;
-
-            border-radius: 10px;
-
-            cursor: default !important;
-
-            box-sizing: border-box !important;
-        }
-
-
-        .camino-validator-btn.camino-validator-success i {
-
-            flex: 0 0 20px;
-
-            width: 20px;
-            height: 20px;
-
-            font-size: 17px;
-
-            color: #63f0aa;
-
-            text-shadow:
-                0 0 8px
-                rgba(80,255,170,.65);
-        }
-
-
-        .camino-validator-btn.camino-validator-success span {
-
-            flex: 1 1 auto;
-
-            min-width: 0;
-
-            display: -webkit-box !important;
-
-            font-size: 16px !important;
-
-            font-weight: 800 !important;
-
-            line-height: 19px !important;
-
-            color: #fff !important;
-
-            text-align: left;
-
-            white-space: normal !important;
-
-            overflow: hidden !important;
-
-            overflow-wrap: anywhere;
-
-            -webkit-box-orient: vertical;
-
-            -webkit-line-clamp: 2;
-        }
-
-
-        .camino-validator-btn.camino-validator-success:hover {
-
-            transform: none !important;
-
-            border-color:
-                rgba(80,255,170,.35) !important;
-
-            box-shadow:
-                0 0 0 1px
-                rgba(80,255,170,.06),
-
-                0 0 18px
-                rgba(80,255,170,.10);
-        }
-
-
-        /* =========================================
-           ERROR
-           ========================================= */
-
-        .camino-validator-btn.camino-validator-error {
-
-            width: 100px !important;
-            min-width: 100px !important;
-            max-width: 100px !important;
-
-            border-color:
-                rgba(255,80,100,.4);
-
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(75,20,28,.95),
-                    rgba(35,12,17,.98)
-                );
-
-            color: #ff7d91;
-        }
-
-
-        .camino-validator-btn.camino-validator-error i {
-
-            color: #ff687f;
+        .camino-validator-btn:active {
+            transform:scale(.92);
         }
 
     `;
 
-
-    document.head.appendChild(
-        style
-    );
+    document.head.appendChild(style);
 
 })();
 
