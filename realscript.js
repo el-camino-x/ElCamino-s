@@ -4574,241 +4574,354 @@ function avEscape(value) {
         .replace(/'/g, "&#039;");
 }
 
+// =============================================================
+// CAMINO GLOBAL VALIDATION LOCK
+// Lock berdasarkan BANK CODE + ACCOUNT NUMBER
+// =============================================================
+
+window.__CAMINO_VALIDATION_LOCKS =
+    window.__CAMINO_VALIDATION_LOCKS || new Map();
+
+
+// =============================================================
+// BUILD UNIQUE VALIDATION KEY
+// =============================================================
+
+function getCaminoValidationKey(
+    bankCode,
+    accountNumber
+) {
+
+    return (
+        String(bankCode ?? "")
+            .trim()
+            .toUpperCase()
+        +
+        "::" +
+        String(accountNumber ?? "")
+            .trim()
+    );
+
+}
+
+
+// =============================================================
+// CAMINO VALIDATOR
+// =============================================================
+
 async function caminoValidateAccount(
     bankCode,
     accountNumber
 ) {
 
+    // =========================================================
+    // BASIC VALIDATION
+    // =========================================================
+
     if (!bankCode) {
+
         throw new Error(
             "BANK CODE TIDAK DITEMUKAN"
         );
+
     }
 
     if (!accountNumber) {
+
         throw new Error(
             "NOMOR REKENING TIDAK DITEMUKAN"
         );
+
     }
 
-    console.log(
-        "[CAMINO VALIDATOR] Sending validation request..."
+
+    // =========================================================
+    // NORMALIZE VALUE
+    // =========================================================
+
+    const normalizedBankCode =
+        String(bankCode)
+            .trim()
+            .toUpperCase();
+
+    const normalizedAccountNumber =
+        String(accountNumber)
+            .trim();
+
+
+    // =========================================================
+    // GLOBAL VALIDATION KEY
+    // =========================================================
+
+    const validationKey =
+        getCaminoValidationKey(
+            normalizedBankCode,
+            normalizedAccountNumber
+        );
+
+
+    // =========================================================
+    // CHECK GLOBAL LOCK
+    //
+    // Kalau BANK + REKENING yang sama sedang diproses,
+    // JANGAN kirim API request kedua.
+    //
+    // Request kedua akan menggunakan Promise request pertama.
+    // =========================================================
+
+    const existingRequest =
+        window.__CAMINO_VALIDATION_LOCKS.get(
+            validationKey
+        );
+
+    if (existingRequest) {
+
+        console.warn(
+            "[CAMINO VALIDATOR] DUPLICATE REQUEST BLOCKED:",
+            validationKey
+        );
+
+        console.warn(
+            "[CAMINO VALIDATOR] USING EXISTING REQUEST:",
+            validationKey
+        );
+
+        return await existingRequest;
+
+    }
+
+
+    // =========================================================
+    // CREATE ONLY ONE API REQUEST
+    // =========================================================
+
+    const requestPromise =
+        (async () => {
+
+            console.log(
+                "[CAMINO VALIDATOR] Sending validation request..."
+            );
+
+            console.log(
+                "[CAMINO VALIDATOR] BANK CODE:",
+                normalizedBankCode
+            );
+
+            console.log(
+                "[CAMINO VALIDATOR] ACCOUNT:",
+                normalizedAccountNumber
+            );
+
+
+            // =================================================
+            // BUILD API URL
+            // =================================================
+
+            const url =
+                `${API_BASE}/api/cek` +
+                `?code=${encodeURIComponent(
+                    normalizedBankCode
+                )}` +
+                `&nomor=${encodeURIComponent(
+                    normalizedAccountNumber
+                )}`;
+
+
+            console.log(
+                "[CAMINO VALIDATOR] REQUEST:",
+                url
+            );
+
+
+            // =================================================
+            // API REQUEST
+            // =================================================
+
+            let response;
+
+            try {
+
+                response =
+                    await fetch(
+                        url,
+                        {
+                            method: "GET",
+
+                            headers: {
+
+                                "X-API-Key":
+                                    API_KEY,
+
+                                "X-Idempotency-Key":
+                                    "elcamino-" +
+                                    validationKey +
+                                    "-" +
+                                    crypto.randomUUID()
+
+                            }
+
+                        }
+                    );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "[CAMINO VALIDATOR] FETCH ERROR:",
+                    error
+                );
+
+                throw new Error(
+                    "GAGAL TERHUBUNG KE SERVER API"
+                );
+
+            }
+
+
+            // =================================================
+            // HTTP STATUS
+            // =================================================
+
+            console.log(
+                "[CAMINO VALIDATOR] HTTP STATUS:",
+                response.status
+            );
+
+
+            // =================================================
+            // PARSE RESPONSE
+            // =================================================
+
+            let data;
+
+            try {
+
+                data =
+                    await response.json();
+
+            }
+
+            catch {
+
+                throw new Error(
+                    `Response API tidak valid (HTTP ${response.status})`
+                );
+
+            }
+
+
+            // =================================================
+            // API RESPONSE LOG
+            // =================================================
+
+            console.log(
+                "[CAMINO VALIDATOR] API RESPONSE:",
+                data
+            );
+
+
+            // =================================================
+            // HTTP ERROR
+            // =================================================
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data?.message ||
+                    data?.error ||
+                    data?.error_code ||
+                    `HTTP ${response.status}`
+                );
+
+            }
+
+
+            // =================================================
+            // API VALIDATION ERROR
+            // =================================================
+
+            if (
+                data?.success === false ||
+                data?.status === false
+            ) {
+
+                throw new Error(
+                    data?.message ||
+                    data?.error ||
+                    data?.error_code ||
+                    "Validasi gagal"
+                );
+
+            }
+
+
+            // =================================================
+            // SUCCESS
+            // =================================================
+
+            console.log(
+                "[CAMINO VALIDATOR] VALIDATION SUCCESS:",
+                validationKey
+            );
+
+
+            return data;
+
+        })();
+
+
+    // =========================================================
+    // SAVE PROMISE IMMEDIATELY
+    //
+    // HARUS disimpan SEBELUM await.
+    // Ini yang membuat request kedua melihat lock.
+    // =========================================================
+
+    window.__CAMINO_VALIDATION_LOCKS.set(
+        validationKey,
+        requestPromise
     );
 
-    console.log(
-        "[CAMINO VALIDATOR] BANK CODE:",
-        bankCode
-    );
 
-    console.log(
-        "[CAMINO VALIDATOR] ACCOUNT:",
-        accountNumber
-    );
-
-    const url =
-        `${API_BASE}/api/cek` +
-        `?code=${encodeURIComponent(bankCode)}` +
-        `&nomor=${encodeURIComponent(accountNumber)}`;
-
-    console.log(
-        "[CAMINO VALIDATOR] REQUEST:",
-        url
-    );
+    // =========================================================
+    // WAIT FOR REQUEST
+    // =========================================================
 
     try {
 
-        const response = await fetch(
-            url,
-            {
-                method: "GET",
+        return await requestPromise;
 
-                headers: {
-                    "X-API-Key": API_KEY,
+    }
 
-                    "X-Idempotency-Key":
-                        "elcamino-row-validator-" +
-                        crypto.randomUUID()
-                }
-            }
-        );
+    finally {
 
-        console.log(
-            "[CAMINO VALIDATOR] HTTP STATUS:",
-            response.status
-        );
-
-        let data;
-
-        try {
-
-            data =
-                await response.json();
-
-        } catch {
-
-            throw new Error(
-                `Response API tidak valid (HTTP ${response.status})`
-            );
-        }
-
-        console.log(
-            "[CAMINO VALIDATOR] API RESPONSE:",
-            data
-        );
-
-        if (!response.ok) {
-
-            throw new Error(
-                data?.message ||
-                data?.error ||
-                data?.error_code ||
-                `HTTP ${response.status}`
-            );
-        }
+        // =====================================================
+        // RELEASE ONLY OUR OWN LOCK
+        //
+        // Jangan menghapus lock milik request lain.
+        // =====================================================
 
         if (
-            data?.success === false ||
-            data?.status === false
+            window.__CAMINO_VALIDATION_LOCKS.get(
+                validationKey
+            ) === requestPromise
         ) {
 
-            throw new Error(
-                data?.message ||
-                data?.error ||
-                data?.error_code ||
-                "Validasi gagal"
+            window.__CAMINO_VALIDATION_LOCKS.delete(
+                validationKey
             );
+
         }
 
-        return data;
 
-    } catch (error) {
-
-        console.error(
-            "[CAMINO VALIDATOR] API ERROR:",
-            error
+        console.log(
+            "[CAMINO VALIDATOR] GLOBAL LOCK RELEASED:",
+            validationKey
         );
 
-        throw error;
-    }
-}
-
-async function validateAccount(bankCode, accountNumber) {
-
-    // ==============================
-    // BASIC VALIDATION
-    // ==============================
-
-    if (!bankCode) {
-        throw new Error("BANK TIDAK DIDUKUNG");
     }
 
-    if (!accountNumber) {
-        throw new Error("NOMOR REKENING KOSONG");
-    }
-
-    // ==============================
-    // BUILD API URL
-    // ==============================
-
-    const url =
-        `${API_BASE}/api/v3/validate` +
-        `?code=${encodeURIComponent(bankCode)}` +
-        `&accountNumber=${encodeURIComponent(accountNumber)}`;
-
-    console.log(
-        "[ACCOUNT VALIDATOR] REQUEST:",
-        url
-    );
-
-    // ==============================
-    // API REQUEST
-    // ==============================
-
-    let response;
-
-    try {
-
-        response = await fetch(
-            url,
-            {
-                method: "GET",
-
-                headers: {
-                    "X-API-Key": API_KEY,
-                    "X-Idempotency-Key":
-                        "elcamino-validator-" +
-                        Date.now()
-                }
-            }
-        );
-
-    } catch (error) {
-
-        console.error(
-            "[ACCOUNT VALIDATOR] FETCH ERROR:",
-            error
-        );
-
-        throw new Error(
-            "GAGAL TERHUBUNG KE SERVER API"
-        );
-    }
-
-    // ==============================
-    // PARSE RESPONSE
-    // ==============================
-
-    let data;
-
-    try {
-
-        data = await response.json();
-
-    } catch {
-
-        throw new Error(
-            `Response API tidak valid (HTTP ${response.status})`
-        );
-    }
-
-    console.log(
-        "[ACCOUNT VALIDATOR] RESPONSE:",
-        response.status,
-        data
-    );
-
-    // ==============================
-    // HTTP ERROR
-    // ==============================
-
-    if (!response.ok) {
-
-        throw new Error(
-            data?.message ||
-            data?.error ||
-            data?.error_code ||
-            `HTTP ${response.status}`
-        );
-    }
-
-    // ==============================
-    // API VALIDATION ERROR
-    // ==============================
-
-    if (data?.success === false) {
-
-        throw new Error(
-            data?.message ||
-            data?.error ||
-            "Validasi gagal"
-        );
-    }
-
-    // ==============================
-    // SUCCESS
-    // ==============================
-
-    return data;
 }
 
 function createAccountValidator() {
@@ -4941,176 +5054,6 @@ function createAccountValidator() {
         panel.querySelector(
             "#av-status"
         );
-
-validateButton.addEventListener("click", async () => {
-
-    // =========================================
-    // BLOCK DOUBLE CLICK
-    // =========================================
-    if (validationInProgress) {
-        console.log(
-            "[CAMINO VALIDATOR] Validation already running."
-        );
-        return;
-    }
-
-    // LOCK
-    validationInProgress = true;
-
-    // DISABLE BUTTON
-    validateButton.disabled = true;
-    validateButton.classList.add("is-loading");
-
-    const originalText =
-        validateButton.innerHTML;
-
-    try {
-
-        const bankCode =
-            bankValue.value.trim();
-
-        const accountNumber =
-            accountInput.value.trim();
-
-        // =========================================
-        // BASIC VALIDATION
-        // =========================================
-
-        if (!bankCode) {
-            throw new Error(
-                "SILAKAN PILIH BANK / E-WALLET"
-            );
-        }
-
-        if (!accountNumber) {
-            throw new Error(
-                "NOMOR REKENING KOSONG"
-            );
-        }
-
-        // =========================================
-        // LOADING
-        // =========================================
-
-        validateButton.innerHTML = `
-            <span class="av-spinner"></span>
-            VALIDATING...
-        `;
-
-        statusBox.innerHTML = `
-            <div class="av-loading">
-                VALIDATING ACCOUNT...
-            </div>
-        `;
-
-        console.log(
-            "[CAMINO VALIDATOR] Starting validation..."
-        );
-
-        // =========================================
-        // API — CUMA SEKALI
-        // =========================================
-
-        const result =
-            await caminoValidateAccount(
-                bankCode,
-                accountNumber
-            );
-
-        console.log(
-            "[CAMINO VALIDATOR] VALIDATION RESULT:",
-            result
-        );
-
-        // =========================================
-        // SUCCESS
-        // =========================================
-
-        const data =
-            result?.data || result;
-
-        statusBox.innerHTML = `
-            <div class="av-success">
-
-                <div class="av-success-title">
-                    ✓ ACCOUNT VALID
-                </div>
-
-                <div class="av-result-row">
-                    <span>BANK</span>
-                    <strong>
-                        ${avEscape(bankSearch.value)}
-                    </strong>
-                </div>
-
-                <div class="av-result-row">
-                    <span>ACCOUNT</span>
-                    <strong>
-                        ${avEscape(
-                            data?.account_number ||
-                            accountNumber
-                        )}
-                    </strong>
-                </div>
-
-                <div class="av-result-row">
-                    <span>NAME</span>
-                    <strong>
-                        ${avEscape(
-                            data?.account_name || "-"
-                        )}
-                    </strong>
-                </div>
-
-            </div>
-        `;
-
-    } catch (error) {
-
-        console.error(
-            "[CAMINO VALIDATOR] VALIDATION ERROR:",
-            error
-        );
-
-        statusBox.innerHTML = `
-            <div class="av-error">
-
-                <div class="av-error-title">
-                    ✕ VALIDATION FAILED
-                </div>
-
-                <div class="av-error-message">
-                    ${avEscape(
-                        error?.message ||
-                        "Terjadi kesalahan saat validasi"
-                    )}
-                </div>
-
-            </div>
-        `;
-
-    } finally {
-
-        // =========================================
-        // UNLOCK SETELAH REQUEST SELESAI
-        // =========================================
-
-        validationInProgress = false;
-
-        validateButton.disabled = false;
-
-        validateButton.classList.remove(
-            "is-loading"
-        );
-
-        validateButton.innerHTML =
-            originalText;
-
-        console.log(
-            "[CAMINO VALIDATOR] Validation finished."
-        );
-    }
-});
 
     function renderBankList(
         keyword = ""
@@ -5325,39 +5268,88 @@ w.addEventListener(
     );
     validateButton.onclick =
         async () => {
+
+            // =========================================
+            // BLOCK DOUBLE CLICK / DOUBLE REQUEST
+            // =========================================
+
+            if (validationInProgress) {
+
+                console.log(
+                    "[CAMINO VALIDATOR] Validation already running."
+                );
+
+                return;
+            }
+
+
+            // =========================================
+            // GET INPUT
+            // =========================================
+
             const bankCode =
-                bankValue.value;
+                bankValue.value.trim();
+
             const bankName =
-                bankSearch.value
-                    .trim();
+                bankSearch.value.trim();
+
             const accountNumber =
-                accountInput.value
-                    .trim();
-            if (
-                !bankCode
-            ) {
+                accountInput.value.trim();
+
+
+            // =========================================
+            // BASIC VALIDATION
+            // =========================================
+
+            if (!bankCode) {
+
                 statusBox.innerHTML = `
                     <div class="av-error">
                         ✕ PILIH BANK TERLEBIH DAHULU
                     </div>
                 `;
+
                 return;
             }
-            if (
-                !accountNumber
-            ) {
+
+
+            if (!accountNumber) {
+
                 statusBox.innerHTML = `
                     <div class="av-error">
                         ✕ NOMOR REKENING KOSONG
                     </div>
                 `;
+
                 accountInput.focus();
+
                 return;
             }
+
+
+            // =========================================
+            // LOCK
+            // =========================================
+
+            validationInProgress = true;
+
             validateButton.disabled =
                 true;
-            validateButton.textContent =
-                "CHECKING...";
+
+            validateButton.classList.add(
+                "is-loading"
+            );
+
+
+            // =========================================
+            // LOADING
+            // =========================================
+
+            validateButton.innerHTML = `
+                <span class="av-spinner"></span>
+                VALIDATING...
+            `;
+
             statusBox.innerHTML = `
                 <div class="av-loading">
                     <span class="av-loading-dot">
@@ -5367,95 +5359,164 @@ w.addEventListener(
                     ON CHECKING...
                 </div>
             `;
+
+
             try {
+
+                console.log(
+                    "[CAMINO VALIDATOR] MANUAL VALIDATION START"
+                );
+
+                console.log(
+                    "[CAMINO VALIDATOR] BANK:",
+                    bankName
+                );
+
+                console.log(
+                    "[CAMINO VALIDATOR] BANK CODE:",
+                    bankCode
+                );
+
+                console.log(
+                    "[CAMINO VALIDATOR] ACCOUNT:",
+                    accountNumber
+                );
+
+
+                // =========================================
+                // API
+                // SATU REQUEST SAJA
+                // =========================================
+
                 const result =
-                    await validateAccount(
+                    await caminoValidateAccount(
                         bankCode,
                         accountNumber
                     );
+
+
                 console.log(
-                    "[ACCOUNT VALIDATOR] RESULT:",
+                    "[CAMINO VALIDATOR] RESULT:",
                     result
                 );
+
+
+                // =========================================
+                // RESPONSE DATA
+                // =========================================
+
+                const data =
+                    result?.data ||
+                    result ||
+                    {};
+
+
                 const name =
-                    result?.data?.account_name ||
-                    result?.data?.nama ||
-                    result?.account_name ||
-                    result?.nama ||
-                    result?.data?.accountName ||
-                    result?.accountName;
-                if (
-                    result?.success &&
-                    name
-                ) {
-                    statusBox.innerHTML = `
-                        <div class="av-success">
-                            <span class="av-success-icon">
-                                ✓
-                            </span>
-                            ACCOUNT VALID
-                        </div>
-                        <div class="av-name-label">
-                            ACCOUNT NAME
-                        </div>
-                        <div class="av-name">
-                            ${avEscape(name)}
-                        </div>
-                        <div class="av-bank-confirm">
-                            ${avEscape(bankName)}
-                            <span>•</span>
-                            ${avEscape(accountNumber)}
-                        </div>
-                    `;
-                }
-                else if (
-                    result?.success
-                ) {
-                    statusBox.innerHTML = `
-                        <div class="av-success">
-                            ✓ REQUEST SUCCESS
-                        </div>
-                        <pre class="av-json">${avEscape(
-                            JSON.stringify(
-                                result,
-                                null,
-                                2
-                            )
-                        )}</pre>
-                    `;
-                }
-                else {
-                    throw new Error(
-                        result?.message ||
-                        "Validasi gagal"
-                    );
-                }
-            }
-            catch (
-                error
-            ) {
-                console.error(
-                    "[ACCOUNT VALIDATOR]",
-                    error
-                );
+                    data?.account_name ||
+                    data?.accountName ||
+                    data?.nama ||
+                    "-";
+
+
+                const returnedAccount =
+                    data?.account_number ||
+                    data?.accountNumber ||
+                    accountNumber;
+
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+
                 statusBox.innerHTML = `
-                    <div class="av-error">
-                        ✕ VALIDATION ERROR
-                    </div>
-                    <div class="av-error-detail">
-                        ${avEscape(
-                            error.message
-                        )}
+                    <div class="av-success">
+
+                        <div class="av-success-title">
+                            ✓ ACCOUNT VALID
+                        </div>
+
+                        <div class="av-result-row">
+                            <span>BANK</span>
+                            <strong>
+                                ${avEscape(bankName)}
+                            </strong>
+                        </div>
+
+                        <div class="av-result-row">
+                            <span>ACCOUNT</span>
+                            <strong>
+                                ${avEscape(
+                                    returnedAccount
+                                )}
+                            </strong>
+                        </div>
+
+                        <div class="av-result-row">
+                            <span>NAME</span>
+                            <strong>
+                                ${avEscape(name)}
+                            </strong>
+                        </div>
+
                     </div>
                 `;
-            }
-            finally {
+
+
+            } catch (
+                error
+            ) {
+
+                console.error(
+                    "[CAMINO VALIDATOR] MANUAL VALIDATION ERROR:",
+                    error
+                );
+
+
+                statusBox.innerHTML = `
+                    <div class="av-error">
+
+                        <div class="av-error-title">
+                            ✕ VALIDATION FAILED
+                        </div>
+
+                        <div class="av-error-message">
+                            ${avEscape(
+                                error?.message ||
+                                "Terjadi kesalahan saat validasi"
+                            )}
+                        </div>
+
+                    </div>
+                `;
+
+
+            } finally {
+
+                // =========================================
+                // UNLOCK
+                // =========================================
+
+                validationInProgress = false;
+
                 validateButton.disabled =
                     false;
-                validateButton.textContent =
+
+                validateButton.classList.remove(
+                    "is-loading"
+                );
+
+                validateButton.innerHTML =
                     "VALIDATE";
+
+
+                console.log(
+                    "[CAMINO VALIDATOR] MANUAL VALIDATION FINISHED"
+                );
+
             }
+
         };
+
     accountInput.addEventListener(
         "keydown",
         event => {
@@ -6673,10 +6734,7 @@ w.addEventListener(
 
 })();
 
-/* =========================================================
-   CAMINO VALIDATOR COLUMN
-   STEP 1 — INJECT VALIDATOR BUTTON
-========================================================= */
+
 
 (function initCaminoValidator() {
 
@@ -6688,10 +6746,6 @@ w.addEventListener(
     let scanTimer = null;
 
 
-    // =========================================================
-    // GET TABLE
-    // =========================================================
-
     function getTable() {
 
         return document.getElementById(
@@ -6699,26 +6753,6 @@ w.addEventListener(
         );
 
     }
-
-
-    // =========================================================
-    // GET ACTION CELL
-    //
-    // DOM ASLI:
-    //
-    // 0 checkbox
-    // 1 No
-    // 2 tanggal
-    // 3 tiket
-    // 4 username
-    // 5 payment to
-    // 6 amount
-    // 7 grup
-    // 8 balance
-    // 9 payment from
-    // 10 aksi
-    //
-    // =========================================================
 
     function getActionCell(row) {
 
@@ -7158,14 +7192,6 @@ w.addEventListener(
             }
         );
 
-
-        // =====================================================
-        // APPEND KE ACTION CELL
-        //
-        // BUKAN append <td> baru.
-        // Jadi jumlah kolom DataTables TETAP.
-        // =====================================================
-
         const container =
             actionCell.querySelector(
                 '.btn-container'
@@ -7189,15 +7215,6 @@ w.addEventListener(
 
     }
 
-
-    // =========================================================
-    // HEADER
-    //
-    // KITA TIDAK MEMBUAT TH.
-    //
-    // Header "VALIDATOR" ditampilkan menggunakan CSS
-    // pada header Aksi.
-    // =========================================================
 
     function markHeader() {
 
@@ -7263,9 +7280,6 @@ w.addEventListener(
     }
 
 
-    // =========================================================
-    // SCAN
-    // =========================================================
 
     function scan() {
 
@@ -7299,10 +7313,6 @@ w.addEventListener(
     }
 
 
-    // =========================================================
-    // DEBOUNCE
-    // =========================================================
-
     function scheduleScan() {
 
         if (scanTimer) {
@@ -7327,13 +7337,6 @@ w.addEventListener(
 
     }
 
-
-    // =========================================================
-    // DATATABLE REDRAW DETECTOR
-    //
-    // Hanya listen perubahan TBODY.
-    // Tidak menyentuh header.
-    // =========================================================
 
     function observe() {
 
@@ -7516,9 +7519,6 @@ w.addEventListener(
 }
 
 
-/* =========================================================
-   ICON
-   ========================================================= */
 
 .camino-validator-btn i {
 
@@ -7538,9 +7538,6 @@ w.addEventListener(
 }
 
 
-/* =========================================================
-   ACCOUNT NAME
-   ========================================================= */
 
 .camino-validator-name {
 
@@ -7580,10 +7577,6 @@ w.addEventListener(
 }
 
 
-/* =========================================================
-   HOVER
-   ========================================================= */
-
 .camino-validator-btn:hover {
 
     transform:
@@ -7609,10 +7602,6 @@ w.addEventListener(
 }
 
 
-/* =========================================================
-   ACTIVE
-   ========================================================= */
-
 .camino-validator-btn:active {
 
     transform:
@@ -7625,25 +7614,13 @@ w.addEventListener(
 }
 
 
-/* =========================================================
-   DISABLED
-   ========================================================= */
-
 .camino-validator-btn:disabled {
-
     cursor: wait !important;
-
     opacity: .88 !important;
-
     transform: none !important;
-
     pointer-events: none !important;
 }
 
-
-/* =========================================================
-   LOADING
-   ========================================================= */
 
 .camino-validator-btn.camino-validator-loading {
 
@@ -7667,10 +7644,6 @@ w.addEventListener(
 }
 
 
-/* =========================================================
-   LOADING SPINNER
-   ========================================================= */
-
 .camino-validator-btn.camino-validator-loading i {
 
     animation:
@@ -7691,10 +7664,6 @@ w.addEventListener(
 
 }
 
-
-/* =========================================================
-   SUCCESS
-   ========================================================= */
 
 .camino-validator-btn.camino-validator-success {
 
@@ -7718,10 +7687,6 @@ w.addEventListener(
 }
 
 
-/* =========================================================
-   SUCCESS ICON
-   ========================================================= */
-
 .camino-validator-btn.camino-validator-success i {
 
     color: #72e6a5 !important;
@@ -7730,10 +7695,6 @@ w.addEventListener(
         0 0 7px rgba(72,220,145,.30) !important;
 }
 
-
-/* =========================================================
-   SUCCESS HOVER
-   ========================================================= */
 
 .camino-validator-btn.camino-validator-success:hover {
 
@@ -7757,10 +7718,6 @@ w.addEventListener(
 }
 
 
-/* =========================================================
-   ERROR
-   ========================================================= */
-
 .camino-validator-btn.camino-validator-error {
 
     border-color:
@@ -7782,16 +7739,9 @@ w.addEventListener(
         0 0 12px rgba(255,70,90,.10) !important;
 }
 
-
-/* =========================================================
-   ERROR HOVER
-   ========================================================= */
-
 .camino-validator-btn.camino-validator-error:hover {
-
     border-color:
         rgba(255, 100, 120, .72) !important;
-
     background:
         linear-gradient(
             145deg,
@@ -7799,213 +7749,105 @@ w.addEventListener(
             #27151c 55%,
             #180d12 100%
         ) !important;
-
     color: #ff9aa5 !important;
 }
 
-
-/* =========================================================
-   ACTION HEADER
-   ========================================================= */
-
 .camino-action-header
 .DataTables_sort_wrapper {
-
     display: flex !important;
-
     align-items: center !important;
-
     justify-content: center !important;
-
     gap: 8px !important;
 }
 
-
-/* =========================================================
-   VALIDATOR HEADER
-   ========================================================= */
-
 .camino-action-header
 .DataTables_sort_wrapper::after {
-
     content: "VALIDATOR";
-
     font-size: 12px !important;
-
     font-weight: 800 !important;
-
     letter-spacing: .10em !important;
-
     color: #00f5ff !important;
-
     opacity: .95 !important;
-
     text-shadow:
         0 0 8px rgba(0,245,255,.25) !important;
 }
 
-
-/* =========================================================
-   ACTION CELL
-   ========================================================= */
-
 #withdrawal-pending-table
 tbody
 td.gridview.sticky-action-revamp.right {
-
     white-space: nowrap !important;
-
     overflow: visible !important;
 }
-
-
-/* =========================================================
-   BUTTON INSIDE TABLE
-   ========================================================= */
 
 #withdrawal-pending-table
 tbody
 .camino-validator-btn {
-
     flex-shrink: 0 !important;
-
     width: 220px !important;
-
     min-width: 220px !important;
-
     max-width: 220px !important;
-
     height: 54px !important;
-
     min-height: 54px !important;
 }
-
-
-/* =========================================================
-   NAME INSIDE BUTTON
-   ========================================================= */
 
 #withdrawal-pending-table
 .camino-validator-btn
 .camino-validator-name {
-
     display: -webkit-box !important;
-
     flex: 1 1 auto !important;
-
     min-width: 0 !important;
-
     max-width: 175px !important;
-
     overflow: hidden !important;
-
     text-overflow: clip !important;
-
     white-space: normal !important;
-
     word-break: normal !important;
-
     overflow-wrap: anywhere !important;
-
     font-size: 19px !important;
-
     font-weight: 850 !important;
-
     line-height: 21px !important;
-
     letter-spacing: .15px !important;
-
     -webkit-box-orient: vertical !important;
-
     -webkit-line-clamp: 2 !important;
 }
 
-
-/* =========================================================
-   ACTION CONTAINER
-   ========================================================= */
-
 #withdrawal-pending-table
 .action-btn-container {
-
     display: flex !important;
-
     align-items: center !important;
-
     gap: 5px !important;
-
     overflow: visible !important;
 }
 
-
-/* =========================================================
-   BUTTON ALIGNMENT
-   ========================================================= */
-
 #withdrawal-pending-table
 .camino-validator-btn {
-
     vertical-align: middle !important;
-
     margin-top: 0 !important;
-
     margin-bottom: 0 !important;
 }
 
-
-/* =========================================================
-   MOBILE / SMALL TABLE
-   ========================================================= */
-
 @media (max-width: 1200px) {
-
     .camino-validator-btn {
-
         width: 195px !important;
-
         min-width: 195px !important;
-
         max-width: 195px !important;
-
         height: 52px !important;
-
         min-height: 52px !important;
-
     }
 
     .camino-validator-name {
-
         max-width: 150px !important;
-
         font-size: 17px !important;
-
         line-height: 19px !important;
-
     }
-
 }
-
-
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-
     .camino-validator-btn,
     .camino-validator-btn.camino-validator-loading i {
-
         animation: none !important;
-
         transition: none !important;
     }
-
 }
-
-/* =========================================================
-   CAMINO — APPROVE / REJECT BUTTON SIZE
-   FORCE SAME SIZE AS VALIDATOR
-   ========================================================= */
 
 #withdrawal-pending-table
 tbody
@@ -8016,42 +7858,25 @@ tbody
 #withdrawal-pending-table
 tbody
 .approve-btn {
-
     width: 220px !important;
     min-width: 220px !important;
     max-width: 220px !important;
-
     height: 54px !important;
     min-height: 54px !important;
     max-height: 54px !important;
-
     box-sizing: border-box !important;
-
     padding: 7px 12px !important;
-
     display: inline-flex !important;
-
     align-items: center !important;
     justify-content: center !important;
-
     gap: 10px !important;
-
     border-radius: 9px !important;
-
     font-size: 19px !important;
     font-weight: 800 !important;
-
     line-height: 22px !important;
-
     white-space: nowrap !important;
-
     vertical-align: middle !important;
 }
-
-
-/* =========================================================
-   ICON APPROVE / REJECT
-   ========================================================= */
 
 #withdrawal-pending-table
 tbody
@@ -8062,26 +7887,15 @@ tbody
 #withdrawal-pending-table
 tbody
 .approve-btn i {
-
     width: 21px !important;
     height: 21px !important;
-
     display: inline-flex !important;
-
     align-items: center !important;
     justify-content: center !important;
-
     flex: 0 0 auto !important;
-
     font-size: 18px !important;
-
     line-height: 1 !important;
 }
-
-
-/* =========================================================
-   TEXT APPROVE / REJECT
-   ========================================================= */
 
 #withdrawal-pending-table
 tbody
@@ -8092,20 +7906,12 @@ tbody
 #withdrawal-pending-table
 tbody
 .approve-btn span {
-
     font-size: 19px !important;
-
     font-weight: 850 !important;
-
     line-height: 22px !important;
-
     white-space: nowrap !important;
 }
 
-
-/* =========================================================
-   ACTION CONTAINER
-   ========================================================= */
 
 #withdrawal-pending-table
 tbody
@@ -8113,22 +7919,13 @@ tbody
 #withdrawal-pending-table
 tbody
 .action-btn-container {
-
     display: flex !important;
-
     align-items: center !important;
-
     justify-content: center !important;
-
     gap: 6px !important;
-
     overflow: visible !important;
 }
 
-
-/* =========================================================
-   KEEP ALL ACTION BUTTONS SAME HEIGHT
-   ========================================================= */
 
 #withdrawal-pending-table
 tbody
