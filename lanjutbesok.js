@@ -6690,59 +6690,60 @@ function injectValidatorHeader(table) {
 
     if (!table) return;
 
-    const thead =
-        table.querySelector('thead');
-
+    const thead = table.querySelector('thead');
     if (!thead) return;
 
-    const headerRows =
-        thead.querySelectorAll('tr');
-
-    if (!headerRows.length) return;
-
-    let headerRow = null;
-
-    // Cari row yang memang berisi header kolom
-    headerRows.forEach(row => {
-
-        const cells =
-            row.querySelectorAll('th, td');
-
-        const text =
-            Array.from(cells)
-                .map(cell =>
-                    cell.innerText
-                        .trim()
-                        .toUpperCase()
-                )
-                .join(' | ');
-
-        // Cari row yang punya header utama
-        if (
-            text.includes('NO') &&
-            (
-                text.includes('PAYMENT TO') ||
-                text.includes('NAMA PENGGUNA') ||
-                text.includes('AKSI')
-            )
-        ) {
-            headerRow = row;
-        }
-    });
-
-    // Kalau tidak ketemu, jangan inject
-    if (!headerRow) {
-        return;
-    }
-
-    // Jangan inject dua kali
+    // Jangan inject 2x
     if (
-        headerRow.querySelector(
+        thead.querySelector(
             '.camino-validator-header'
         )
     ) {
         return;
     }
+
+    // =========================================
+    // CARI HEADER "AKSI"
+    // =========================================
+
+    const allHeaders =
+        thead.querySelectorAll('th');
+
+    let actionHeader = null;
+
+    allHeaders.forEach(th => {
+
+        const text =
+            th.innerText
+                .trim()
+                .toUpperCase();
+
+        if (text === 'AKSI') {
+            actionHeader = th;
+        }
+    });
+
+    if (!actionHeader) {
+
+        console.warn(
+            '[CAMINO VALIDATOR] Header AKSI tidak ditemukan'
+        );
+
+        return;
+    }
+
+    // =========================================
+    // PAKAI ROW YANG SAMA DENGAN AKSI
+    // =========================================
+
+    const headerRow =
+        actionHeader.closest('tr');
+
+    if (!headerRow) return;
+
+    // =========================================
+    // BUAT HEADER VALIDATOR
+    // =========================================
 
     const th =
         document.createElement('th');
@@ -6750,14 +6751,43 @@ function injectValidatorHeader(table) {
     th.className =
         'camino-validator-header';
 
+    // Samakan atribut penting dengan AKSI
+    if (actionHeader.hasAttribute('style')) {
+        th.setAttribute(
+            'style',
+            actionHeader.getAttribute('style')
+        );
+    }
+
+    if (actionHeader.hasAttribute('class')) {
+        th.classList.add(
+            ...actionHeader.classList
+        );
+    }
+
+    // Pastikan class kita tetap ada
+    th.classList.add(
+        'camino-validator-header'
+    );
+
     th.innerHTML = `
         <span class="camino-validator-header-title">
             VALIDATOR
         </span>
     `;
 
-    // Posisikan sebagai kolom terakhir
-    headerRow.appendChild(th);
+    // =========================================
+    // TARUH TEPAT SETELAH AKSI
+    // =========================================
+
+    actionHeader.insertAdjacentElement(
+        'afterend',
+        th
+    );
+
+    console.log(
+        '[CAMINO VALIDATOR] VALIDATOR header injected'
+    );
 }
 
 
@@ -7140,29 +7170,27 @@ function scanValidatorRows() {
    ========================================================= */
 
 .camino-validator-cell {
-    width: 210px !important;
-    min-width: 210px !important;
-    max-width: 210px !important;
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
 
-    padding: 7px 10px !important;
+    padding: 10px 12px !important;
 
     text-align: center !important;
     vertical-align: middle !important;
-
-    white-space: normal !important;
 
     box-sizing: border-box !important;
 }
 
 
 /* =========================================================
-   HEADER
+   CAMINO VALIDATOR HEADER
    ========================================================= */
 
 .camino-validator-header {
-    width: 210px !important;
-    min-width: 210px !important;
-    max-width: 210px !important;
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
 
     padding: 10px 12px !important;
 
@@ -7171,34 +7199,54 @@ function scanValidatorRows() {
 
     white-space: nowrap !important;
 
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   HEADER CONTENT
+   ========================================================= */
+
+.camino-validator-header-title {
+
+    display: flex !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 7px;
+
+    white-space: nowrap !important;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    line-height: 1;
+
+    letter-spacing: .7px;
+
+    color: inherit;
+
     box-sizing: border-box;
 }
 
-.camino-validator-header-title {
-    display: inline-flex;
 
-    align-items: center;
-    justify-content: center;
-
-    width: 100%;
-
-    white-space: nowrap;
-
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: .7px;
-}
-
-
-/* Header indicator */
+/* =========================================================
+   HEADER INDICATOR
+   ========================================================= */
 
 .camino-validator-header-title::before {
+
     content: "";
 
     width: 5px;
     height: 5px;
 
-    flex: 0 0 auto;
+    flex: 0 0 5px;
 
     border-radius: 50%;
 
@@ -7206,7 +7254,8 @@ function scanValidatorRows() {
 
     box-shadow:
         0 0 7px #8d82ff,
-        0 0 14px rgba(141, 130, 255, .35);
+        0 0 14px
+        rgba(141, 130, 255, .35);
 }
 
 
@@ -7358,11 +7407,11 @@ function scanValidatorRows() {
 
 .camino-validator-btn.camino-validator-success {
 
-    width: 210px !important;
-    min-width: 210px !important;
-    max-width: 210px !important;
+    width: 236px !important;
+    min-width: 236px !important;
+    max-width: 236px !important;
 
-    min-height: 56px !important;
+    min-height: 62px !important;
     height: auto !important;
 
     display: flex !important;
@@ -7370,35 +7419,15 @@ function scanValidatorRows() {
     align-items: center !important;
     justify-content: flex-start !important;
 
-    gap: 10px;
+    gap: 11px;
 
-    padding: 8px 12px !important;
+    padding: 9px 13px !important;
 
     box-sizing: border-box;
 
-    border-radius: 9px;
-
-    white-space: normal !important;
+    border-radius: 10px;
 
     cursor: default !important;
-
-    background:
-        linear-gradient(
-            135deg,
-            #171c27,
-            #0d1119
-        ) !important;
-
-    border:
-        1px solid
-        rgba(99, 240, 170, .30);
-
-    box-shadow:
-        0 0 0 1px
-        rgba(99, 240, 170, .04),
-
-        0 0 16px
-        rgba(99, 240, 170, .08);
 }
 
 
@@ -7408,23 +7437,14 @@ function scanValidatorRows() {
 
 .camino-validator-btn.camino-validator-success i {
 
-    flex: 0 0 20px;
+    flex: 0 0 22px;
 
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
 
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    font-size: 17px !important;
+    font-size: 18px !important;
 
     color: #63f0aa !important;
-
-    text-shadow:
-        0 0 8px
-        rgba(80, 255, 170, .65);
 }
 
 
@@ -7438,21 +7458,16 @@ function scanValidatorRows() {
 
     flex: 1 1 auto;
 
-    width: auto !important;
-
     min-width: 0;
 
-    max-width: none !important;
-
-    font-size: 15px !important;
-
+    font-size: 16px !important;
     font-weight: 800 !important;
 
-    line-height: 18px !important;
+    line-height: 19px !important;
 
-    letter-spacing: .25px;
+    letter-spacing: .3px;
 
-    color: #ffffff !important;
+    color: #fff !important;
 
     text-align: left;
 
@@ -7463,14 +7478,9 @@ function scanValidatorRows() {
     text-overflow: clip !important;
 
     -webkit-box-orient: vertical;
-
-    /*
-       Maksimal 2 baris
-    */
     -webkit-line-clamp: 2;
 
     word-break: normal !important;
-
     overflow-wrap: anywhere;
 }
 
