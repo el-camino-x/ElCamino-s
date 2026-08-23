@@ -7294,8 +7294,8 @@ function scanValidatorRows() {
 }
 
 
-/* =========================================================
-   BUTTON
+//* =========================================================
+   BUTTON — SEARCH
    ========================================================= */
 
 .camino-validator-btn {
@@ -7306,35 +7306,33 @@ function scanValidatorRows() {
     align-items: center;
     justify-content: center;
 
-    gap: 7px;
+    gap: 10px;
 
-    width: 42px;
-    min-width: 42px;
-    max-width: 100%;
+    width: 64px !important;
+    min-width: 64px !important;
+    height: 52px !important;
 
-    height: 34px;
-
-    padding: 0 12px;
+    padding: 0 16px !important;
 
     box-sizing: border-box;
 
-    border: 1px solid rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .14);
 
-    border-radius: 8px;
+    border-radius: 11px;
 
     background:
         linear-gradient(
             135deg,
-            #171923,
-            #0d0f15
+            #191c29,
+            #0d0f16
         );
 
-    color: #cfd3ff;
+    color: #d8d5ff;
 
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 800;
 
-    letter-spacing: .4px;
+    letter-spacing: .5px;
 
     cursor: pointer;
 
@@ -7343,7 +7341,7 @@ function scanValidatorRows() {
     transition:
         width .25s ease,
         min-width .25s ease,
-        max-width .25s ease,
+        height .25s ease,
         background .25s ease,
         border-color .25s ease,
         box-shadow .25s ease,
@@ -7352,61 +7350,63 @@ function scanValidatorRows() {
 
 
 /* =========================================================
-   ICON
+   SEARCH ICON
    ========================================================= */
 
-.camino-validator-btn i {
+.camino-validator-btn > i {
     flex: 0 0 auto;
 
-    width: 14px;
-    height: 14px;
+    width: 22px;
+    height: 22px;
 
     display: inline-flex;
 
     align-items: center;
     justify-content: center;
 
-    font-size: 13px;
+    font-size: 21px !important;
+
+    line-height: 1;
 }
 
 
 /* =========================================================
-   HOVER
+   SEARCH HOVER
    ========================================================= */
 
 .camino-validator-btn:hover:not(:disabled) {
 
     border-color:
-        rgba(130, 120, 255, .55);
+        rgba(141, 130, 255, .65);
 
     background:
         linear-gradient(
             135deg,
-            #1d2030,
-            #11131c
+            #22263a,
+            #111420
         );
 
     box-shadow:
         0 0 0 1px
-        rgba(130, 120, 255, .08),
+        rgba(141, 130, 255, .10),
 
-        0 0 18px
-        rgba(100, 90, 255, .16);
+        0 0 22px
+        rgba(100, 90, 255, .22);
 
     transform:
-        translateY(-1px);
+        translateY(-2px) scale(1.02);
 }
 
 
 /* =========================================================
-   DISABLED / LOADING
+   DISABLED
    ========================================================= */
 
 .camino-validator-btn:disabled {
 
     cursor: wait;
 
-    opacity: .9;
+    opacity: .95;
 }
 
 
@@ -7416,22 +7416,37 @@ function scanValidatorRows() {
 
 .camino-validator-btn:has(.fa-spinner) {
 
-    width: 42px;
-    min-width: 42px;
+    width: 64px !important;
+    min-width: 64px !important;
 
-    padding: 0;
+    height: 52px !important;
+
+    padding: 0 !important;
 }
+
+
+/* =========================================================
+   LOADING ICON
+   ========================================================= */
 
 .camino-validator-btn .fa-spinner {
 
-    font-size: 14px;
+    width: 26px !important;
+    height: 26px !important;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 26px !important;
 
     color: #a79cff;
 
     filter:
         drop-shadow(
-            0 0 6px
-            rgba(141, 130, 255, .55)
+            0 0 7px
+            rgba(141, 130, 255, .75)
         );
 }
 
@@ -7442,44 +7457,74 @@ function scanValidatorRows() {
 
 .camino-validator-btn.camino-validator-success {
 
-    width: 236px !important;
-    min-width: 236px !important;
-    max-width: 236px !important;
+    width: 246px !important;
+    min-width: 246px !important;
+    max-width: 246px !important;
 
-    min-height: 62px !important;
-    height: auto !important;
+    min-height: 82px !important;
+    height: 82px !important;
 
     display: flex !important;
 
     align-items: center !important;
     justify-content: flex-start !important;
 
-    gap: 11px;
+    gap: 13px;
 
-    padding: 9px 13px !important;
+    padding: 12px 15px !important;
 
     box-sizing: border-box;
 
-    border-radius: 10px;
+    border-radius: 12px;
 
     cursor: default !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #18221f,
+            #0d1513
+        ) !important;
+
+    border:
+        1px solid
+        rgba(99, 240, 170, .38);
+
+    box-shadow:
+        0 0 0 1px
+        rgba(99, 240, 170, .05),
+
+        0 0 22px
+        rgba(99, 240, 170, .12);
 }
 
 
 /* =========================================================
-   SUCCESS ICON
+   SUCCESS CHECK ICON
    ========================================================= */
 
 .camino-validator-btn.camino-validator-success i {
 
-    flex: 0 0 22px;
+    flex: 0 0 28px !important;
 
-    width: 22px;
-    height: 22px;
+    width: 28px !important;
+    height: 28px !important;
 
-    font-size: 18px !important;
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 25px !important;
 
     color: #63f0aa !important;
+
+    text-shadow:
+        0 0 8px
+        rgba(80, 255, 170, .65),
+
+        0 0 18px
+        rgba(80, 255, 170, .25);
 }
 
 
@@ -7494,15 +7539,17 @@ function scanValidatorRows() {
     flex: 1 1 auto;
 
     min-width: 0;
+    max-width: 100%;
 
-    font-size: 16px !important;
-    font-weight: 800 !important;
+    font-size: 21px !important;
 
-    line-height: 19px !important;
+    font-weight: 900 !important;
 
-    letter-spacing: .3px;
+    line-height: 24px !important;
 
-    color: #fff !important;
+    letter-spacing: .35px;
+
+    color: #ffffff !important;
 
     text-align: left;
 
@@ -7513,15 +7560,20 @@ function scanValidatorRows() {
     text-overflow: clip !important;
 
     -webkit-box-orient: vertical;
+
+    /*
+       Maksimal 2 baris
+    */
     -webkit-line-clamp: 2;
 
     word-break: normal !important;
-    overflow-wrap: anywhere;
+
+    overflow-wrap: break-word;
 }
 
 
 /* =========================================================
-   SUCCESS — JANGAN BISA DIKLIK LAGI
+   SUCCESS — PERMANENT LOCK
    ========================================================= */
 
 .camino-validator-btn.camino-validator-success:disabled {
@@ -7541,14 +7593,14 @@ function scanValidatorRows() {
     transform: none !important;
 
     border-color:
-        rgba(80, 255, 170, .35) !important;
+        rgba(80, 255, 170, .45) !important;
 
     box-shadow:
         0 0 0 1px
-        rgba(80, 255, 170, .06),
+        rgba(80, 255, 170, .07),
 
-        0 0 18px
-        rgba(80, 255, 170, .10);
+        0 0 24px
+        rgba(80, 255, 170, .13);
 }
 
 
@@ -7558,29 +7610,44 @@ function scanValidatorRows() {
 
 .camino-validator-btn.camino-validator-error {
 
-    width: 100px;
+    width: 125px !important;
+    min-width: 125px !important;
+    max-width: 125px !important;
 
-    min-width: 100px;
+    height: 52px !important;
 
-    max-width: 100px;
+    gap: 9px;
 
     border-color:
-        rgba(255, 80, 100, .4);
+        rgba(255, 80, 100, .45);
 
     background:
         linear-gradient(
             135deg,
-            rgba(75, 20, 28, .95),
+            rgba(75, 20, 28, .98),
             rgba(35, 12, 17, .98)
         );
 
     color: #ff7d91;
+
+    font-size: 15px;
+    font-weight: 900;
 }
 
 
+/* =========================================================
+   ERROR ICON
+   ========================================================= */
+
 .camino-validator-btn.camino-validator-error i {
 
+    font-size: 21px !important;
+
     color: #ff687f;
+
+    text-shadow:
+        0 0 8px
+        rgba(255, 80, 100, .55);
 }
 
     `;
