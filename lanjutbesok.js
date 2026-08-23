@@ -4574,19 +4574,34 @@ function avEscape(value) {
         .replace(/'/g, "&#039;");
 }
 
-async function caminoValidateAccount(bankCode, accountNumber) {
+async function caminoValidateAccount(
+    bankCode,
+    accountNumber
+) {
+
+    if (!bankCode) {
+        throw new Error(
+            "BANK CODE TIDAK DITEMUKAN"
+        );
+    }
+
+    if (!accountNumber) {
+        throw new Error(
+            "NOMOR REKENING TIDAK DITEMUKAN"
+        );
+    }
 
     console.log(
-        '[CAMINO VALIDATOR] Sending validation request...'
+        "[CAMINO VALIDATOR] Sending validation request..."
     );
 
     console.log(
-        '[CAMINO VALIDATOR] BANK CODE:',
+        "[CAMINO VALIDATOR] BANK CODE:",
         bankCode
     );
 
     console.log(
-        '[CAMINO VALIDATOR] ACCOUNT:',
+        "[CAMINO VALIDATOR] ACCOUNT:",
         accountNumber
     );
 
@@ -4596,40 +4611,48 @@ async function caminoValidateAccount(bankCode, accountNumber) {
         `&nomor=${encodeURIComponent(accountNumber)}`;
 
     console.log(
-        '[CAMINO VALIDATOR] REQUEST:',
+        "[CAMINO VALIDATOR] REQUEST:",
         url
     );
 
     try {
 
-        const response = await fetch(url, {
-            method: "GET",
+        const response = await fetch(
+            url,
+            {
+                method: "GET",
 
-            headers: {
-                "X-API-Key": API_KEY,
-                "X-Idempotency-Key":
-                    "elcamino-row-validator-" +
-                    crypto.randomUUID()
+                headers: {
+                    "X-API-Key": API_KEY,
+
+                    "X-Idempotency-Key":
+                        "elcamino-row-validator-" +
+                        crypto.randomUUID()
+                }
             }
-        });
+        );
 
         console.log(
-            '[CAMINO VALIDATOR] HTTP STATUS:',
+            "[CAMINO VALIDATOR] HTTP STATUS:",
             response.status
         );
 
         let data;
 
         try {
-            data = await response.json();
+
+            data =
+                await response.json();
+
         } catch {
+
             throw new Error(
                 `Response API tidak valid (HTTP ${response.status})`
             );
         }
 
         console.log(
-            '[CAMINO VALIDATOR] API RESPONSE:',
+            "[CAMINO VALIDATOR] API RESPONSE:",
             data
         );
 
@@ -4643,7 +4666,10 @@ async function caminoValidateAccount(bankCode, accountNumber) {
             );
         }
 
-        if (data?.success === false) {
+        if (
+            data?.success === false ||
+            data?.status === false
+        ) {
 
             throw new Error(
                 data?.message ||
@@ -4658,7 +4684,7 @@ async function caminoValidateAccount(bankCode, accountNumber) {
     } catch (error) {
 
         console.error(
-            '[CAMINO VALIDATOR] API ERROR:',
+            "[CAMINO VALIDATOR] API ERROR:",
             error
         );
 
@@ -4668,6 +4694,10 @@ async function caminoValidateAccount(bankCode, accountNumber) {
 
 async function validateAccount(bankCode, accountNumber) {
 
+    // ==============================
+    // BASIC VALIDATION
+    // ==============================
+
     if (!bankCode) {
         throw new Error("BANK TIDAK DIDUKUNG");
     }
@@ -4676,39 +4706,83 @@ async function validateAccount(bankCode, accountNumber) {
         throw new Error("NOMOR REKENING KOSONG");
     }
 
+    // ==============================
+    // BUILD API URL
+    // ==============================
+
     const url =
         `${API_BASE}/api/v3/validate` +
         `?code=${encodeURIComponent(bankCode)}` +
         `&accountNumber=${encodeURIComponent(accountNumber)}`;
 
-    console.log("[ACCOUNT VALIDATOR V3] REQUEST:", url);
+    console.log(
+        "[ACCOUNT VALIDATOR] REQUEST:",
+        url
+    );
 
-    const response = await fetch(url, {
-        method: "GET",
-        headers: {
-            "X-API-Key": API_KEY,
-            "X-Idempotency-Key":
-                "elcamino-validator-" + Date.now()
-        }
-    });
+    // ==============================
+    // API REQUEST
+    // ==============================
+
+    let response;
+
+    try {
+
+        response = await fetch(
+            url,
+            {
+                method: "GET",
+
+                headers: {
+                    "X-API-Key": API_KEY,
+                    "X-Idempotency-Key":
+                        "elcamino-validator-" +
+                        Date.now()
+                }
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "[ACCOUNT VALIDATOR] FETCH ERROR:",
+            error
+        );
+
+        throw new Error(
+            "GAGAL TERHUBUNG KE SERVER API"
+        );
+    }
+
+    // ==============================
+    // PARSE RESPONSE
+    // ==============================
 
     let data;
 
     try {
+
         data = await response.json();
+
     } catch {
+
         throw new Error(
             `Response API tidak valid (HTTP ${response.status})`
         );
     }
 
     console.log(
-        "[ACCOUNT VALIDATOR V3] RESPONSE:",
+        "[ACCOUNT VALIDATOR] RESPONSE:",
         response.status,
         data
     );
 
+    // ==============================
+    // HTTP ERROR
+    // ==============================
+
     if (!response.ok) {
+
         throw new Error(
             data?.message ||
             data?.error ||
@@ -4717,7 +4791,12 @@ async function validateAccount(bankCode, accountNumber) {
         );
     }
 
-    if (data?.success === false || data?.status === false) {
+    // ==============================
+    // API VALIDATION ERROR
+    // ==============================
+
+    if (data?.success === false) {
+
         throw new Error(
             data?.message ||
             data?.error ||
@@ -4725,10 +4804,16 @@ async function validateAccount(bankCode, accountNumber) {
         );
     }
 
+    // ==============================
+    // SUCCESS
+    // ==============================
+
     return data;
 }
 
 function createAccountValidator() {
+
+    let validationInProgress = false;
 
     const existingPanel =
         w.querySelector(
@@ -4856,6 +4941,176 @@ function createAccountValidator() {
         panel.querySelector(
             "#av-status"
         );
+
+validateButton.addEventListener("click", async () => {
+
+    // =========================================
+    // BLOCK DOUBLE CLICK
+    // =========================================
+    if (validationInProgress) {
+        console.log(
+            "[CAMINO VALIDATOR] Validation already running."
+        );
+        return;
+    }
+
+    // LOCK
+    validationInProgress = true;
+
+    // DISABLE BUTTON
+    validateButton.disabled = true;
+    validateButton.classList.add("is-loading");
+
+    const originalText =
+        validateButton.innerHTML;
+
+    try {
+
+        const bankCode =
+            bankValue.value.trim();
+
+        const accountNumber =
+            accountInput.value.trim();
+
+        // =========================================
+        // BASIC VALIDATION
+        // =========================================
+
+        if (!bankCode) {
+            throw new Error(
+                "SILAKAN PILIH BANK / E-WALLET"
+            );
+        }
+
+        if (!accountNumber) {
+            throw new Error(
+                "NOMOR REKENING KOSONG"
+            );
+        }
+
+        // =========================================
+        // LOADING
+        // =========================================
+
+        validateButton.innerHTML = `
+            <span class="av-spinner"></span>
+            VALIDATING...
+        `;
+
+        statusBox.innerHTML = `
+            <div class="av-loading">
+                VALIDATING ACCOUNT...
+            </div>
+        `;
+
+        console.log(
+            "[CAMINO VALIDATOR] Starting validation..."
+        );
+
+        // =========================================
+        // API — CUMA SEKALI
+        // =========================================
+
+        const result =
+            await caminoValidateAccount(
+                bankCode,
+                accountNumber
+            );
+
+        console.log(
+            "[CAMINO VALIDATOR] VALIDATION RESULT:",
+            result
+        );
+
+        // =========================================
+        // SUCCESS
+        // =========================================
+
+        const data =
+            result?.data || result;
+
+        statusBox.innerHTML = `
+            <div class="av-success">
+
+                <div class="av-success-title">
+                    ✓ ACCOUNT VALID
+                </div>
+
+                <div class="av-result-row">
+                    <span>BANK</span>
+                    <strong>
+                        ${avEscape(bankSearch.value)}
+                    </strong>
+                </div>
+
+                <div class="av-result-row">
+                    <span>ACCOUNT</span>
+                    <strong>
+                        ${avEscape(
+                            data?.account_number ||
+                            accountNumber
+                        )}
+                    </strong>
+                </div>
+
+                <div class="av-result-row">
+                    <span>NAME</span>
+                    <strong>
+                        ${avEscape(
+                            data?.account_name || "-"
+                        )}
+                    </strong>
+                </div>
+
+            </div>
+        `;
+
+    } catch (error) {
+
+        console.error(
+            "[CAMINO VALIDATOR] VALIDATION ERROR:",
+            error
+        );
+
+        statusBox.innerHTML = `
+            <div class="av-error">
+
+                <div class="av-error-title">
+                    ✕ VALIDATION FAILED
+                </div>
+
+                <div class="av-error-message">
+                    ${avEscape(
+                        error?.message ||
+                        "Terjadi kesalahan saat validasi"
+                    )}
+                </div>
+
+            </div>
+        `;
+
+    } finally {
+
+        // =========================================
+        // UNLOCK SETELAH REQUEST SELESAI
+        // =========================================
+
+        validationInProgress = false;
+
+        validateButton.disabled = false;
+
+        validateButton.classList.remove(
+            "is-loading"
+        );
+
+        validateButton.innerHTML =
+            originalText;
+
+        console.log(
+            "[CAMINO VALIDATOR] Validation finished."
+        );
+    }
+});
 
     function renderBankList(
         keyword = ""
@@ -5861,6 +6116,40 @@ w.addEventListener(
         0 1px 2px rgba(0,0,0,.65);
 }
 
+#av-validate {
+    position: relative;
+    transition:
+        opacity .2s ease,
+        transform .2s ease,
+        filter .2s ease;
+}
+
+#av-validate.is-loading {
+    cursor: wait;
+    opacity: .85;
+    pointer-events: none;
+}
+
+.av-spinner {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: -3px;
+    margin-right: 9px;
+
+    border: 2px solid rgba(255,255,255,.25);
+    border-top-color: #fff;
+    border-radius: 50%;
+
+    animation: avSpin .7s linear infinite;
+}
+
+@keyframes avSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 #av-validate::before {
     content:"";
 
@@ -6393,153 +6682,286 @@ w.addEventListener(
 
     const VALIDATOR_CELL = 'camino-validator-cell';
 
-    function injectValidator(row) {
 
-        if (!row) return;
+    // =========================================
+    // INJECT HEADER
+    // =========================================
+    function injectValidatorHeader(table) {
 
-        // Jangan inject dua kali
-        if (row.querySelector('.' + VALIDATOR_CELL)) {
+        if (!table) return;
+
+        const thead =
+            table.querySelector('thead');
+
+        if (!thead) return;
+
+        const headerRow =
+            thead.querySelector('tr');
+
+        if (!headerRow) return;
+
+        // Jangan inject header 2x
+        if (
+            headerRow.querySelector(
+                '.camino-validator-header'
+            )
+        ) {
             return;
         }
 
-        const td = document.createElement('td');
+        const th =
+            document.createElement('th');
 
-        td.className = VALIDATOR_CELL;
+        th.className =
+            'camino-validator-header';
 
-        td.innerHTML = `
-            <button
-                type="button"
-                class="camino-validator-btn"
-                title="Validate Account"
-            >
-                <i class="fa fa-search"></i>
-            </button>
+        th.innerHTML = `
+            <span class="camino-validator-header-title">
+                VALIDATOR
+            </span>
         `;
 
-const btn =
-    td.querySelector('.camino-validator-btn');
+        headerRow.appendChild(th);
+    }
 
-btn.addEventListener('click', async () => {
 
-    console.log(
-        '[CAMINO VALIDATOR] Button clicked'
-    );
+    // =========================================
+    // INJECT VALIDATOR CELL
+    // =========================================
+    function injectValidator(row) {
 
-    const paymentTo =
-        row.querySelectorAll('td')[5];
+    if (!row) return;
 
-    if (!paymentTo) {
-        console.warn(
-            '[CAMINO VALIDATOR] PAYMENT TO tidak ditemukan'
-        );
+    if (
+        row.querySelector(
+            '.' + VALIDATOR_CELL
+        )
+    ) {
         return;
     }
 
-    const text =
-        paymentTo.innerText
-            .trim()
-            .replace(/\s+/g, ' ');
+    const td =
+        document.createElement('td');
 
-    console.log(
-        '[CAMINO VALIDATOR] PAYMENT TO:',
-        text
-    );
+    td.className =
+        VALIDATOR_CELL;
 
-    // Ambil nomor rekening dari bagian paling belakang
-    const accountMatch =
-        text.match(/(\d{6,20})$/);
+    td.innerHTML = `
+        <button
+            type="button"
+            class="camino-validator-btn"
+            title="Validate Account"
+        >
+            <i class="fa fa-search"></i>
+        </button>
+    `;
 
-    if (!accountMatch) {
-
-        console.warn(
-            '[CAMINO VALIDATOR] ACCOUNT NUMBER tidak ditemukan'
+    const btn =
+        td.querySelector(
+            '.camino-validator-btn'
         );
 
-        return;
-    }
+    btn.addEventListener('click', async () => {
 
-    const accountNumber =
-        accountMatch[1];
+        // =========================================
+        // BLOCK DOUBLE CLICK
+        // =========================================
+        if (btn.dataset.validating === "1") {
+            console.warn(
+                '[CAMINO VALIDATOR] VALIDATION ALREADY RUNNING'
+            );
+            return;
+        }
 
-    // Buang nomor rekening dari text
-    const beforeAccount =
-        text
-            .slice(0, accountMatch.index)
-            .trim();
+        btn.dataset.validating = "1";
+        btn.disabled = true;
 
-    // Ambil kata terakhir sebelum nomor rekening
-      const bankMatch =
-          beforeAccount.match(/([A-Za-z0-9]+)$/);
+        // =========================================
+        // LOADING
+        // =========================================
+        btn.innerHTML = `
+            <i class="fa fa-spinner fa-spin"></i>
+        `;
 
-      const bank =
-          bankMatch
-              ? bankMatch[1]
-              : null;
+        try {
 
-      const bankCode =
-          getCaminoBankCode(bank);
+            // =========================================
+            // PAYMENT TO
+            // =========================================
+            const paymentTo =
+                row.querySelectorAll('td')[5];
 
-      console.log(
-          '[CAMINO VALIDATOR] BANK:',
-          bank
-      );
+            if (!paymentTo) {
+                throw new Error(
+                    'PAYMENT TO TIDAK DITEMUKAN'
+                );
+            }
 
-      console.log(
-          '[CAMINO VALIDATOR] BANK CODE:',
-          bankCode
-      );
+            const text =
+                paymentTo.innerText
+                    .trim()
+                    .replace(/\s+/g, ' ');
 
-      console.log(
-          '[CAMINO VALIDATOR] ACCOUNT NUMBER:',
-          accountNumber
-      );
+            console.log(
+                '[CAMINO VALIDATOR] PAYMENT TO:',
+                text
+            );
 
-if (!bankCode) {
-    console.warn(
-        '[CAMINO VALIDATOR] BANK CODE TIDAK DITEMUKAN:',
-        bank
-    );
-    return;
+            // =========================================
+            // ACCOUNT NUMBER
+            // =========================================
+            const accountMatch =
+                text.match(/(\d{6,20})$/);
+
+            if (!accountMatch) {
+                throw new Error(
+                    'ACCOUNT NUMBER TIDAK DITEMUKAN'
+                );
+            }
+
+            const accountNumber =
+                accountMatch[1];
+
+            // =========================================
+            // BANK
+            // =========================================
+            const beforeAccount =
+                text
+                    .slice(0, accountMatch.index)
+                    .trim();
+
+            const bankMatch =
+                beforeAccount.match(
+                    /([A-Za-z0-9]+)$/
+                );
+
+            const bank =
+                bankMatch
+                    ? bankMatch[1]
+                    : null;
+
+            const bankCode =
+                getCaminoBankCode(bank);
+
+            console.log(
+                '[CAMINO VALIDATOR] BANK:',
+                bank
+            );
+
+            console.log(
+                '[CAMINO VALIDATOR] BANK CODE:',
+                bankCode
+            );
+
+            console.log(
+                '[CAMINO VALIDATOR] ACCOUNT NUMBER:',
+                accountNumber
+            );
+
+            if (!bankCode) {
+                throw new Error(
+                    `BANK CODE TIDAK DITEMUKAN: ${bank || '-'}`
+                );
+            }
+
+            // =========================================
+            // API — SATU REQUEST SAJA
+            // =========================================
+            console.log(
+                '[CAMINO VALIDATOR] STARTING API VALIDATION...'
+            );
+
+            const result =
+                await caminoValidateAccount(
+                    bankCode,
+                    accountNumber
+                );
+
+            console.log(
+                '[CAMINO VALIDATOR] VALIDATION RESULT:',
+                result
+            );
+
+            // =========================================
+            // HASIL API
+            // =========================================
+            const data =
+                result?.data || result;
+
+            const accountName =
+                data?.account_name ||
+                data?.accountName ||
+                'VALID';
+
+            // =========================================
+            // SUCCESS
+            // =========================================
+            btn.innerHTML = `
+                <i class="fa fa-check"></i>
+                <span>
+                    ${avEscape(accountName)}
+                </span>
+            `;
+
+            btn.classList.add(
+                'camino-validator-success'
+            );
+
+            console.log(
+                '[CAMINO VALIDATOR] RESULT DISPLAYED:',
+                accountName
+            );
+
+        } catch (error) {
+
+            console.error(
+                '[CAMINO VALIDATOR] VALIDATION ERROR:',
+                error
+            );
+
+            // =========================================
+            // ERROR
+            // =========================================
+            btn.innerHTML = `
+                <i class="fa fa-times"></i>
+                <span>ERROR</span>
+            `;
+
+            btn.classList.add(
+                'camino-validator-error'
+            );
+
+        } finally {
+
+            // =========================================
+            // UNLOCK
+            // =========================================
+            btn.dataset.validating = "0";
+            btn.disabled = false;
+
+            console.log(
+                '[CAMINO VALIDATOR] Validation finished.'
+            );
+        }
+    });
+
+    row.appendChild(td);
 }
-
-console.log(
-    '[CAMINO VALIDATOR] STARTING API VALIDATION...'
-);
-
-try {
-
-    console.log(
-        '[CAMINO VALIDATOR] CALLING caminoValidateAccount...'
-    );
-
-    const result =
-        await caminoValidateAccount(
-            bankCode,
-            accountNumber
-        );
-
-    console.log(
-        '[CAMINO VALIDATOR] VALIDATION RESULT:',
-        result
-    );
-
-} catch (error) {
-
-    console.error(
-        '[CAMINO VALIDATOR] VALIDATION ERROR:',
-        error
-    );
-
-}
-
-});
-
-
-        row.appendChild(td);
-    }
 
     function scanValidatorRows() {
 
+        // =========================================
+        // INJECT HEADER
+        // =========================================
+        document
+            .querySelectorAll('table')
+            .forEach(table => {
+                injectValidatorHeader(table);
+            });
+
+        // =========================================
+        // INJECT VALIDATOR COLUMN
+        // =========================================
         const rows = document.querySelectorAll(
             'tbody tr[role="row"]'
         );
