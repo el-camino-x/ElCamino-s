@@ -6695,37 +6695,43 @@ function injectValidatorHeader(table) {
 
     if (!thead) return;
 
-    // Ambil SEMUA header row
     const headerRows =
         thead.querySelectorAll('tr');
 
     if (!headerRows.length) return;
 
-    // Cari row header yang benar-benar berisi
-    // kolom "AKSI"
     let headerRow = null;
 
+    // Cari row yang memang berisi header kolom
     headerRows.forEach(row => {
 
-        const text =
-            row.innerText
-                .trim()
-                .replace(/\s+/g, ' ')
-                .toUpperCase();
+        const cells =
+            row.querySelectorAll('th, td');
 
+        const text =
+            Array.from(cells)
+                .map(cell =>
+                    cell.innerText
+                        .trim()
+                        .toUpperCase()
+                )
+                .join(' | ');
+
+        // Cari row yang punya header utama
         if (
-            text.includes('AKSI') &&
-            text.includes('PAYMENT TO')
+            text.includes('NO') &&
+            (
+                text.includes('PAYMENT TO') ||
+                text.includes('NAMA PENGGUNA') ||
+                text.includes('AKSI')
+            )
         ) {
             headerRow = row;
         }
-
     });
 
+    // Kalau tidak ketemu, jangan inject
     if (!headerRow) {
-        console.warn(
-            '[CAMINO VALIDATOR] HEADER ROW TIDAK DITEMUKAN'
-        );
         return;
     }
 
@@ -6738,7 +6744,6 @@ function injectValidatorHeader(table) {
         return;
     }
 
-    // Buat TH
     const th =
         document.createElement('th');
 
@@ -6751,28 +6756,8 @@ function injectValidatorHeader(table) {
         </span>
     `;
 
-    // Masukkan setelah AKSI
-    const actionHeader =
-        Array.from(
-            headerRow.children
-        ).find(cell =>
-            cell.innerText
-                .trim()
-                .toUpperCase() === 'AKSI'
-        );
-
-    if (actionHeader) {
-
-        actionHeader.insertAdjacentElement(
-            'afterend',
-            th
-        );
-
-    } else {
-
-        // fallback
-        headerRow.appendChild(th);
-    }
+    // Posisikan sebagai kolom terakhir
+    headerRow.appendChild(th);
 }
 
 
@@ -7179,14 +7164,14 @@ function scanValidatorRows() {
     min-width: 210px !important;
     max-width: 210px !important;
 
-    padding: 9px 10px !important;
+    padding: 10px 12px !important;
 
     text-align: center !important;
     vertical-align: middle !important;
 
     white-space: nowrap !important;
 
-    box-sizing: border-box !important;
+    box-sizing: border-box;
 }
 
 .camino-validator-header-title {
@@ -7195,16 +7180,13 @@ function scanValidatorRows() {
     align-items: center;
     justify-content: center;
 
-    gap: 7px;
+    width: 100%;
 
     white-space: nowrap;
 
-    color: #cfd3ff;
-
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 800;
-
-    letter-spacing: 1px;
+    letter-spacing: .7px;
 }
 
 
