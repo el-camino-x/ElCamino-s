@@ -4590,32 +4590,28 @@ async function caminoValidateAccount(bankCode, accountNumber) {
         accountNumber
     );
 
+    const url =
+        `${API_BASE}/api/cek` +
+        `?code=${encodeURIComponent(bankCode)}` +
+        `&nomor=${encodeURIComponent(accountNumber)}`;
+
+    console.log(
+        '[CAMINO VALIDATOR] REQUEST:',
+        url
+    );
+
     try {
 
-        const url =
-            `${API_BASE}/api/v3/validate` +
-            `?code=${encodeURIComponent(bankCode)}` +
-            `&accountNumber=${encodeURIComponent(accountNumber)}`;
+        const response = await fetch(url, {
+            method: "GET",
 
-        console.log(
-            '[CAMINO VALIDATOR] REQUEST:',
-            url
-        );
-
-        const response =
-            await fetch(
-                url,
-                {
-                    method: "GET",
-
-                    headers: {
-                        "X-API-Key": API_KEY,
-                        "X-Idempotency-Key":
-                            "elcamino-row-validator-" +
-                            Date.now()
-                    }
-                }
-            );
+            headers: {
+                "X-API-Key": API_KEY,
+                "X-Idempotency-Key":
+                    "elcamino-row-validator-" +
+                    crypto.randomUUID()
+            }
+        });
 
         console.log(
             '[CAMINO VALIDATOR] HTTP STATUS:',
@@ -4625,16 +4621,11 @@ async function caminoValidateAccount(bankCode, accountNumber) {
         let data;
 
         try {
-
-            data =
-                await response.json();
-
+            data = await response.json();
         } catch {
-
             throw new Error(
                 `Response API tidak valid (HTTP ${response.status})`
             );
-
         }
 
         console.log(
@@ -4650,7 +4641,16 @@ async function caminoValidateAccount(bankCode, accountNumber) {
                 data?.error_code ||
                 `HTTP ${response.status}`
             );
+        }
 
+        if (data?.success === false) {
+
+            throw new Error(
+                data?.message ||
+                data?.error ||
+                data?.error_code ||
+                "Validasi gagal"
+            );
         }
 
         return data;
@@ -4663,62 +4663,100 @@ async function caminoValidateAccount(bankCode, accountNumber) {
         );
 
         throw error;
-
     }
 }
 
-async function validateAccount(
-    bankCode,
-    accountNumber
-) {
+async function validateAccount(bankCode, accountNumber) {
+
+    // ==============================
+    // BASIC VALIDATION
+    // ==============================
+
     if (!bankCode) {
-        throw new Error(
-            "BANK TIDAK DIDUKUNG"
-        );
+        throw new Error("BANK TIDAK DIDUKUNG");
     }
+
     if (!accountNumber) {
-        throw new Error(
-            "NOMOR REKENING KOSONG"
-        );
+        throw new Error("NOMOR REKENING KOSONG");
     }
+
+    // ==============================
+    // BUILD API URL
+    // ==============================
+
     const url =
         `${API_BASE}/api/v3/validate` +
         `?code=${encodeURIComponent(bankCode)}` +
         `&accountNumber=${encodeURIComponent(accountNumber)}`;
+
     console.log(
         "[ACCOUNT VALIDATOR] REQUEST:",
         url
     );
-    const response =
-        await fetch(
+
+    // ==============================
+    // API REQUEST
+    // ==============================
+
+    let response;
+
+    try {
+
+        response = await fetch(
             url,
             {
                 method: "GET",
+
                 headers: {
-                    "X-API-Key":
-                        API_KEY,
+                    "X-API-Key": API_KEY,
                     "X-Idempotency-Key":
                         "elcamino-validator-" +
                         Date.now()
                 }
             }
         );
-    let data;
-    try {
-        data =
-            await response.json();
+
+    } catch (error) {
+
+        console.error(
+            "[ACCOUNT VALIDATOR] FETCH ERROR:",
+            error
+        );
+
+        throw new Error(
+            "GAGAL TERHUBUNG KE SERVER API"
+        );
     }
-    catch {
+
+    // ==============================
+    // PARSE RESPONSE
+    // ==============================
+
+    let data;
+
+    try {
+
+        data = await response.json();
+
+    } catch {
+
         throw new Error(
             `Response API tidak valid (HTTP ${response.status})`
         );
     }
+
     console.log(
         "[ACCOUNT VALIDATOR] RESPONSE:",
         response.status,
         data
     );
+
+    // ==============================
+    // HTTP ERROR
+    // ==============================
+
     if (!response.ok) {
+
         throw new Error(
             data?.message ||
             data?.error ||
@@ -4726,15 +4764,24 @@ async function validateAccount(
             `HTTP ${response.status}`
         );
     }
-    if (
-        data?.success === false
-    ) {
+
+    // ==============================
+    // API VALIDATION ERROR
+    // ==============================
+
+    if (data?.success === false) {
+
         throw new Error(
             data?.message ||
             data?.error ||
             "Validasi gagal"
         );
     }
+
+    // ==============================
+    // SUCCESS
+    // ==============================
+
     return data;
 }
 
