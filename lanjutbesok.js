@@ -6682,51 +6682,500 @@ w.addEventListener(
 
     const VALIDATOR_CELL = 'camino-validator-cell';
 
+
+    // =========================================
+    // INJECT HEADER
+    // =========================================
+function injectValidatorHeader(table) {
+
+    if (!table) return;
+
+    const thead =
+        table.querySelector('thead');
+
+    if (!thead) return;
+
+    const headerRow =
+        thead.querySelector('tr');
+
+    if (!headerRow) return;
+
+
+    // =========================================
+    // CEK APAKAH SUDAH ADA
+    // =========================================
+
+    if (
+        headerRow.querySelector(
+            '.camino-validator-header'
+        )
+    ) {
+        return;
+    }
+
+
+    // =========================================
+    // CARI HEADER AKSI
+    // =========================================
+
+    const headers =
+        Array.from(
+            headerRow.querySelectorAll('th')
+        );
+
+    const actionHeader =
+        headers.find(th => {
+
+            const text =
+                th.innerText
+                    .trim()
+                    .replace(/\s+/g, ' ')
+                    .toUpperCase();
+
+            return text === 'AKSI';
+        });
+
+
+    if (!actionHeader) {
+        return;
+    }
+
+
+    // =========================================
+    // BUAT 1 TH SAJA
+    // =========================================
+
+    const th =
+        document.createElement('th');
+
+    th.className =
+        'camino-validator-header';
+
+
+    th.innerHTML = `
+        <span class="camino-validator-header-title">
+            VALIDATOR
+        </span>
+    `;
+
+
+    // =========================================
+    // TARUH SETELAH AKSI
+    // =========================================
+
+    actionHeader.insertAdjacentElement(
+        'afterend',
+        th
+    );
+
+
+    console.log(
+        '[CAMINO VALIDATOR] HEADER INJECTED'
+    );
+}
+
+
+    // =========================================
+    // INJECT VALIDATOR CELL
+    // =========================================
+    function injectValidator(row) {
+
+    if (!row) return;
+
+    if (
+        row.querySelector(
+            '.' + VALIDATOR_CELL
+        )
+    ) {
+        return;
+    }
+
+    const td =
+        document.createElement('td');
+
+    td.className =
+        VALIDATOR_CELL;
+
+    td.innerHTML = `
+        <button
+            type="button"
+            class="camino-validator-btn"
+            title="Validate Account"
+        >
+            <i class="fa fa-search"></i>
+        </button>
+    `;
+
+    const btn =
+        td.querySelector(
+            '.camino-validator-btn'
+        );
+
+    btn.addEventListener('click', async () => {
+
+        // =========================================
+        // SUDAH BERHASIL DIVALIDASI
+        // =========================================
+        if (btn.dataset.validated === "1") {
+            console.warn(
+                '[CAMINO VALIDATOR] ACCOUNT ALREADY VALIDATED'
+            );
+            return;
+        }
+
+
+        // =========================================
+        // BLOCK DOUBLE CLICK
+        // =========================================
+        if (btn.dataset.validating === "1") {
+            console.warn(
+                '[CAMINO VALIDATOR] VALIDATION ALREADY RUNNING'
+            );
+            return;
+        }
+
+
+        // =========================================
+        // LOCK
+        // =========================================
+        btn.dataset.validating = "1";
+        btn.disabled = true;
+
+
+        // =========================================
+        // RESET ERROR STATE
+        // =========================================
+        btn.classList.remove(
+            'camino-validator-error'
+        );
+
+
+        // =========================================
+        // LOADING
+        // =========================================
+        btn.innerHTML = `
+            <i class="fa fa-spinner fa-spin"></i>
+        `;
+
+
+        try {
+
+            // =========================================
+            // PAYMENT TO
+            // =========================================
+            const paymentTo =
+                row.querySelectorAll('td')[5];
+
+            if (!paymentTo) {
+                throw new Error(
+                    'PAYMENT TO TIDAK DITEMUKAN'
+                );
+            }
+
+
+            const text =
+                paymentTo.innerText
+                    .trim()
+                    .replace(/\s+/g, ' ');
+
+
+            console.log(
+                '[CAMINO VALIDATOR] PAYMENT TO:',
+                text
+            );
+
+
+            // =========================================
+            // ACCOUNT NUMBER
+            // =========================================
+            const accountMatch =
+                text.match(/(\d{6,20})$/);
+
+
+            if (!accountMatch) {
+                throw new Error(
+                    'ACCOUNT NUMBER TIDAK DITEMUKAN'
+                );
+            }
+
+
+            const accountNumber =
+                accountMatch[1];
+
+
+            // =========================================
+            // BANK
+            // =========================================
+            const beforeAccount =
+                text
+                    .slice(0, accountMatch.index)
+                    .trim();
+
+
+            const bankMatch =
+                beforeAccount.match(
+                    /([A-Za-z0-9]+)$/
+                );
+
+
+            const bank =
+                bankMatch
+                    ? bankMatch[1]
+                    : null;
+
+
+            const bankCode =
+                getCaminoBankCode(bank);
+
+
+            console.log(
+                '[CAMINO VALIDATOR] BANK:',
+                bank
+            );
+
+            console.log(
+                '[CAMINO VALIDATOR] BANK CODE:',
+                bankCode
+            );
+
+            console.log(
+                '[CAMINO VALIDATOR] ACCOUNT NUMBER:',
+                accountNumber
+            );
+
+
+            if (!bankCode) {
+                throw new Error(
+                    `BANK CODE TIDAK DITEMUKAN: ${bank || '-'}`
+                );
+            }
+
+
+            // =========================================
+            // API — SATU REQUEST
+            // =========================================
+            console.log(
+                '[CAMINO VALIDATOR] STARTING API VALIDATION...'
+            );
+
+
+            const result =
+                await caminoValidateAccount(
+                    bankCode,
+                    accountNumber
+                );
+
+
+            console.log(
+                '[CAMINO VALIDATOR] VALIDATION RESULT:',
+                result
+            );
+
+
+            // =========================================
+            // HASIL API
+            // =========================================
+            const data =
+                result?.data || result;
+
+
+            const accountName =
+                data?.account_name ||
+                data?.accountName ||
+                'VALID';
+
+
+            // =========================================
+            // SUCCESS
+            // =========================================
+            btn.innerHTML = `
+                <i class="fa fa-check"></i>
+                <span>
+                    ${avEscape(accountName)}
+                </span>
+            `;
+
+
+            btn.classList.remove(
+                'camino-validator-error'
+            );
+
+
+            btn.classList.add(
+                'camino-validator-success'
+            );
+
+
+            // =========================================
+            // PERMANENT LOCK
+            // =========================================
+            btn.dataset.validated = "1";
+            btn.dataset.validating = "0";
+
+            btn.disabled = true;
+
+
+            console.log(
+                '[CAMINO VALIDATOR] RESULT DISPLAYED:',
+                accountName
+            );
+
+            console.log(
+                '[CAMINO VALIDATOR] BUTTON LOCKED'
+            );
+
+
+        } catch (error) {
+
+            // =========================================
+            // ERROR
+            // =========================================
+            console.error(
+                '[CAMINO VALIDATOR] VALIDATION ERROR:',
+                error
+            );
+
+
+            btn.innerHTML = `
+                <i class="fa fa-times"></i>
+                <span>ERROR</span>
+            `;
+
+
+            btn.classList.remove(
+                'camino-validator-success'
+            );
+
+
+            btn.classList.add(
+                'camino-validator-error'
+            );
+
+
+        } finally {
+
+            // =========================================
+            // REQUEST SELESAI
+            // =========================================
+            btn.dataset.validating = "0";
+
+
+            // Kalau SUKSES:
+            // tetap disabled.
+            if (
+                btn.dataset.validated === "1"
+            ) {
+
+                btn.disabled = true;
+
+            } else {
+
+                // Kalau ERROR:
+                // boleh retry.
+                btn.disabled = false;
+
+            }
+
+
+            console.log(
+                '[CAMINO VALIDATOR] Validation finished.'
+            );
+        }
+    });
+
+
+    row.appendChild(td);
+}
+
 function scanValidatorRows() {
+
+    // =========================================
+    // 1. CARI TABLE
+    // =========================================
+
+    document
+        .querySelectorAll('table')
+        .forEach(table => {
+
+            // Header dicek TERPISAH
+            // dari row
+            injectValidatorHeader(table);
+
+        });
+
+
+    // =========================================
+    // 2. CARI ROW
+    // =========================================
 
     const rows =
         document.querySelectorAll(
-            'tbody tr[role="row"]'
+            'tbody tr'
         );
+
 
     rows.forEach(row => {
 
+        if (!row) return;
+
+
+        // =====================================
+        // PASTIKAN ADA CELL
+        // =====================================
+
+        const cells =
+            row.querySelectorAll('td');
+
+        if (!cells.length) {
+            return;
+        }
+
+
+        // =====================================
+        // PAYMENT TO
+        // =====================================
+
         const paymentTo =
-            row.querySelectorAll('td')[5];
+            cells[5];
 
         if (!paymentTo) {
             return;
         }
 
-        // Inject hanya cell validator
+
+        // =====================================
+        // PASTIKAN ADA TABLE
+        // =====================================
+
+        const table =
+            row.closest('table');
+
+        if (!table) {
+            return;
+        }
+
+
+        // =====================================
+        // INJECT CELL
+        // =====================================
+
         injectValidator(row);
+
     });
 }
 
+    // Initial scan
+    scanValidatorRows();
 
-
-// =========================================
-// INITIAL SCAN
-// =========================================
-
-scanValidatorRows();
-
-
-// =========================================
-// MONITOR TABLE
-// =========================================
-
-const observer =
-    new MutationObserver(() => {
-
+    // Monitor perubahan table
+    const observer = new MutationObserver(() => {
         scanValidatorRows();
-
     });
 
-observer.observe(document.body, {
-    childList: true,
-    subtree: true
-});
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
 
 })();
 
@@ -6743,31 +7192,44 @@ observer.observe(document.body, {
     style.textContent = `
 
 /* =========================================================
-   CELL
+   CAMINO TABLE VALIDATOR
    ========================================================= */
 
-.camino-validator-cell {
+/* =========================================================
+   CAMINO VALIDATOR COLUMN
+   ========================================================= */
+
+.camino-validator-cell,
+.camino-validator-header {
+
     width: 260px !important;
     min-width: 260px !important;
     max-width: 260px !important;
-
-    padding: 10px 12px !important;
-
-    text-align: center !important;
-    vertical-align: middle !important;
 
     box-sizing: border-box !important;
 }
 
 
 /* =========================================================
-   CAMINO VALIDATOR HEADER
+   CELL
+   ========================================================= */
+
+.camino-validator-cell {
+
+    padding: 10px 12px !important;
+
+    text-align: center !important;
+    vertical-align: middle !important;
+
+    white-space: normal !important;
+}
+
+
+/* =========================================================
+   HEADER
    ========================================================= */
 
 .camino-validator-header {
-    width: 260px !important;
-    min-width: 260px !important;
-    max-width: 260px !important;
 
     padding: 10px 12px !important;
 
@@ -6775,8 +7237,6 @@ observer.observe(document.body, {
     vertical-align: middle !important;
 
     white-space: nowrap !important;
-
-    box-sizing: border-box !important;
 }
 
 
@@ -6789,7 +7249,6 @@ observer.observe(document.body, {
     display: flex !important;
 
     width: 100% !important;
-    height: 100% !important;
 
     align-items: center !important;
     justify-content: center !important;
@@ -6808,9 +7267,8 @@ observer.observe(document.body, {
 
     color: inherit;
 
-    box-sizing: border-box;
+    box-sizing: border-box !important;
 }
-
 
 /* =========================================================
    HEADER INDICATOR
