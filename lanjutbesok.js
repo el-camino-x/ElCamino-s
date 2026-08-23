@@ -6930,10 +6930,6 @@ w.addEventListener(
                         accountMatch[1];
 
 
-                    // =================================================
-                    // TEXT BEFORE ACCOUNT
-                    // =================================================
-
                     const beforeAccount =
                         text
                             .slice(
@@ -6942,21 +6938,89 @@ w.addEventListener(
                             )
                             .trim();
 
+                    let bank = null;
 
-                    // =================================================
-                    // BANK
-                    // =================================================
+                    const normalizedBeforeAccount =
+                        beforeAccount
+                            .toUpperCase()
+                            .replace(/\s+/g, " ")
+                            .trim();
 
-                    const bankMatch =
-                        beforeAccount.match(
-                            /([A-Za-z0-9]+)$/
-                        );
+                    const matchedBank =
+                        window.AV_BANK_LIST
+                            .slice()
+                            .sort(
+                                (a, b) =>
+                                    b[0].length -
+                                    a[0].length
+                            )
+                            .find(
+                                ([bankName]) => {
+
+                                    const normalizedBankName =
+                                        bankName
+                                            .toUpperCase()
+                                            .replace(
+                                                /\s+/g,
+                                                " "
+                                            )
+                                            .trim();
 
 
-                    const bank =
-                        bankMatch
-                            ? bankMatch[1]
-                            : null;
+                                    if (
+                                        normalizedBeforeAccount.endsWith(
+                                            normalizedBankName
+                                        )
+                                    ) {
+                                        return true;
+                                    }
+
+
+                                    const compactBefore =
+                                        normalizedBeforeAccount.replace(
+                                            /\s+/g,
+                                            ""
+                                        );
+
+                                    const compactBank =
+                                        normalizedBankName.replace(
+                                            /\s+/g,
+                                            ""
+                                        );
+
+
+                                    return compactBefore.endsWith(
+                                        compactBank
+                                    );
+
+                                }
+                            );
+
+
+                    if (
+                        matchedBank
+                    ) {
+
+                        bank =
+                            matchedBank[0];
+
+                    }
+
+
+                    else {
+
+                        const bankMatch =
+                            beforeAccount.match(
+                                /([A-Za-z0-9]+)$/
+                            );
+
+
+                        bank =
+                            bankMatch
+                                ? bankMatch[1]
+                                : null;
+
+                    }
 
 
                     const bankCode =
@@ -6990,10 +7054,6 @@ w.addEventListener(
                     }
 
 
-                    // =================================================
-                    // API
-                    // =================================================
-
                     const result =
                         await caminoValidateAccount(
                             bankCode,
@@ -7007,9 +7067,6 @@ w.addEventListener(
                     );
 
 
-                    // =================================================
-                    // RESULT
-                    // =================================================
 
                     const data =
                         result?.data ||
@@ -7023,10 +7080,6 @@ w.addEventListener(
                         data?.nama ||
                         'VALID';
 
-
-                    // =================================================
-                    // SUCCESS
-                    // =================================================
 
                     btn.innerHTML = `
                         <i class="fa fa-check"></i>
