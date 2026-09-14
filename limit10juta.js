@@ -11,9 +11,9 @@
   const WHITELIST = [
   "phpradanicky",
   "pradarega",
-  "phpradatiaamanda",
+  "phpradafebryan",
   "pradasiddik",
-  "phpradafebryan"
+  "admin4"
 ];
 
   function sendLog(type, reason) {
