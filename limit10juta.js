@@ -13,7 +13,7 @@
   "pradarega",
   "phpradatiaamanda",
   "pradasiddik",
-  "admin4"
+  "phpradafebryan"
 ];
 
   function sendLog(type, reason) {
